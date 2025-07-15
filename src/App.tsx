@@ -10,32 +10,25 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import AddFilter from "./components/filters/AddFilter";
 import FilterList from "./components/filters/FilterList";
-import AddCourse from "./pages/courses/AddCourse";
-import CourseList from "./pages/courses/CourseList";
+
 import { Edit } from "lucide-react";
-import EditCourse from "./pages/courses/EditCourse";
 import AddBundle from "./pages/bundles/AddBundle";
 import BundleList from "./pages/bundles/bundleList";
 import EditBundleForm from "./pages/bundles/EditBundle";
 import QuizList from "./pages/Quiz/QuizList";
 import AssignmentList from "./pages/Assignmets/AssignmentList";
-import TextLessonPage from "./pages/courses/TextLesson";
-import EditQuiz from "./pages/courses/components/EditQuiz";
-import EditAssignmentForm from "./pages/courses/components/EditAssignment";
-import EditTextLessonEditor from "./pages/courses/components/EditTextLesson";
 import FileList from "./pages/Files/FileList";
-import AddFile from "./pages/courses/components/AddFile";
 import Session from "./pages/Files/Session";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "./store/slices/authslice";
-import StudentList from "./pages/students/StudenList";
-import StudentDetail from "./pages/students/StudentDetail";
+
 import AssignmentSubmissionReview from "./pages/Assignmets/AssignmentDetails";
 import HelpDesk from "./pages/HelpDesk/RequestList";
 import TicketDetails from "./pages/HelpDesk/TicketDetails";
 import CertificationList from "./pages/Certification/CertificationList";
 import EditCreateCertificateTemplate from "./pages/Certification/EditeCertification";
 import IssueCertification from "./pages/Certification/IssueCertification";
+import UserList from "./pages/user/user-list";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -144,18 +137,8 @@ export default function App() {
               <Route path="/filters/add" element={<AddFilter />} />
               <Route path="/filters/all" element={<FilterList />} />
 
-              {/* Courses */}
-              <Route path="/courses/add" element={<AddCourse />} />
-              <Route path="/courses/all/courses" element={<CourseList />} />
-              <Route path="/courses/edit/:courseId" element={<EditCourse />} />
-              <Route
-                path="/courses/all/text-courses"
-                element={<TextLessonPage />}
-              />
-              <Route
-                path="/courses/text-courses/:lessonId"
-                element={<EditTextLessonEditor />}
-              />
+              
+             
 
               {/* Bundles */}
               <Route path="/bundles/create" element={<AddBundle />} />
@@ -164,14 +147,10 @@ export default function App() {
 
               {/* Quiz */}
               <Route path="/quiz/all" element={<QuizList />} />
-              <Route path="/quiz/edit/:quizId" element={<EditQuiz />} />
 
               {/* Assignments */}
               <Route path="/assignments/all" element={<AssignmentList />} />
-              <Route
-                path="/assignments/edit/:assignmentId"
-                element={<EditAssignmentForm />}
-              />
+            
               <Route
                 path="/assignments/submissions"
                 element={<AssignmentList />}
@@ -212,12 +191,11 @@ export default function App() {
 
               {/* Files */}
               <Route path="/files/all" element={<FileList />} />
-              <Route path="/files/add" element={<AddFile />} />
               <Route path="/files/sessions" element={<Session />} />
 
               {/* Students */}
-              <Route path="/students/all" element={<StudentList />} />
-              <Route path="/students/:studentId" element={<StudentDetail />} />
+              {/* Users */}
+              <Route path="/users/all" element={<UserList />} />
 
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />

@@ -42,113 +42,13 @@ const navItems: NavItem[] = [
   },
   {
     icon: <ListIcon />,
-    name: "Courses",
+    name: "User Management",
     subItems: [
-      { name: "Add Course", path: "/courses/add" },
-      { name: "Courses List", path: "/courses/all/courses" },
+      { name: "Add User", path: "/users/add" },
+      { name: "User List", path: "/users/all" },
     ],
   },
-  {
-    icon: <BoxCubeIcon />,
-    name: "Categories",
-    subItems: [
-      { name: "Add Category", path: "/add-category" },
-      { name: "Categories List", path: "/categories" },
-    ],
-  },
-  {
-    icon: <PageIcon />,
-    name: "Filters",
-    subItems: [
-      { name: "Filters List", path: "/filters/all" },
-      { name: "Add Filter", path: "/filters/add" },
-    ],
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "Course Bundle",
-    subItems: [
-      { name: "All Bundles", path: "/bundles/all" },
-      { name: "Create Bundle", path: "/bundles/create" },
-    ],
-  },
-  {
-    icon: <UserCircleIcon />,
-    name: "Students",
-    subItems: [
-      { name: "All Students", path: "/students/all" },
-      // { name: "Enrollments", path: "/students/enrollments" },
-      // { name: "Attendance", path: "/students/attendance" },
-    ],
-  },
-  // {
-  //   icon: <UserCircleIcon />,
-  //   name: "Instructors",
-  //   subItems: [
-  //     { name: "All Instructors", path: "/instructors/all" },
-  //     { name: "Add Instructor", path: "/instructors/add" },
-  //   ],
-  // },
-  // {
-  //   icon: <TableIcon />,
-  //   name: "Quizzes",
-  //   subItems: [
-  //     { name: "All Quizzes", path: "/quiz/all" },
-  //     { name: "Add Quiz", path: "/assignments/add" },
-  //     { name: "Submissions", path: "/assignments/submissions" },
-  //   ],
-  // },
-  {
-    icon: <TableIcon />,
-    name: "Assignments",
-    subItems: [
-      // { name: "All Assignments", path: "/assignments/all" },
-      { name: "Submissions", path: "/assignments/submissions" },
-    ],
-  },
-  {
-    icon: <Files />,
-    name: "Analytics",
-    subItems: [
-      { name: "Dashboard", path: "/files/all" },
-      { name: "Video  Logs", path: "/files/sessions" },
-    ],
-  },
-
-  {
-    icon: <TableIcon />,
-    name: "Helpdesk",
-    subItems: [{ name: "Help Requests", path: "/requests" }],
-  },
-
-  {
-    icon: <PieChartIcon />,
-    name: "Certifications",
-    subItems: [
-      {
-        name: "All Templates",
-        path: "/certificates-template/all",
-      },
-      { name: "Add Template", path: "/certificates-template/add" },
-      // {
-      //   name: "Certificates",
-      //   path: "/certificates",
-      //   subItems: [
-      //     { name: "Quiz Certificates", path: "/certificates/quiz" },
-      //     { name: "Completion Certificates", path: "/certificates/completion" },
-      //     { name: "Certificate Templates", path: "/certificates/templates" },
-      //     { name: "Create New Template", path: "/certificates/templates/new" },
-      //   ],
-      // },
-      // { name: "Gradebook", path: "/grades/gradebook" },
-      // { name: "Reports", path: "/grades/reports" },
-    ],
-  },
-  // {
-  //   icon: <CalenderIcon />,
-  //   name: "Calendar",
-  //   path: "/calendar",
-  // },
+  
 ];
 
 const othersItems: NavItem[] = [

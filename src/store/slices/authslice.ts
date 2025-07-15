@@ -49,7 +49,7 @@ export const login = createAsyncThunk<
     );
     console.log("Login response:", response);
 
-    const data = response.data;
+    const data = response;
 
     // Store tokens and user using correct keys from response
     if (data.data?.access) {
@@ -59,13 +59,10 @@ export const login = createAsyncThunk<
     if (data.data?.refresh) {
       localStorage.setItem("refreshToken", data.data.refresh);
     }
-    if (data.data?.user) {
-      localStorage.setItem("user", JSON.stringify(data.data.user));
-    }
+   
 
     // Return all required fields for state update
     return {
-      user: data.data.user,
       accessToken: data.data.access,
       refreshToken: data.data.refresh,
     };
@@ -549,7 +546,7 @@ export const { clearError, clearStatuses, setCredentials, clearCredentials } =
 
 // Selectors with proper typing
 export const selectCurrentUser = (state: { auth: AuthState }) =>
-  state.auth.user;
+  state.auth.token;
 export const selectToken = (state: { auth: AuthState }) => state.auth.token;
 export const selectIsAuthenticated = (state: { auth: AuthState }) =>
   state.auth.isAuthenticated;

@@ -15,11 +15,11 @@ import drip from "./slices/drip";
 import vedio from "./slices/vedio";
 import anayltics from "./slices/anayltics";
 import plans from "./slices/plans";
-import studentsSlice from "./slices/students";
 import Support from "./slices/support";
 import certificateReducer from "./slices/certificate";
 import dashboardReducer from "./slices/dashboard";
 import issueCertificate from "./slices/IssuesCertification";
+import user from "./slices/user";
 
 export const store = configureStore({
   reducer: {
@@ -34,11 +34,11 @@ export const store = configureStore({
     courseBundle: CourseBundle,
     quiz: quiz,
     drip: drip,
+    users: user,
     vedio: vedio,
     file: file,
     analytics: anayltics,
     plan: plans,
-    students: studentsSlice,
     support: Support,
     dashboard: dashboardReducer,
     certificate: certificateReducer, // Assuming you have a certificate reducer
