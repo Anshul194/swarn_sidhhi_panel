@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import axiosInstance from "../../services/axiosConfig";
 import type {
   User,
-  LoginCredentials,
   SignupData,
   AuthResponse,
   AuthState,
@@ -13,9 +12,11 @@ import type {
 } from "../../types/auth";
 
 // API base URL
-const API_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3000/";
+
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "https://test.swarnsiddhi.com/admin/api/v1";
 
 // Helper function to handle API errors
+
 const handleApiError = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     return error.response?.data?.message || error.message || "Network error";
@@ -24,48 +25,59 @@ const handleApiError = (error: unknown): string => {
 };
 
 // Async thunks for API calls
+
+// login api call 
+
 export const login = createAsyncThunk<
   AuthResponse,
-  LoginCredentials,
+  { username: string; password: string },
   { rejectValue: string }
 >("auth/login", async (credentials, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.post<ApiResponse<AuthResponse>>(
-      `${API_BASE_URL}/login`,
+      `${API_BASE_URL}/auth/login/`,
       {
-        email: credentials.email,
+        username: credentials.username,
         password: credentials.password,
       },
       {
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
       }
     );
+    console.log("Login response:", response);
 
     const data = response.data;
 
-    // Store tokens in localStorage
-    if (data.data?.accessToken) {
-      localStorage.setItem("token", data.data.accessToken);
-      localStorage.setItem("accessToken", data.data.accessToken);
+    // Store tokens and user using correct keys from response
+    if (data.data?.access) {
+      localStorage.setItem("token", data.data.access);
+      localStorage.setItem("accessToken", data.data.access);
     }
-    if (data.data?.refreshToken) {
-      localStorage.setItem("refreshToken", data.data.refreshToken);
+    if (data.data?.refresh) {
+      localStorage.setItem("refreshToken", data.data.refresh);
     }
     if (data.data?.user) {
       localStorage.setItem("user", JSON.stringify(data.data.user));
     }
 
+    // Return all required fields for state update
     return {
       user: data.data.user,
-      accessToken: data.data.accessToken,
-      refreshToken: data.data.refreshToken,
+      accessToken: data.data.access,
+      refreshToken: data.data.refresh,
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Login error:", error.message);
     return rejectWithValue(handleApiError(error));
   }
 });
+
+
+
+// signup api call
 
 export const signup = createAsyncThunk<
   AuthResponse,
@@ -95,7 +107,7 @@ export const signup = createAsyncThunk<
     const data = response.data;
 
     console.log("Signup data:", data);
-    // Store tokens in localStorage
+
     if (data.data?.accessToken) {
       localStorage.setItem("token", data.data.accessToken);
       localStorage.setItem("accessToken", data.data.accessToken);
@@ -117,6 +129,9 @@ export const signup = createAsyncThunk<
     return rejectWithValue(handleApiError(error));
   }
 });
+
+
+// Logout API call
 
 export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
   "auth/logout",
@@ -141,9 +156,8 @@ export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
 
-      window.location.href = "/signin"; // Redirect to login page
+      window.location.href = "/signin"; 
     } catch (error) {
-      // Clear tokens even on error
       localStorage.removeItem("token");
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
@@ -151,6 +165,8 @@ export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
     }
   }
 );
+
+// Check authentication status API call
 
 export const checkAuthStatus = createAsyncThunk<
   { user: User; token: string },
@@ -334,7 +350,7 @@ const initialState: AuthState = {
   user: parseStoredUser(),
   token: localStorage.getItem("accessToken") || localStorage.getItem("token"),
   refreshToken: localStorage.getItem("refreshToken"),
-  isAuthenticated: !!parseStoredUser(),
+  isAuthenticated: !!(localStorage.getItem("accessToken") || localStorage.getItem("token")),
   status: "idle",
   error: null,
   loginStatus: "idle",
@@ -403,7 +419,8 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
-        state.isAuthenticated = true;
+        // Set isAuthenticated based on accessToken
+        state.isAuthenticated = !!action.payload.accessToken;
         state.error = null;
       })
       .addCase(login.rejected, (state, action) => {

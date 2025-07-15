@@ -39,7 +39,6 @@ import IssueCertification from "./pages/Certification/IssueCertification";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
-const SignUp = lazy(() => import("./pages/AuthPages/SignUp"));
 const NotFound = lazy(() => import("./pages/OtherPage/NotFound"));
 
 const UserProfiles = lazy(() => import("./pages/UserProfiles"));
@@ -126,9 +125,9 @@ export default function App() {
             }
           />
           <Route
-            path="/signup"
+            path="/signin"
             element={
-              !isAuthenticated ? <SignUp /> : <Navigate to="/" replace />
+              !isAuthenticated ? <SignIn /> : <Navigate to="/" replace />
             }
           />
 

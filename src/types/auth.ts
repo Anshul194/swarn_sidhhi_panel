@@ -19,12 +19,16 @@ export interface SignupData {
 }
 
 export interface AuthResponse {
+  refresh: string;
+  access: string;
   user: User;
   accessToken: string;
   refreshToken: string;
 }
 
 export interface ApiResponse<T> {
+  access: string;
+  refresh: string;
   success: boolean;
   message: string;
   data: T;

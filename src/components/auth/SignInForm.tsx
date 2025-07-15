@@ -23,11 +23,11 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: ""
   });
   const [formErrors, setFormErrors] = useState({
-    email: "",
+    username: "",
     password: ""
   });
 
@@ -49,7 +49,7 @@ export default function SignInForm() {
   }, [dispatch]);
 
   // Handle input changes
-  const handleInputChange = (field: "email" | "password", value: string) => {
+  const handleInputChange = (field: "username" | "password", value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -67,15 +67,14 @@ export default function SignInForm() {
   // Form validation
   const validateForm = () => {
     const errors = {
-      email: "",
+      username: "",
       password: ""
     };
 
-    if (!formData.email.trim()) {
-      errors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = "Please enter a valid email address";
-    }
+    if (!formData.username.trim()) {
+      errors.username = "Username is required";
+    } 
+    // Optionally add username format validation here
 
     if (!formData.password.trim()) {
       errors.password = "Password is required";
@@ -84,7 +83,7 @@ export default function SignInForm() {
     }
 
     setFormErrors(errors);
-    return !errors.email && !errors.password;
+    return !errors.username && !errors.password;
   };
 
   // Handle form submission
@@ -98,7 +97,7 @@ export default function SignInForm() {
     try {
      
       const result = await dispatch(login({
-        email: formData.email.trim(),
+        username: formData.username.trim(),
         password: formData.password.trim(),
       }));
 
@@ -131,7 +130,7 @@ export default function SignInForm() {
               Sign In
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your email and password to sign in!
+              Enter your username and password to sign in!
             </p>
           </div>
 
@@ -143,24 +142,22 @@ export default function SignInForm() {
           )}
 
           <div>
-          
-            
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Email <span className="text-error-500">*</span>
+                    Username <span className="text-error-500">*</span>
                   </Label>
                   <Input 
-                    placeholder="info@gmail.com" 
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    placeholder="Enter your username" 
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => handleInputChange("username", e.target.value)}
                     disabled={isLoading}
-                    className={formErrors.email ? "border-red-500" : ""}
+                    className={formErrors.username ? "border-red-500" : ""}
                   />
-                  {formErrors.email && (
-                    <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+                  {formErrors.username && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.username}</p>
                   )}
                 </div>
                 
@@ -231,8 +228,6 @@ export default function SignInForm() {
                 </div>
               </div>
             </form>
-
-          
           </div>
         </div>
       </div>
