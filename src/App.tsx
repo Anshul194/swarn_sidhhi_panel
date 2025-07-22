@@ -39,6 +39,9 @@ const FormElements = lazy(() => import("./pages/Forms/FormElements"));
 const AppLayout = lazy(() => import("./layout/AppLayout"));
 const Home = lazy(() => import("./pages/Dashboard/Home"));
 
+const AddRashi = lazy(() => import("./pages/Content/Rashi/AddRashi"));
+const RashiList = lazy(() => import("./pages/Content/Rashi/RashiList"));
+
 
 // Simple modal wrapper for SignIn
 function SignInModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -137,8 +140,11 @@ export default function App() {
               <Route path="/content/add" element={<AddArticle></AddArticle>} />
               <Route path="/content/all" element={<ArticleList />} />
               <Route path="/articles/edit" element={<EditArticle />} />
-
-              {/* Settings */}
+ 
+            <Route path="/kundli/rashi/add" element={<AddRashi></AddRashi>} />
+            <Route path="/kundli/rashi/list" element={<RashiList />} />
+            <Route path="/kundli/planet/add" element={<div>Add Planet</div>} />
+            <Route path="/kundli/planet/list" element={<div>Planet List</div>} />
 
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />
