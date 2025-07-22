@@ -24,8 +24,8 @@ export const fetchAllUsers = createAsyncThunk<
   try {
     const queryParams = new URLSearchParams();
 
-    if (params.page) queryParams.append("page", String(params.page));
-    if (params.page_size) queryParams.append("page_size", String(params.page_size));
+    if (params.page !== undefined) queryParams.append("page", String(params.page));
+    if (params.page_size !== undefined) queryParams.append("page_size", String(params.page_size));
     if (params.search) queryParams.append("search", params.search);
     if (params.is_premium !== undefined) queryParams.append("is_premium", String(params.is_premium));
     if (params.is_active !== undefined) queryParams.append("is_active", String(params.is_active));
@@ -35,9 +35,9 @@ export const fetchAllUsers = createAsyncThunk<
     if (params.sort_by) queryParams.append("sort_by", params.sort_by);
     if (params.sort_order) queryParams.append("sort_order", params.sort_order);
 
-    // Fix: Use relative URL since axiosInstance already has baseURL
+    // Always pass all query params as required by the API
     const response = await axiosInstance.get(
-      `/users?${queryParams.toString()}`, // Remove API_BASE_URL from here
+      `/users?${queryParams.toString()}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -57,45 +57,100 @@ export const fetchAllUsers = createAsyncThunk<
   }
 });
 
-// Alternative approach if the above doesn't work
-export const fetchAllUsersAlternative = createAsyncThunk<
-  { users: any[]; pagination: any },
-  FetchUsersParams
->("users/fetchAllAlt", async (params: FetchUsersParams = {}, { rejectWithValue }) => {
+
+
+export const fetchUserById = createAsyncThunk<
+  any,
+  string,
+  { rejectValue: string }
+>("users/fetchById", async (user_id, { rejectWithValue }) => {
   try {
-    const queryParams = new URLSearchParams();
+    const response = await axiosInstance.get(`/users/${user_id}`, {
+      headers: {
+        "Accept": "application/json",
+      },
+    });
+    return response.data?.data || null;
+  } catch (error: any) {
+    console.error("Fetch user by ID error:", error);
+    return rejectWithValue(error.response?.data?.message || error.message);
+  }
+});
 
-    if (params.page) queryParams.append("page", String(params.page));
-    if (params.page_size) queryParams.append("page_size", String(params.page_size));
-    if (params.search) queryParams.append("search", params.search);
-    if (params.is_premium !== undefined) queryParams.append("is_premium", String(params.is_premium));
-    if (params.is_active !== undefined) queryParams.append("is_active", String(params.is_active));
-    if (params.is_blocked !== undefined) queryParams.append("is_blocked", String(params.is_blocked));
-    if (params.created_after) queryParams.append("created_after", params.created_after);
-    if (params.created_before) queryParams.append("created_before", params.created_before);
-    if (params.sort_by) queryParams.append("sort_by", params.sort_by);
-    if (params.sort_order) queryParams.append("sort_order", params.sort_order);
 
-    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-    
-    const response = await axiosInstance.get(
-      `/users?${queryParams.toString()}`,
+export interface BlockUserParams {
+  user_id: string;
+  is_blocked: boolean;
+  reason?: string;
+}
+
+export const blockUser = createAsyncThunk<
+  any,
+  BlockUserParams,
+  { rejectValue: string }
+>("users/blockUser", async (params, { rejectWithValue }) => {
+  try {
+    const { user_id, ...blockData } = params;
+    const response = await axiosInstance.post(
+      `/users/${user_id}/block/`,
+      blockData,
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
         },
       }
     );
-
-    const data = response.data?.data;
-
-    return {
-      users: data?.users || [],
-      pagination: data?.pagination || {},
-    };
+    return response.data?.data || null;
   } catch (error: any) {
-    console.error("Fetch users error:", error);
+    console.error("Block user error:", error);
+    return rejectWithValue(error.response?.data?.message || error.message);
+  }
+});
+
+
+
+export interface UpdateUserParams {
+  user_id: string;
+  name?: string;
+  email?: string;
+  phone_number?: string;
+  country_code?: string;
+  gender?: string;
+  lifestyle?: string;
+  date_of_birth?: string;
+  time_of_birth?: string;
+  place_of_birth?: string;
+  latitude?: number;
+  longitude?: number;
+  timezone?: string;
+  karma_type?: string;
+  grade?: string;
+  is_active?: boolean;
+  is_blocked?: boolean;
+  block_reason?: string;
+}
+
+export const updateUser = createAsyncThunk<
+  any,
+  UpdateUserParams,
+  { rejectValue: string }
+>("users/updateUser", async (params, { rejectWithValue }) => {
+  try {
+    const { user_id, ...updateData } = params;
+    const response = await axiosInstance.put(
+      `/users/${user_id}/`,
+      updateData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+      }
+    );
+    return response.data?.data || null;
+  } catch (error: any) {
+    console.error("Update user error:", error);
     return rejectWithValue(error.response?.data?.message || error.message);
   }
 });
@@ -167,6 +222,39 @@ const userSlice = createSlice({
         state.pagination = action.payload.pagination;
       })
       .addCase(fetchAllUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchUserById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userDetails = action.payload;
+      })
+      .addCase(fetchUserById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      }
+      )
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        // Update the user in the list if it exists
+        const index = state.users.findIndex(user => user.id === action.payload.id);
+        if (index !== -1) {
+          state.users[index] = action.payload;
+        }
+        // Also update userDetails if it matches
+        if (state.userDetails?.id === action.payload.id) {
+          state.userDetails = action.payload;
+        }
+      })
+      .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

@@ -8,27 +8,13 @@ import React from "react";
 import { lazy, Suspense, useState }from "react";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { ScrollToTop } from "./components/common/ScrollToTop";
-import AddFilter from "./components/filters/AddFilter";
-import FilterList from "./components/filters/FilterList";
-
 import { Edit } from "lucide-react";
-import AddBundle from "./pages/bundles/AddBundle";
-import BundleList from "./pages/bundles/bundleList";
-import EditBundleForm from "./pages/bundles/EditBundle";
-import QuizList from "./pages/Quiz/QuizList";
-import AssignmentList from "./pages/Assignmets/AssignmentList";
-import FileList from "./pages/Files/FileList";
-import Session from "./pages/Files/Session";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "./store/slices/authslice";
 
-import AssignmentSubmissionReview from "./pages/Assignmets/AssignmentDetails";
-import HelpDesk from "./pages/HelpDesk/RequestList";
-import TicketDetails from "./pages/HelpDesk/TicketDetails";
-import CertificationList from "./pages/Certification/CertificationList";
-import EditCreateCertificateTemplate from "./pages/Certification/EditeCertification";
-import IssueCertification from "./pages/Certification/IssueCertification";
 import UserList from "./pages/user/user-list";
+import UserEditForm from "./pages/user/userEditForm";
+import UserAnalytics from "./pages/Anayltics/userAnayltics";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -43,16 +29,12 @@ const Avatars = lazy(() => import("./pages/UiElements/Avatars"));
 const Buttons = lazy(() => import("./pages/UiElements/Buttons"));
 const LineChart = lazy(() => import("./pages/Charts/LineChart"));
 const BarChart = lazy(() => import("./pages/Charts/BarChart"));
-const Calendar = lazy(() => import("./pages/Calendar"));
 const BasicTables = lazy(() => import("./pages/Tables/BasicTables"));
 const FormElements = lazy(() => import("./pages/Forms/FormElements"));
-const AddCategory = lazy(() => import("./pages/AddCategory"));
-const CategoryList = lazy(() => import("./pages/CategoryList"));
+
+
 const AppLayout = lazy(() => import("./layout/AppLayout"));
 const Home = lazy(() => import("./pages/Dashboard/Home"));
-const CreateCertificateTemplate = lazy(
-  () => import("./pages/Certification/CreateCertificateTemplate")
-);
 
 // Simple modal wrapper for SignIn
 function SignInModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -129,73 +111,24 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route index path="/" element={<Home />} />
               <Route path="/profile" element={<UserProfiles />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/add-category" element={<AddCategory />} />
-              <Route path="/categories" element={<CategoryList />} />
-
               {/* Filters */}
-              <Route path="/filters/add" element={<AddFilter />} />
-              <Route path="/filters/all" element={<FilterList />} />
 
               
              
 
-              {/* Bundles */}
-              <Route path="/bundles/create" element={<AddBundle />} />
-              <Route path="/bundles/all" element={<BundleList />} />
-              <Route path="/bundles/:bundleId" element={<EditBundleForm />} />
-
-              {/* Quiz */}
-              <Route path="/quiz/all" element={<QuizList />} />
-
-              {/* Assignments */}
-              <Route path="/assignments/all" element={<AssignmentList />} />
             
-              <Route
-                path="/assignments/submissions"
-                element={<AssignmentList />}
-              />
-              <Route
-                path="/assignments/submissions/:id"
-                element={<AssignmentSubmissionReview />}
-              />
-
-              {/* Support Tickets */}
-              <Route
-                path="/support-tickets/view/:ticketId"
-                element={<TicketDetails isEditMode={false} />}
-              />
-              <Route
-                path="/support-tickets/edit/:ticketId"
-                element={<TicketDetails isEditMode={true} />}
-              />
-              <Route path="/requests" element={<HelpDesk />} />
-
-              {/* Certificates */}
-              <Route
-                path="/certificates-template/add"
-                element={<CreateCertificateTemplate />}
-              />
-              <Route
-                path="/certificates-template/all"
-                element={<CertificationList />}
-              />
-              <Route
-                path="/certificates-template/edit/:certificateId"
-                element={<EditCreateCertificateTemplate />}
-              />
-              <Route
-                path="/certificates/issue"
-                element={<IssueCertification />}
-              />
 
               {/* Files */}
-              <Route path="/files/all" element={<FileList />} />
-              <Route path="/files/sessions" element={<Session />} />
 
               {/* Students */}
               {/* Users */}
               <Route path="/users/all" element={<UserList />} />
+              <Route path="/users/:userId" element={<UserEditForm />} />
+
+
+              <Route path="/analytics/user" element={<UserAnalytics />} />
+
+              {/* User Management */}
 
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />

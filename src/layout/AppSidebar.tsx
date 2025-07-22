@@ -48,7 +48,21 @@ const navItems: NavItem[] = [
       { name: "User List", path: "/users/all" },
     ],
   },
-  
+  {
+    icon: <PageIcon />,
+    name: "Content Management",
+    subItems: [
+      { name: "Add Articles", path: "/content/add" },
+      { name: "Articles List", path: "/content/all" },
+    ],
+  },
+  {
+    icon: <PieChartIcon />,
+    name: "Analytics",
+    subItems: [
+      { name: "Overview", path: "/analytics/user" },
+    ],
+  },
 ];
 
 const othersItems: NavItem[] = [

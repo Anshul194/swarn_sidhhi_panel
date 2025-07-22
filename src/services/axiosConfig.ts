@@ -8,6 +8,7 @@ const axiosInstance: AxiosInstance = axios.create({
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   }
 });
 
@@ -19,12 +20,12 @@ axiosInstance.interceptors.request.use(
     
     if (token && config.headers) {
       config.headers['Authorization'] = `Bearer ${token}`;
-      config.headers['x-access-token'] = token;
+      // config.headers['x-access-token'] = token;
       
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (refreshToken) {
-        config.headers['x-refresh-token'] = refreshToken;
-      }
+      // const refreshToken = localStorage.getItem('refreshToken');
+      // if (refreshToken) {
+      //   config.headers['x-refresh-token'] = refreshToken;
+      // }
     }
     return config;
   },
