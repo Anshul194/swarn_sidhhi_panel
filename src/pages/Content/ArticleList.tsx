@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchArticles, deleteArticle } from "../../store/slices/content";
 import { Search, RotateCcw, Pencil, Trash, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const ArticleList: React.FC = () => {
   const dispatch = useDispatch();
@@ -78,6 +79,7 @@ const ArticleList: React.FC = () => {
     );
     setShowDeletePopup(false);
     setArticleToDelete(null);
+    toast.success("Article deleted successfully");
     dispatch(
       fetchArticles({
         token,

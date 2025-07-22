@@ -5,7 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import React from "react";
-import { lazy, Suspense, useState }from "react";
+import { lazy, Suspense, useState } from "react";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import { Edit } from "lucide-react";
@@ -18,6 +18,7 @@ import UserEditForm from "./pages/user/userEditForm";
 import UserAnalytics from "./pages/Anayltics/userAnayltics";
 import EditArticle from "./pages/Content/EditArticle";
 import AddArticle from "./pages/Content/AddArticle";
+import EditRashi from "./pages/Content/Rashi/EditRashi";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -35,16 +36,20 @@ const BarChart = lazy(() => import("./pages/Charts/BarChart"));
 const BasicTables = lazy(() => import("./pages/Tables/BasicTables"));
 const FormElements = lazy(() => import("./pages/Forms/FormElements"));
 
-
 const AppLayout = lazy(() => import("./layout/AppLayout"));
 const Home = lazy(() => import("./pages/Dashboard/Home"));
 
 const AddRashi = lazy(() => import("./pages/Content/Rashi/AddRashi"));
 const RashiList = lazy(() => import("./pages/Content/Rashi/RashiList"));
 
-
 // Simple modal wrapper for SignIn
-function SignInModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+function SignInModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   if (!open) return null;
   return (
     <div
@@ -70,7 +75,7 @@ function SignInModal({ open, onClose }: { open: boolean; onClose: () => void }) 
           minWidth: 350,
           boxShadow: "0 2px 16px rgba(0,0,0,0.2)",
         }}
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <Suspense fallback={<div>Loading...</div>}>
           <SignIn />
@@ -120,18 +125,12 @@ export default function App() {
               <Route path="/profile" element={<UserProfiles />} />
               {/* Filters */}
 
-              
-             
-
-            
-
               {/* Files */}
 
               {/* Students */}
               {/* Users */}
               <Route path="/users/all" element={<UserList />} />
               <Route path="/users/:userId" element={<UserEditForm />} />
-
 
               <Route path="/analytics/user" element={<UserAnalytics />} />
 
@@ -140,11 +139,18 @@ export default function App() {
               <Route path="/content/add" element={<AddArticle></AddArticle>} />
               <Route path="/content/all" element={<ArticleList />} />
               <Route path="/articles/edit" element={<EditArticle />} />
- 
-            <Route path="/kundli/rashi/add" element={<AddRashi></AddRashi>} />
-            <Route path="/kundli/rashi/list" element={<RashiList />} />
-            <Route path="/kundli/planet/add" element={<div>Add Planet</div>} />
-            <Route path="/kundli/planet/list" element={<div>Planet List</div>} />
+
+              <Route path="/kundli/rashi/add" element={<AddRashi></AddRashi>} />
+              <Route path="/kundli/rashi/list" element={<RashiList />} />
+              <Route path="/kundli/rashi/edit" element={<EditRashi />} />
+              <Route
+                path="/kundli/planet/add"
+                element={<div>Add Planet</div>}
+              />
+              <Route
+                path="/kundli/planet/list"
+                element={<div>Planet List</div>}
+              />
 
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />
@@ -179,7 +185,14 @@ export default function App() {
           />
         </Routes>
         {/* SignIn Popup */}
-        <SignInModal open={showSignIn && window.location.pathname !== "/signin" && window.location.pathname !== "/signup"} onClose={() => setShowSignIn(false)} />
+        <SignInModal
+          open={
+            showSignIn &&
+            window.location.pathname !== "/signin" &&
+            window.location.pathname !== "/signup"
+          }
+          onClose={() => setShowSignIn(false)}
+        />
       </Suspense>
     </Router>
   );
