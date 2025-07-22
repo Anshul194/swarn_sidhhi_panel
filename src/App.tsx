@@ -11,10 +11,13 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import { Edit } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "./store/slices/authslice";
+import ArticleList from "./pages/Content/ArticleList";
 
 import UserList from "./pages/user/user-list";
 import UserEditForm from "./pages/user/userEditForm";
 import UserAnalytics from "./pages/Anayltics/userAnayltics";
+import EditArticle from "./pages/Content/EditArticle";
+import AddArticle from "./pages/Content/AddArticle";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -35,6 +38,7 @@ const FormElements = lazy(() => import("./pages/Forms/FormElements"));
 
 const AppLayout = lazy(() => import("./layout/AppLayout"));
 const Home = lazy(() => import("./pages/Dashboard/Home"));
+
 
 // Simple modal wrapper for SignIn
 function SignInModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -128,7 +132,13 @@ export default function App() {
 
               <Route path="/analytics/user" element={<UserAnalytics />} />
 
-              {/* User Management */}
+              {/* Content Management */}
+
+              <Route path="/content/add" element={<AddArticle></AddArticle>} />
+              <Route path="/content/all" element={<ArticleList />} />
+              <Route path="/articles/edit" element={<EditArticle />} />
+
+              {/* Settings */}
 
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />
