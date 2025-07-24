@@ -29,6 +29,7 @@ import EditPersonality from "./pages/Content/numerology/personality/EditPersonal
 import AddYearPrediction from "./pages/Content/numerology/yearPredictions/AddYearPredictions";
 import YearPredictionsList from "./pages/Content/numerology/yearPredictions/YearPredictionsList";
 import EditYearPrediction from "./pages/Content/numerology/yearPredictions/EditYearPredictions";
+import AddPlanet from "./pages/Content/Planet/AddPlanet";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));

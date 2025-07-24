@@ -8,6 +8,7 @@ import vastuEntranceSlice from "./slices/vastuEntranceAnalysisSlice";
 import entranceChoiceSlice from "./slices/entranceChoiceSlice";
 import personalitySlice from "./slices/personality";
 import yearPredictionsSlice from "./slices/yearPredictions";
+import planetReducer from "./slices/planet";
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     entranceChoice: entranceChoiceSlice,
     personality: personalitySlice,
     yearPredictions: yearPredictionsSlice,
+    planet: planetReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
