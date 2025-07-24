@@ -155,7 +155,7 @@ export default function App() {
               <Route path="/kundli/rashi/edit" element={<EditRashi />} />
               <Route
                 path="/kundli/planet/add"
-                element={<div>Add Planet</div>}
+                element={<AddPlanet />}
               />
               <Route
                 path="/kundli/planet/list"
