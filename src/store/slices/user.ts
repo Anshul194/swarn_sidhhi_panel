@@ -2,7 +2,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../services/axiosConfig";
 
-const API_BASE_URL = import.meta.env.VITE_BASE_URL || "https://test.swarnsiddhi.com/admin/api/v1";
+const API_BASE_URL =
+  import.meta.env.VITE_BASE_URL || "https://test.swarnsiddhi.com/admin/api/v1";
 
 export interface FetchUsersParams {
   page?: number;
@@ -20,44 +21,53 @@ export interface FetchUsersParams {
 export const fetchAllUsers = createAsyncThunk<
   { users: any[]; pagination: any },
   FetchUsersParams
->("users/fetchAll", async (params: FetchUsersParams = {}, { rejectWithValue }) => {
-  try {
-    const queryParams = new URLSearchParams();
+>(
+  "users/fetchAll",
+  async (params: FetchUsersParams = {}, { rejectWithValue }) => {
+    try {
+      const queryParams = new URLSearchParams();
 
-    if (params.page !== undefined) queryParams.append("page", String(params.page));
-    if (params.page_size !== undefined) queryParams.append("page_size", String(params.page_size));
-    if (params.search) queryParams.append("search", params.search);
-    if (params.is_premium !== undefined) queryParams.append("is_premium", String(params.is_premium));
-    if (params.is_active !== undefined) queryParams.append("is_active", String(params.is_active));
-    if (params.is_blocked !== undefined) queryParams.append("is_blocked", String(params.is_blocked));
-    if (params.created_after) queryParams.append("created_after", params.created_after);
-    if (params.created_before) queryParams.append("created_before", params.created_before);
-    if (params.sort_by) queryParams.append("sort_by", params.sort_by);
-    if (params.sort_order) queryParams.append("sort_order", params.sort_order);
+      if (params.page !== undefined)
+        queryParams.append("page", String(params.page));
+      if (params.page_size !== undefined)
+        queryParams.append("page_size", String(params.page_size));
+      if (params.search) queryParams.append("search", params.search);
+      if (params.is_premium !== undefined)
+        queryParams.append("is_premium", String(params.is_premium));
+      if (params.is_active !== undefined)
+        queryParams.append("is_active", String(params.is_active));
+      if (params.is_blocked !== undefined)
+        queryParams.append("is_blocked", String(params.is_blocked));
+      if (params.created_after)
+        queryParams.append("created_after", params.created_after);
+      if (params.created_before)
+        queryParams.append("created_before", params.created_before);
+      if (params.sort_by) queryParams.append("sort_by", params.sort_by);
+      if (params.sort_order)
+        queryParams.append("sort_order", params.sort_order);
 
-    // Always pass all query params as required by the API
-    const response = await axiosInstance.get(
-      `/users?${queryParams.toString()}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+      // Always pass all query params as required by the API
+      const response = await axiosInstance.get(
+        `/users?${queryParams.toString()}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    const data = response.data?.data;
+      const data = response.data?.data;
 
-    return {
-      users: data?.users || [],
-      pagination: data?.pagination || {},
-    };
-  } catch (error: any) {
-    console.error("Fetch users error:", error);
-    return rejectWithValue(error.response?.data?.message || error.message);
+      return {
+        users: data?.users || [],
+        pagination: data?.pagination || {},
+      };
+    } catch (error: any) {
+      console.error("Fetch users error:", error);
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
   }
-});
-
-
+);
 
 export const fetchUserById = createAsyncThunk<
   any,
@@ -67,16 +77,16 @@ export const fetchUserById = createAsyncThunk<
   try {
     const response = await axiosInstance.get(`/users/${user_id}`, {
       headers: {
-        "Accept": "application/json",
+        Accept: "application/json",
       },
     });
-    return response.data?.data || null;
+    console.log("Fetch user by ID response:", response.data);
+    return response.data || null;
   } catch (error: any) {
     console.error("Fetch user by ID error:", error);
     return rejectWithValue(error.response?.data?.message || error.message);
   }
 });
-
 
 export interface BlockUserParams {
   user_id: string;
@@ -97,7 +107,7 @@ export const blockUser = createAsyncThunk<
       {
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
         },
       }
     );
@@ -107,8 +117,6 @@ export const blockUser = createAsyncThunk<
     return rejectWithValue(error.response?.data?.message || error.message);
   }
 });
-
-
 
 export interface UpdateUserParams {
   user_id: string;
@@ -138,16 +146,12 @@ export const updateUser = createAsyncThunk<
 >("users/updateUser", async (params, { rejectWithValue }) => {
   try {
     const { user_id, ...updateData } = params;
-    const response = await axiosInstance.put(
-      `/users/${user_id}/`,
-      updateData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-      }
-    );
+    const response = await axiosInstance.put(`/users/${user_id}/`, updateData, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
     return response.data?.data || null;
   } catch (error: any) {
     console.error("Update user error:", error);
@@ -236,8 +240,7 @@ const userSlice = createSlice({
       .addCase(fetchUserById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      }
-      )
+      })
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -245,7 +248,9 @@ const userSlice = createSlice({
       .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
         // Update the user in the list if it exists
-        const index = state.users.findIndex(user => user.id === action.payload.id);
+        const index = state.users.findIndex(
+          (user) => user.id === action.payload.id
+        );
         if (index !== -1) {
           state.users[index] = action.payload;
         }
