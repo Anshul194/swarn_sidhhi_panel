@@ -30,6 +30,12 @@ import AddYearPrediction from "./pages/Content/numerology/yearPredictions/AddYea
 import YearPredictionsList from "./pages/Content/numerology/yearPredictions/YearPredictionsList";
 import EditYearPrediction from "./pages/Content/numerology/yearPredictions/EditYearPredictions";
 import AddPlanet from "./pages/Content/Planet/AddPlanet";
+import AddMissingNumber from "./pages/Content/numerology/missingNumberRemedies/AddNumber";
+import MissingNumberList from "./pages/Content/numerology/missingNumberRemedies/NumberList";
+import EditMissingNumber from "./pages/Content/numerology/missingNumberRemedies/EditNumber";
+import AddRajyog from "./pages/Content/numerology/rajyog/AddRajyog";
+import RajyogsList from "./pages/Content/numerology/rajyog/RajyogList";
+import EditRajyog from "./pages/Content/numerology/rajyog/EditRajyog";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -154,10 +160,7 @@ export default function App() {
               <Route path="/kundli/rashi/add" element={<AddRashi></AddRashi>} />
               <Route path="/kundli/rashi/list" element={<RashiList />} />
               <Route path="/kundli/rashi/edit" element={<EditRashi />} />
-              <Route
-                path="/kundli/planet/add"
-                element={<AddPlanet />}
-              />
+              <Route path="/kundli/planet/add" element={<AddPlanet />} />
               <Route
                 path="/kundli/planet/list"
                 element={<div>Planet List</div>}
@@ -201,6 +204,24 @@ export default function App() {
                 path="/numerology/year-prediction/edit"
                 element={<EditYearPrediction />}
               />
+              <Route
+                path="/numerology/missing-number-remedies/add"
+                element={<AddMissingNumber />}
+              />
+              <Route
+                path="/numerology/missing-number-remedies/list"
+                element={<MissingNumberList />}
+              />
+              <Route
+                path="/numerology/missing-number-remedies/edit"
+                element={<EditMissingNumber />}
+              />
+              <Route path="/numerology/rajyogs/add" element={<AddRajyog />} />
+              <Route
+                path="/numerology/rajyogs/list"
+                element={<RajyogsList />}
+              />
+              <Route path="/numerology/rajyogs/edit" element={<EditRajyog />} />
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />
 

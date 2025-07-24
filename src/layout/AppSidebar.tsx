@@ -127,6 +127,34 @@ const navItems: NavItem[] = [
           },
         ],
       },
+      {
+        name: "Missing Number Remedies",
+        path: "/numerology/missing-number-remedies/list",
+        subItems: [
+          {
+            name: "Add Missing Number Remedy",
+            path: "/numerology/missing-number-remedies/add",
+          },
+          {
+            name: "Missing Number Remedies List",
+            path: "/numerology/missing-number-remedies/list",
+          },
+        ],
+      },
+      {
+        name: "Loshu Rajyogs",
+        path: "/numerology/rajyogs/list",
+        subItems: [
+          {
+            name: "Add Loshu Rajyog",
+            path: "/numerology/rajyogs/add",
+          },
+          {
+            name: "Loshu Rajyogs List",
+            path: "/numerology/rajyogs/list",
+          },
+        ],
+      },
     ],
   },
   {

@@ -14,22 +14,20 @@ import {
   Edit3,
   FileText,
   Languages,
-  User,
 } from "lucide-react";
-import { createPersonality } from "../../../../store/slices/personality";
+import { createYearPrediction } from "../../../../store/slices/yearPredictions";
+import { RootState } from "../../../../store";
+import { createMissingNumberRemedy } from "../../../../store/slices/missingNumber";
 
-const AddPersonality: React.FC = () => {
+const AddMissingNumber: React.FC = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state: RootState) => state.rashi);
 
   // Form state - removed title, titleHi, content, contentHi
-  const [mulank, setMulank] = useState(0);
-
+  const [number, setNumber] = useState(0);
   // Personality fields
-  const [positiveSide, setPositiveSide] = useState("");
-  const [positiveSideHi, setPositiveSideHi] = useState("");
-  const [negativeSide, setNegativeSide] = useState("");
-  const [negativeSideHi, setNegativeSideHi] = useState("");
+  const [text, setText] = useState("");
+  const [textHi, setTextHi] = useState("");
 
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [addedSuccess, setAddedSuccess] = useState(false);
@@ -87,19 +85,13 @@ const AddPersonality: React.FC = () => {
     if (activeLanguage === "en") {
       switch (activeEditor) {
         case "positive":
-          setPositiveSide(newValue);
-          break;
-        case "negative":
-          setNegativeSide(newValue);
+          setText(newValue);
           break;
       }
     } else {
       switch (activeEditor) {
         case "positive":
-          setPositiveSideHi(newValue);
-          break;
-        case "negative":
-          setNegativeSideHi(newValue);
+          setTextHi(newValue);
           break;
       }
     }
@@ -179,9 +171,9 @@ const AddPersonality: React.FC = () => {
   // Validate form - removed title and content validation
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
-    if (!mulank.trim()) errors.mulank = "Mulank number is required";
-    if (!positiveSide.trim()) errors.positiveSide = "Positive side is required";
-    if (!negativeSide.trim()) errors.negativeSide = "Negative side is required";
+
+    if (!number) errors.number = "Number is required";
+    if (!text.trim()) errors.text = "Text is required";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -191,29 +183,18 @@ const AddPersonality: React.FC = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    console.log("Submitting Rashi with data:", {
-      positiveSide,
-      positiveSideHi,
-      negativeSide,
-      negativeSideHi,
-    });
-
     dispatch(
-      createPersonality({
-        mulank_number: mulank,
-        positive_side: positiveSide,
-        positive_side_hi: positiveSideHi,
-        negative_side: negativeSide,
-        negative_side_hi: negativeSideHi,
+      createMissingNumberRemedy({
+        missing_number: number,
+        text: text,
+        text_hi: textHi,
       })
     ).then((action: any) => {
-      if (createPersonality.fulfilled.match(action)) {
+      if (createMissingNumberRemedy.fulfilled.match(action)) {
         setAddedSuccess(true);
-        setMulank("");
-        setPositiveSide("");
-        setPositiveSideHi("");
-        setNegativeSide("");
-        setNegativeSideHi("");
+        setNumber("");
+        setText("");
+        setTextHi("");
 
         setTimeout(() => setAddedSuccess(false), 2500);
       }
@@ -224,7 +205,7 @@ const AddPersonality: React.FC = () => {
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
         <Edit3 className="h-8 w-8" />
-        Add Personality - Personality Traits
+        Add Missing Number Remedy - Markdown Editor
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -255,8 +236,7 @@ const AddPersonality: React.FC = () => {
               }
               className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="positive">Positive Side</option>
-              <option value="negative">Negative Side</option>
+              <option value="positive">Prediction</option>
             </select>
           </div>
 
@@ -299,42 +279,35 @@ const AddPersonality: React.FC = () => {
         {/* Name Field */}
 
         {/* Personality Section Header */}
-        <div className="mb-4">
-          <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-            <User className="h-6 w-6" />
-            Personality Traits
-          </h3>
-          <p className="text-sm text-gray-600 mt-1">
-            Describe the positive and negative personality traits for this rashi
-          </p>
-        </div>
-        <div className="mb-6">
-          <label
-            htmlFor="mulank"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Mulank Number*
-          </label>
-          <input
-            id="mulank"
-            type="text"
-            value={mulank}
-            onChange={(e) => setMulank(e.target.value)}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-          />
-          {formErrors.mulank && (
-            <p className="mt-1 text-sm text-red-600">{formErrors.mulank}</p>
-          )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="">
+            <label
+              htmlFor="year_number"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Year Number*
+            </label>
+            <input
+              id="year_number"
+              type="text"
+              value={number}
+              onChange={(e) => setNumber(e.target.value)}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+            {formErrors.mulank && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.mulank}</p>
+            )}
+          </div>
         </div>
 
         {/* Positive Side Fields */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div>
             <label
-              htmlFor="positive_side"
+              htmlFor="prediction"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Positive Side (English) *{" "}
+              Prediction (English) *{" "}
               {activeLanguage === "en" && activeEditor === "positive" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}
@@ -343,23 +316,23 @@ const AddPersonality: React.FC = () => {
             activeLanguage === "en" &&
             activeEditor === "positive" ? (
               <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-green-50 overflow-auto prose max-w-none"
+                className="min-h-[200px] p-4 border border-gray-300 rounded-md  overflow-auto prose max-w-none"
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(positiveSide),
+                  __html: renderMarkdown(text),
                 }}
               />
             ) : (
               <textarea
-                id="positive_side"
-                value={positiveSide}
-                onChange={(e) => setPositiveSide(e.target.value)}
+                id="prediction"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
                 onFocus={() => {
                   setActiveEditor("positive");
                   setActiveLanguage("en");
                 }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-green-50"
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm "
                 rows={10}
-                placeholder="Describe positive personality traits using markdown..."
+                placeholder="Describe prediction ..."
               />
             )}
             {formErrors.positiveSide && (
@@ -371,10 +344,10 @@ const AddPersonality: React.FC = () => {
 
           <div>
             <label
-              htmlFor="positive_side_hi"
+              htmlFor="prediction_hi"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Positive Side (Hindi){" "}
+              Prediction (Hindi){" "}
               {activeLanguage === "hi" && activeEditor === "positive" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}
@@ -383,101 +356,23 @@ const AddPersonality: React.FC = () => {
             activeLanguage === "hi" &&
             activeEditor === "positive" ? (
               <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-green-50 overflow-auto prose max-w-none"
+                className="min-h-[200px] p-4 border border-gray-300 rounded-md  overflow-auto prose max-w-none"
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(positiveSideHi),
+                  __html: renderMarkdown(textHi),
                 }}
               />
             ) : (
               <textarea
-                id="positive_side_hi"
-                value={positiveSideHi}
-                onChange={(e) => setPositiveSideHi(e.target.value)}
+                id="prediction_hi"
+                value={textHi}
+                onChange={(e) => setTextHi(e.target.value)}
                 onFocus={() => {
                   setActiveEditor("positive");
                   setActiveLanguage("hi");
                 }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-green-50"
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
                 rows={10}
-                placeholder="सकारात्मक व्यक्तित्व लक्षणों का वर्णन करें..."
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Negative Side Fields */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label
-              htmlFor="negative_side"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Negative Side (English) *{" "}
-              {activeLanguage === "en" && activeEditor === "negative" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "negative" ? (
-              <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-red-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(negativeSide),
-                }}
-              />
-            ) : (
-              <textarea
-                id="negative_side"
-                value={negativeSide}
-                onChange={(e) => setNegativeSide(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("negative");
-                  setActiveLanguage("en");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-red-50"
-                rows={10}
-                placeholder="Describe negative personality traits using markdown..."
-              />
-            )}
-            {formErrors.negativeSide && (
-              <p className="mt-1 text-sm text-red-600">
-                {formErrors.negativeSide}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="negative_side_hi"  
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Negative Side (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "negative" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "negative" ? (
-              <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-red-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(negativeSideHi),
-                }}
-              />
-            ) : (
-              <textarea
-                id="negative_side_hi"
-                value={negativeSideHi}
-                onChange={(e) => setNegativeSideHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("negative");
-                  setActiveLanguage("hi");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-red-50"
-                rows={10}
-                placeholder="नकारात्मक व्यक्तित्व लक्षणों का वर्णन करें..."
+                placeholder=" भविष्यवाणी का वर्णन करें..."
               />
             )}
           </div>
@@ -488,12 +383,12 @@ const AddPersonality: React.FC = () => {
           className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
           disabled={loading}
         >
-          {loading ? "Adding..." : "Add Personality"}
+          {loading ? "Adding..." : "Add Missing Number"}
         </button>
 
         {addedSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
-            Rashi added successfully!
+            Missing number added successfully!
           </div>
         )}
         {error && <div className="mt-4 text-red-600">{error}</div>}
@@ -502,4 +397,4 @@ const AddPersonality: React.FC = () => {
   );
 };
 
-export default AddPersonality;
+export default AddMissingNumber;
