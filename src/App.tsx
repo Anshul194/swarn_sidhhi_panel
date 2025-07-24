@@ -19,6 +19,16 @@ import UserAnalytics from "./pages/Anayltics/userAnayltics";
 import EditArticle from "./pages/Content/EditArticle";
 import AddArticle from "./pages/Content/AddArticle";
 import EditRashi from "./pages/Content/Rashi/EditRashi";
+import AddVastuEntrance from "./pages/Content/vastu/entranceAnalysis/AddEntrance";
+import EntranceAnalysisList from "./pages/Content/vastu/entranceAnalysis/EntranceList";
+import EntranceList from "./pages/Content/vastu/entrance/EntranceList";
+import EditVastuEntrance from "./pages/Content/vastu/entranceAnalysis/EditEntrance";
+import AddPersonality from "./pages/Content/numerology/personality/AddPersonality";
+import PersonalityList from "./pages/Content/numerology/personality/personalityList";
+import EditPersonality from "./pages/Content/numerology/personality/EditPersonality";
+import AddYearPrediction from "./pages/Content/numerology/yearPredictions/AddYearPredictions";
+import YearPredictionsList from "./pages/Content/numerology/yearPredictions/YearPredictionsList";
+import EditYearPrediction from "./pages/Content/numerology/yearPredictions/EditYearPredictions";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -152,6 +162,44 @@ export default function App() {
                 element={<div>Planet List</div>}
               />
 
+              <Route
+                path="/vastu/entrance/analysis/add"
+                element={<AddVastuEntrance />}
+              />
+              <Route
+                path="/vastu/entrance/analysis/list"
+                element={<EntranceAnalysisList />}
+              />
+              <Route
+                path="/vastu/entrance/analysis/edit"
+                element={<EditVastuEntrance />}
+              />
+
+              <Route path="/vastu/entrance/list" element={<EntranceList />} />
+              <Route
+                path="/numerology/personality/add"
+                element={<AddPersonality />}
+              />
+              <Route
+                path="/numerology/personality/list"
+                element={<PersonalityList />}
+              />
+              <Route
+                path="/numerology/personality/edit"
+                element={<EditPersonality />}
+              />
+              <Route
+                path="/numerology/year-prediction/add"
+                element={<AddYearPrediction />}
+              />
+              <Route
+                path="/numerology/year-prediction/list"
+                element={<YearPredictionsList />}
+              />
+              <Route
+                path="/numerology/year-prediction/edit"
+                element={<EditYearPrediction />}
+              />
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />
 

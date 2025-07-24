@@ -63,27 +63,77 @@ const navItems: NavItem[] = [
           { name: "Add Planet", path: "/kundli/planet/add" },
           { name: "Planet List", path: "/kundli/planet/list" },
         ],
-      }
+      },
+    ],
+  },
+  {
+    icon: <PageIcon />,
+    name: "Vastu Management",
+    subItems: [
+      {
+        name: "Entrance Analysis",
+        path: "/vastu/entrance/list",
+        subItems: [
+          {
+            name: "Add Entrance Analysis",
+            path: "/vastu/entrance/analysis/add",
+          },
+          {
+            name: "Entrance Analysis List",
+            path: "/vastu/entrance/analysis/list",
+          },
+        ],
+      },
+
+      {
+        name: "Vastu Element",
+        path: "/vastu/elements/list",
+        subItems: [
+          // { name: "Add Entrance", path: "/vastu/entrance/add" },
+          { name: "Entrance List", path: "/vastu/entrance/list" },
+        ],
+      },
+    ],
+  },
+  {
+    icon: <PageIcon />,
+    name: "Numerology Management",
+    subItems: [
+      {
+        name: "Personality",
+        path: "/numerology/personality/list",
+        subItems: [
+          {
+            name: "Add Personality",
+            path: "/numerology/personality/add",
+          },
+          {
+            name: "Personality List",
+            path: "/numerology/personality/list",
+          },
+        ],
+      },
+      {
+        name: "Year Prediction",
+        path: "/numerology/year-prediction/list",
+        subItems: [
+          {
+            name: "Add Year Prediction",
+            path: "/numerology/year-prediction/add",
+          },
+          {
+            name: "Year Prediction List",
+            path: "/numerology/year-prediction/list",
+          },
+        ],
+      },
     ],
   },
   {
     icon: <PieChartIcon />,
     name: "Analytics",
-    subItems: [
-      { name: "Overview", path: "/analytics/user" },
-    ],
+    subItems: [{ name: "Overview", path: "/analytics/user" }],
   },
-];
-
-const othersItems: NavItem[] = [
-  // {
-  //   icon: <PlugInIcon />,
-  //   name: "Settings",
-  //   subItems: [
-  //     { name: "Profile Settings", path: "/settings/profile" },
-  //     { name: "Account Settings", path: "/settings/account" },
-  //   ],
-  // },
 ];
 
 const AppSidebar: React.FC = () => {
@@ -372,9 +422,9 @@ const AppSidebar: React.FC = () => {
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
         ${
           isExpanded || isMobileOpen
-            ? "w-[290px]"
+            ? "w-[300px]"
             : isHovered
-            ? "w-[290px]"
+            ? "w-[300px]"
             : "w-[90px]"
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
@@ -434,25 +484,8 @@ const AppSidebar: React.FC = () => {
               </h2>
               {renderMenuItems(navItems, "main")}
             </div>
-            <div className="">
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
-            </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );

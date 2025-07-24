@@ -4,6 +4,10 @@ import anayltics from "./slices/anayltics";
 import user from "./slices/user";
 import content from "./slices/content";
 import rashi from "./slices/rashi";
+import vastuEntranceSlice from "./slices/vastuEntranceAnalysisSlice";
+import entranceChoiceSlice from "./slices/entranceChoiceSlice";
+import personalitySlice from "./slices/personality";
+import yearPredictionsSlice from "./slices/yearPredictions";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +16,10 @@ export const store = configureStore({
     content: content,
     analytics: anayltics,
     rashi: rashi,
+    vastuEntrance: vastuEntranceSlice,
+    entranceChoice: entranceChoiceSlice,
+    personality: personalitySlice,
+    yearPredictions: yearPredictionsSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
