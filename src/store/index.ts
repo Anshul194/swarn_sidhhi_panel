@@ -4,6 +4,7 @@ import anayltics from "./slices/anayltics";
 import user from "./slices/user";
 import content from "./slices/content";
 import rashi from "./slices/rashi";
+import planetReducer from './slices/planet';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     content: content,
     analytics: anayltics,
     rashi: rashi,
+    planet: planetReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
