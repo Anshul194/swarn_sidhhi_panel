@@ -51,15 +51,23 @@ const AddPlanet: React.FC = () => {
     let textarea: HTMLTextAreaElement | null = null;
     if (activeLanguage === "en") {
       if (activeEditor === "content") {
-        textarea = document.getElementById("description_en") as HTMLTextAreaElement;
+        textarea = document.getElementById(
+          "description_en"
+        ) as HTMLTextAreaElement;
       } else {
-        textarea = document.getElementById("short_description_en") as HTMLTextAreaElement;
+        textarea = document.getElementById(
+          "short_description_en"
+        ) as HTMLTextAreaElement;
       }
     } else {
       if (activeEditor === "content") {
-        textarea = document.getElementById("description_hi") as HTMLTextAreaElement;
+        textarea = document.getElementById(
+          "description_hi"
+        ) as HTMLTextAreaElement;
       } else {
-        textarea = document.getElementById("short_description_hi") as HTMLTextAreaElement;
+        textarea = document.getElementById(
+          "short_description_hi"
+        ) as HTMLTextAreaElement;
       }
     }
     if (!textarea) return;
@@ -161,8 +169,10 @@ const AddPlanet: React.FC = () => {
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
     if (!name.trim()) errors.name = "Name is required";
-    if (!descriptionEn.trim()) errors.description_en = "Description (English) is required";
-    if (!descriptionHi.trim()) errors.description_hi = "Description (Hindi) is required";
+    if (!descriptionEn.trim())
+      errors.description_en = "Description (English) is required";
+    if (!descriptionHi.trim())
+      errors.description_hi = "Description (Hindi) is required";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -175,12 +185,9 @@ const AddPlanet: React.FC = () => {
     dispatch(
       createPlanet({
         name,
-        description: descriptionEn, // fallback to English for main description
+        description: shortDescriptionEn, // fallback to English for main description
         description_en: descriptionEn,
         description_hi: descriptionHi,
-        short_description: shortDescriptionEn, // fallback to English for main short description
-        short_description_en: shortDescriptionEn,
-        short_description_hi: shortDescriptionHi,
       })
     ).then((action: any) => {
       if (createPlanet.fulfilled.match(action)) {
@@ -314,12 +321,12 @@ const AddPlanet: React.FC = () => {
               ))}
             </select>
           </div>
-          <div>
+          <div className="col-span-2">
             <label
               htmlFor="title"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Short Description (English){" "}
+              Description (General){" "}
               {activeLanguage === "en" && activeEditor === "title" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}
@@ -353,41 +360,6 @@ const AddPlanet: React.FC = () => {
               </p>
             )}
           </div>
-
-          <div>
-            <label
-              htmlFor="title_hi"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Short Description (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "title" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "title" ? (
-              <div
-                className="min-h-[2.5rem] p-2 border border-gray-300 rounded-md bg-gray-50"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(titleHi) }}
-              />
-            ) : (
-              <textarea
-                id="short_description_hi"
-                value={shortDescriptionHi}
-                onChange={(e) => setShortDescriptionHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("title");
-                  setActiveLanguage("hi");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={6}
-                aria-required="true"
-                aria-describedby="content-error"
-                placeholder="Enter your markdown content here..."
-              />
-            )}
-          </div>
         </div>
 
         {/* Content Fields */}
@@ -397,7 +369,7 @@ const AddPlanet: React.FC = () => {
               htmlFor="content"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Content (English){" "}
+              Description (English){" "}
               {activeLanguage === "en" && activeEditor === "content" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}
@@ -437,7 +409,7 @@ const AddPlanet: React.FC = () => {
               htmlFor="content_hi"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Content (Hindi){" "}
+              Description (Hindi){" "}
               {activeLanguage === "hi" && activeEditor === "content" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}

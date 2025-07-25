@@ -177,10 +177,7 @@ const EditPlanet: React.FC = () => {
         `https://test.swarnsiddhi.com/admin/api/v1/content/kundli/planets/${planetId}/`,
         {
           name,
-          short_description: title,
-          short_description_en: title,
-          short_description_hi: titleHi,
-          description: content,
+          description: title, // fallback to English for main description
           description_en: content,
           description_hi: contentHi,
         },
@@ -223,10 +220,10 @@ const EditPlanet: React.FC = () => {
               },
             }
           );
-          const data = res.data?.data || {};
-          setTitle(data.short_description || "");
-          setTitleHi(data.short_description_hi || "");
-          setContent(data.description || "");
+          const data = res.data || {};
+          console.log("planet data", data);
+          setTitle(data.description || "");
+          setContent(data.description_en || "");
           setContentHi(data.description_hi || "");
           setName(data.name || "");
         } catch (err) {
@@ -344,18 +341,15 @@ const EditPlanet: React.FC = () => {
               <option value="">Select Rashi</option>
 
               {[
-                "Aries",
-                "Taurus",
-                "Gemini",
-                "Cancer",
-                "Leo",
-                "Virgo",
-                "Libra",
-                "Scorpio",
-                "Sagittarius",
-                "Capricorn",
-                "Aquarius",
-                "Pisces",
+                "sun",
+                "moon",
+                "mars",
+                "mercury",
+                "jupiter",
+                "venus",
+                "saturn",
+                "rahu",
+                "ketu",
               ].map((rashi) => (
                 <option key={rashi} value={rashi}>
                   {rashi}
@@ -363,12 +357,12 @@ const EditPlanet: React.FC = () => {
               ))}
             </select>
           </div>
-          <div>
+          <div className="col-span-2">
             <label
               htmlFor="title"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Short Description (English){" "}
+              Description (General){" "}
               {activeLanguage === "en" && activeEditor === "title" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}
@@ -402,41 +396,6 @@ const EditPlanet: React.FC = () => {
               </p>
             )}
           </div>
-
-          <div>
-            <label
-              htmlFor="title_hi"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Short Description (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "title" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "title" ? (
-              <div
-                className="min-h-[2.5rem] p-2 border border-gray-300 rounded-md bg-gray-50"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(titleHi) }}
-              />
-            ) : (
-              <textarea
-                id="title_hi"
-                value={titleHi}
-                onChange={(e) => setTitleHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("title");
-                  setActiveLanguage("hi");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={6}
-                aria-required="true"
-                aria-describedby="content-error"
-                placeholder="Enter your markdown content here..."
-              />
-            )}
-          </div>
         </div>
 
         {/* Content Fields */}
@@ -446,7 +405,7 @@ const EditPlanet: React.FC = () => {
               htmlFor="content"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Content (English){" "}
+              Description (English){" "}
               {activeLanguage === "en" && activeEditor === "content" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}
@@ -486,7 +445,7 @@ const EditPlanet: React.FC = () => {
               htmlFor="content_hi"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Content (Hindi){" "}
+              Description (Hindi){" "}
               {activeLanguage === "hi" && activeEditor === "content" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}

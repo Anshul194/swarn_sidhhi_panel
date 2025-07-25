@@ -31,10 +31,10 @@ const EditMissingNumber: React.FC = () => {
     (state: RootState) => state.rashi
   );
 
-  // Form state - removed title, titleHi, content, contentHi
-  const [number, setNumber] = useState(0);
-  // Personality fields
+  // Form state - updated to match your requirements
+  const [missing_number, setMissingNumber] = useState("");
   const [text, setText] = useState("");
+  const [textEn, setTextEn] = useState("");
   const [textHi, setTextHi] = useState("");
 
   const location = useLocation();
@@ -42,14 +42,14 @@ const EditMissingNumber: React.FC = () => {
   const navigate = useNavigate();
 
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
-  const [addedSuccess, setAddedSuccess] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
 
-  // Editor state - updated to only include positive and negative
+  // Editor state - updated to handle text, textEn, and textHi
   const [activeLanguage, setActiveLanguage] = useState<"en" | "hi">("en");
   const [previewMode, setPreviewMode] = useState(false);
-  const [activeEditor, setActiveEditor] = useState<"positive" | "negative">(
-    "positive"
-  );
+  const [activeEditor, setActiveEditor] = useState<
+    "text" | "textEn" | "textHi"
+  >("text");
 
   // Markdown helper functions
   const insertMarkdown = (
@@ -59,25 +59,17 @@ const EditMissingNumber: React.FC = () => {
   ) => {
     let textareaId = "";
 
-    // Determine the correct textarea ID based on active language and editor
-    if (activeLanguage === "en") {
-      switch (activeEditor) {
-        case "positive":
-          textareaId = "positive_side";
-          break;
-        case "negative":
-          textareaId = "negative_side";
-          break;
-      }
-    } else {
-      switch (activeEditor) {
-        case "positive":
-          textareaId = "positive_side_hi";
-          break;
-        case "negative":
-          textareaId = "negative_side_hi";
-          break;
-      }
+    // Determine the correct textarea ID based on active editor
+    switch (activeEditor) {
+      case "text":
+        textareaId = "text_field";
+        break;
+      case "textEn":
+        textareaId = "text_en_field";
+        break;
+      case "textHi":
+        textareaId = "text_hi_field";
+        break;
     }
 
     const textarea = document.getElementById(textareaId) as HTMLTextAreaElement;
@@ -94,18 +86,16 @@ const EditMissingNumber: React.FC = () => {
       currentValue.substring(0, start) + newText + currentValue.substring(end);
 
     // Update the appropriate state
-    if (activeLanguage === "en") {
-      switch (activeEditor) {
-        case "positive":
-          setText(newValue);
-          break;
-      }
-    } else {
-      switch (activeEditor) {
-        case "positive":
-          setTextHi(newValue);
-          break;
-      }
+    switch (activeEditor) {
+      case "text":
+        setText(newValue);
+        break;
+      case "textEn":
+        setTextEn(newValue);
+        break;
+      case "textHi":
+        setTextHi(newValue);
+        break;
     }
 
     // Set cursor position
@@ -180,17 +170,20 @@ const EditMissingNumber: React.FC = () => {
       .replace(/\n/g, "<br>");
   };
 
-  // Validate form - removed title and content validation
+  // Validate form - updated for new fields
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
 
-    if (!number) errors.number = "Number is required";
+    if (!missing_number) errors.missing_number = "Missing number is required";
     if (!text.trim()) errors.text = "Text is required";
+    if (!textEn.trim()) errors.textEn = "Text (English) is required";
+    if (!textHi.trim()) errors.textHi = "Text (Hindi) is required";
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  // Handle form submission - removed title and content from form data
+  // Handle form submission - updated for new fields
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -199,19 +192,16 @@ const EditMissingNumber: React.FC = () => {
       updateMissingNumberRemedy({
         id: missingNumberId,
         data: {
-          missing_number: number,
+          missing_number: missing_number,
           text: text,
+          text_en: textEn,
           text_hi: textHi,
         },
       })
     ).then((action: any) => {
       if (updateMissingNumberRemedy.fulfilled.match(action)) {
-        setAddedSuccess(true);
-        setNumber("");
-        setText("");
-        setTextHi("");
-
-        setTimeout(() => setAddedSuccess(false), 2500);
+        setUpdateSuccess(true);
+        setTimeout(() => setUpdateSuccess(false), 2500);
       }
     });
   };
@@ -225,9 +215,10 @@ const EditMissingNumber: React.FC = () => {
       const data = response.payload;
       if (fetchMissingNumberRemedyById.fulfilled.match(response)) {
         console.log("Fetched Missing Number:", data);
-        setNumber(data.missing_number);
-        setText(data.text);
-        setTextHi(data.text_hi);
+        setMissingNumber(data.missing_number || "");
+        setText(data.text || "");
+        setTextEn(data.text_en || "");
+        setTextHi(data.text_hi || "");
       } else {
         toast.error("Failed to fetch missing number");
       }
@@ -237,6 +228,7 @@ const EditMissingNumber: React.FC = () => {
       navigate("/numerology/personality/list");
     }
   };
+
   useEffect(() => {
     getData();
   }, [dispatch, missingNumberId, navigate]);
@@ -244,13 +236,13 @@ const EditMissingNumber: React.FC = () => {
   console.log("Selected Missing Number:", selectedRemedy);
   useEffect(() => {
     if (selectedRemedy) {
-      setNumber(selectedRemedy.missing_number);
-      setText(selectedRemedy.text);
-      setTextHi(selectedRemedy.text_hi);
-
-      // thumbnail and image are not set here, only on file input change
+      setMissingNumber(selectedRemedy.missing_number || "");
+      setText(selectedRemedy.text || "");
+      setTextEn(selectedRemedy.text_en || "");
+      setTextHi(selectedRemedy.text_hi || "");
     }
   }, [selectedRemedy]);
+
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
@@ -262,31 +254,18 @@ const EditMissingNumber: React.FC = () => {
         {/* Language and Editor Controls */}
         <div className="flex flex-wrap gap-4 mb-6 p-4 bg-blue-50 rounded-lg">
           <div className="flex items-center gap-2">
-            <Languages className="h-5 w-5 text-blue-600" />
-            <label className="text-sm font-medium text-gray-700">
-              Language:
-            </label>
-            <select
-              value={activeLanguage}
-              onChange={(e) => setActiveLanguage(e.target.value as "en" | "hi")}
-              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="en">English</option>
-              <option value="hi">Hindi</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-blue-600" />
             <label className="text-sm font-medium text-gray-700">Editor:</label>
             <select
               value={activeEditor}
               onChange={(e) =>
-                setActiveEditor(e.target.value as "positive" | "negative")
+                setActiveEditor(e.target.value as "text" | "textEn" | "textHi")
               }
               className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="positive">Prediction</option>
+              <option value="text">Text</option>
+              <option value="textEn">Text (English)</option>
+              <option value="textHi">Text (Hindi)</option>
             </select>
           </div>
 
@@ -326,104 +305,132 @@ const EditMissingNumber: React.FC = () => {
           </div>
         )}
 
-        {/* Name Field */}
-
-        {/* Personality Section Header */}
+        {/* Missing Number Field */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="">
             <label
-              htmlFor="year_number"
+              htmlFor="missing_number"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Year Number*
+              Missing Number*
             </label>
             <input
-              id="year_number"
+              id="missing_number"
               type="text"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
+              value={missing_number}
+              onChange={(e) => setMissingNumber(e.target.value)}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter missing number"
             />
-            {formErrors.mulank && (
-              <p className="mt-1 text-sm text-red-600">{formErrors.mulank}</p>
+            {formErrors.missing_number && (
+              <p className="mt-1 text-sm text-red-600">
+                {formErrors.missing_number}
+              </p>
             )}
           </div>
         </div>
 
-        {/* Positive Side Fields */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Text Fields */}
+        <div className="space-y-6 mb-6">
+          {/* Text Field */}
           <div>
             <label
-              htmlFor="prediction"
+              htmlFor="text_field"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Prediction (English) *{" "}
-              {activeLanguage === "en" && activeEditor === "positive" && (
+              Text *{" "}
+              {activeEditor === "text" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}
             </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "positive" ? (
+            {previewMode && activeEditor === "text" ? (
               <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md  overflow-auto prose max-w-none"
+                className="min-h-[200px] p-4 border border-gray-300 rounded-md overflow-auto prose max-w-none"
                 dangerouslySetInnerHTML={{
                   __html: renderMarkdown(text),
                 }}
               />
             ) : (
               <textarea
-                id="prediction"
+                id="text_field"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("positive");
-                  setActiveLanguage("en");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm "
-                rows={10}
-                placeholder="Describe prediction ..."
+                onFocus={() => setActiveEditor("text")}
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
+                rows={8}
+                placeholder="Enter text content..."
               />
             )}
-            {formErrors.positiveSide && (
-              <p className="mt-1 text-sm text-red-600">
-                {formErrors.positiveSide}
-              </p>
+            {formErrors.text && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.text}</p>
             )}
           </div>
 
+          {/* Text (English) Field */}
           <div>
             <label
-              htmlFor="prediction_hi"
+              htmlFor="text_en_field"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Prediction (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "positive" && (
+              Text (English) *{" "}
+              {activeEditor === "textEn" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}
             </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "positive" ? (
+            {previewMode && activeEditor === "textEn" ? (
               <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md  overflow-auto prose max-w-none"
+                className="min-h-[200px] p-4 border border-gray-300 rounded-md overflow-auto prose max-w-none"
+                dangerouslySetInnerHTML={{
+                  __html: renderMarkdown(textEn),
+                }}
+              />
+            ) : (
+              <textarea
+                id="text_en_field"
+                value={textEn}
+                onChange={(e) => setTextEn(e.target.value)}
+                onFocus={() => setActiveEditor("textEn")}
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
+                rows={8}
+                placeholder="Enter English text content..."
+              />
+            )}
+            {formErrors.textEn && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.textEn}</p>
+            )}
+          </div>
+
+          {/* Text (Hindi) Field */}
+          <div>
+            <label
+              htmlFor="text_hi_field"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Text (Hindi) *{" "}
+              {activeEditor === "textHi" && (
+                <span className="text-blue-600 text-xs">← Active</span>
+              )}
+            </label>
+            {previewMode && activeEditor === "textHi" ? (
+              <div
+                className="min-h-[200px] p-4 border border-gray-300 rounded-md overflow-auto prose max-w-none"
                 dangerouslySetInnerHTML={{
                   __html: renderMarkdown(textHi),
                 }}
               />
             ) : (
               <textarea
-                id="prediction_hi"
+                id="text_hi_field"
                 value={textHi}
                 onChange={(e) => setTextHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("positive");
-                  setActiveLanguage("hi");
-                }}
+                onFocus={() => setActiveEditor("textHi")}
                 className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={10}
-                placeholder=" भविष्यवाणी का वर्णन करें..."
+                rows={8}
+                placeholder="हिंदी टेक्स्ट सामग्री दर्ज करें..."
               />
+            )}
+            {formErrors.textHi && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.textHi}</p>
             )}
           </div>
         </div>
@@ -433,10 +440,10 @@ const EditMissingNumber: React.FC = () => {
           className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
           disabled={loading}
         >
-          {loading ? "Updating..." : "Update"}
+          {loading ? "Updating..." : "Update Missing Number"}
         </button>
 
-        {addedSuccess && (
+        {updateSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
             Missing number updated successfully!
           </div>

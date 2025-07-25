@@ -11,6 +11,7 @@ import yearPredictionsSlice from "./slices/yearPredictions";
 import planetReducer from "./slices/planet";
 import missingNumberRemedySlice from "./slices/missingNumber";
 import rajyogSlice from "./slices/rajyogSlice";
+import tagSLice from "./slices/tag";
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     planet: planetReducer,
     missingNumber: missingNumberRemedySlice,
     rajyog: rajyogSlice,
+    tag: tagSLice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

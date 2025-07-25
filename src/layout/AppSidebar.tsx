@@ -54,6 +54,9 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Add Articles", path: "/content/add" },
       { name: "Articles List", path: "/content/all" },
+      { name: "Add Tags", path: "/content/tags/add" },
+      { name: "Tags List", path: "/content/tags/list" },
+
       {
         name: "Rashi & Planet",
         path: "/content/rashi-planet-folder",

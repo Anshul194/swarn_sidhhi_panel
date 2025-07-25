@@ -30,25 +30,27 @@ const EditYearPrediction: React.FC = () => {
     (state: RootState) => state.yearPredictions
   );
 
-  // Form state - removed title, titleHi, content, contentHi
+  // Form state - now includes all five fields
   const [mulank, setMulank] = useState(0);
   const [year, setYear] = useState(0);
   const location = useLocation();
   const yearPredictionId = location.state?.yearPredictionId;
   const navigate = useNavigate();
-  // Personality fields
+
+  // All prediction fields
   const [prediction, setPrediction] = useState("");
+  const [predictionEn, setPredictionEn] = useState("");
   const [predictionHi, setPredictionHi] = useState("");
 
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [addedSuccess, setAddedSuccess] = useState(false);
 
-  // Editor state - updated to only include positive and negative
+  // Editor state - updated to handle all three prediction fields
   const [activeLanguage, setActiveLanguage] = useState<"en" | "hi">("en");
   const [previewMode, setPreviewMode] = useState(false);
-  const [activeEditor, setActiveEditor] = useState<"positive" | "negative">(
-    "positive"
-  );
+  const [activeEditor, setActiveEditor] = useState<
+    "prediction" | "predictionEn" | "predictionHi"
+  >("prediction");
 
   // Markdown helper functions
   const insertMarkdown = (
@@ -58,25 +60,17 @@ const EditYearPrediction: React.FC = () => {
   ) => {
     let textareaId = "";
 
-    // Determine the correct textarea ID based on active language and editor
-    if (activeLanguage === "en") {
-      switch (activeEditor) {
-        case "positive":
-          textareaId = "positive_side";
-          break;
-        case "negative":
-          textareaId = "negative_side";
-          break;
-      }
-    } else {
-      switch (activeEditor) {
-        case "positive":
-          textareaId = "positive_side_hi";
-          break;
-        case "negative":
-          textareaId = "negative_side_hi";
-          break;
-      }
+    // Determine the correct textarea ID based on active editor
+    switch (activeEditor) {
+      case "prediction":
+        textareaId = "prediction";
+        break;
+      case "predictionEn":
+        textareaId = "prediction_en";
+        break;
+      case "predictionHi":
+        textareaId = "prediction_hi";
+        break;
     }
 
     const textarea = document.getElementById(textareaId) as HTMLTextAreaElement;
@@ -93,18 +87,16 @@ const EditYearPrediction: React.FC = () => {
       currentValue.substring(0, start) + newText + currentValue.substring(end);
 
     // Update the appropriate state
-    if (activeLanguage === "en") {
-      switch (activeEditor) {
-        case "positive":
-          setPrediction(newValue);
-          break;
-      }
-    } else {
-      switch (activeEditor) {
-        case "positive":
-          setPredictionHi(newValue);
-          break;
-      }
+    switch (activeEditor) {
+      case "prediction":
+        setPrediction(newValue);
+        break;
+      case "predictionEn":
+        setPredictionEn(newValue);
+        break;
+      case "predictionHi":
+        setPredictionHi(newValue);
+        break;
     }
 
     // Set cursor position
@@ -179,40 +171,45 @@ const EditYearPrediction: React.FC = () => {
       .replace(/\n/g, "<br>");
   };
 
-  // Validate form - removed title and content validation
+  // Validate form - now includes all prediction fields
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
     if (!year) errors.year = "Year number is required";
     if (!mulank) errors.mulank = "Mulank number is required";
     if (!prediction.trim()) errors.prediction = "Prediction is required";
+    if (!predictionEn.trim())
+      errors.predictionEn = "Prediction (English) is required";
+    if (!predictionHi.trim())
+      errors.predictionHi = "Prediction (Hindi) is required";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  // Handle form submission - removed title and content from form data
+  // Handle form submission - now includes all five fields
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    // Log the data being sent to debug
+    const formData = {
+      mulank_number: mulank,
+      year_number: year,
+      prediction: prediction, // General prediction
+      prediction_en: predictionEn, // English prediction
+      prediction_hi: predictionHi, // Hindi prediction
+    };
+
+    console.log("Form data being sent:", formData);
+
     dispatch(
       updateYearPrediction({
         id: yearPredictionId,
-        data: {
-          mulank_number: mulank,
-          year_number: year,
-          prediction: prediction,
-          prediction_en: prediction,
-          prediction_hi: predictionHi,
-        },
+        data: formData,
       })
     ).then((action: any) => {
       if (updateYearPrediction.fulfilled.match(action)) {
         setAddedSuccess(true);
-        setMulank("");
-        setYear("");
-        setPrediction("");
-        setPredictionHi("");
-
+        toast.success("Year Prediction updated successfully!");
         setTimeout(() => setAddedSuccess(false), 2500);
       }
     });
@@ -227,10 +224,25 @@ const EditYearPrediction: React.FC = () => {
       const data: any = response.payload;
       if (fetchYearPredictionById.fulfilled.match(response)) {
         console.log("Fetched Year Prediction:", data);
-        setMulank(data.mulank_number);
-        setYear(data.year_number);
-        setPrediction(data.prediction);
-        setPredictionHi(data.prediction_hi);
+
+        // Set values with proper fallbacks and logging
+        setMulank(data.mulank_number || 0);
+        setYear(data.year_number || 0);
+
+        // Handle prediction fields separately to avoid cross-contamination
+        const generalPrediction = data.prediction || "";
+        const englishPrediction = data.prediction_en || "";
+        const hindiPrediction = data.prediction_hi || "";
+
+        console.log("Setting prediction values:", {
+          general: generalPrediction,
+          english: englishPrediction,
+          hindi: hindiPrediction,
+        });
+
+        setPrediction(generalPrediction);
+        setPredictionEn(englishPrediction);
+        setPredictionHi(hindiPrediction);
       } else {
         toast.error("Failed to fetch year prediction");
       }
@@ -240,6 +252,7 @@ const EditYearPrediction: React.FC = () => {
       navigate("/numerology/year-predictions/list");
     }
   };
+
   useEffect(() => {
     getData();
   }, [dispatch, yearPredictionId, navigate]);
@@ -249,11 +262,14 @@ const EditYearPrediction: React.FC = () => {
     if (selectedPrediction) {
       setMulank(selectedPrediction.mulank_number);
       setYear(selectedPrediction.year_number);
-      setPrediction(selectedPrediction.prediction);
-      setPredictionHi(selectedPrediction.prediction_hi);
-      // thumbnail and image are not set here, only on file input change
+      setPrediction(selectedPrediction.prediction || "");
+      setPredictionEn(
+        selectedPrediction.prediction_en || selectedPrediction.prediction || ""
+      );
+      setPredictionHi(selectedPrediction.prediction_hi || "");
     }
   }, [selectedPrediction]);
+
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
@@ -285,12 +301,18 @@ const EditYearPrediction: React.FC = () => {
             <select
               value={activeEditor}
               onChange={(e) =>
-                setActiveEditor(e.target.value as "positive" | "negative")
+                setActiveEditor(
+                  e.target.value as
+                    | "prediction"
+                    | "predictionEn"
+                    | "predictionHi"
+                )
               }
               className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="positive">Positive Side</option>
-              <option value="negative">Negative Side</option>
+              <option value="prediction">Prediction (General)</option>
+              <option value="predictionEn">Prediction (English)</option>
+              <option value="predictionHi">Prediction (Hindi)</option>
             </select>
           </div>
 
@@ -330,11 +352,9 @@ const EditYearPrediction: React.FC = () => {
           </div>
         )}
 
-        {/* Name Field */}
-
-        {/* Personality Section Header */}
+        {/* Year and Mulank Fields */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div className="">
+          <div>
             <label
               htmlFor="year_number"
               className="block text-sm font-medium text-gray-700 mb-2"
@@ -348,11 +368,11 @@ const EditYearPrediction: React.FC = () => {
               onChange={(e) => setYear(e.target.value)}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
-            {formErrors.mulank && (
-              <p className="mt-1 text-sm text-red-600">{formErrors.mulank}</p>
+            {formErrors.year && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.year}</p>
             )}
           </div>
-          <div className="">
+          <div>
             <label
               htmlFor="mulank"
               className="block text-sm font-medium text-gray-700 mb-2"
@@ -372,23 +392,22 @@ const EditYearPrediction: React.FC = () => {
           </div>
         </div>
 
-        {/* Positive Side Fields */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Prediction Fields */}
+        <div className="space-y-6 mb-6">
+          {/* General Prediction */}
           <div>
             <label
               htmlFor="prediction"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Prediction Side (English) *{" "}
-              {activeLanguage === "en" && activeEditor === "positive" && (
+              Prediction (General) *{" "}
+              {activeEditor === "prediction" && (
                 <span className="text-blue-600 text-xs">← Active</span>
               )}
             </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "positive" ? (
+            {previewMode && activeEditor === "prediction" ? (
               <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md  overflow-auto prose max-w-none"
+                className="min-h-[200px] p-4 border border-gray-300 rounded-md overflow-auto prose max-w-none"
                 dangerouslySetInnerHTML={{
                   __html: renderMarkdown(prediction),
                 }}
@@ -398,55 +417,92 @@ const EditYearPrediction: React.FC = () => {
                 id="prediction"
                 value={prediction}
                 onChange={(e) => setPrediction(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("positive");
-                  setActiveLanguage("en");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm "
-                rows={10}
-                placeholder="Describe prediction ..."
+                onFocus={() => setActiveEditor("prediction")}
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
+                rows={8}
+                placeholder="Describe general prediction..."
               />
             )}
-            {formErrors.positiveSide && (
+            {formErrors.prediction && (
               <p className="mt-1 text-sm text-red-600">
-                {formErrors.positiveSide}
+                {formErrors.prediction}
               </p>
             )}
           </div>
 
-          <div>
-            <label
-              htmlFor="prediction_hi"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Prediction Side (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "positive" && (
-                <span className="text-blue-600 text-xs">← Active</span>
+          {/* Prediction Fields in Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Prediction English */}
+            <div>
+              <label
+                htmlFor="prediction_en"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Prediction (English) *{" "}
+                {activeEditor === "predictionEn" && (
+                  <span className="text-blue-600 text-xs">← Active</span>
+                )}
+              </label>
+              {previewMode && activeEditor === "predictionEn" ? (
+                <div
+                  className="min-h-[200px] p-4 border border-gray-300 rounded-md overflow-auto prose max-w-none"
+                  dangerouslySetInnerHTML={{
+                    __html: renderMarkdown(predictionEn),
+                  }}
+                />
+              ) : (
+                <textarea
+                  id="prediction_en"
+                  value={predictionEn}
+                  onChange={(e) => setPredictionEn(e.target.value)}
+                  onFocus={() => setActiveEditor("predictionEn")}
+                  className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
+                  rows={10}
+                  placeholder="Describe prediction in English..."
+                />
               )}
-            </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "positive" ? (
-              <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md  overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(predictionHi),
-                }}
-              />
-            ) : (
-              <textarea
-                id="prediction_hi"
-                value={predictionHi}
-                onChange={(e) => setPredictionHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("positive");
-                  setActiveLanguage("hi");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={10}
-                placeholder=" भविष्यवाणी का वर्णन करें..."
-              />
-            )}
+              {formErrors.predictionEn && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.predictionEn}
+                </p>
+              )}
+            </div>
+
+            {/* Prediction Hindi */}
+            <div>
+              <label
+                htmlFor="prediction_hi"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Prediction (Hindi) *{" "}
+                {activeEditor === "predictionHi" && (
+                  <span className="text-blue-600 text-xs">← Active</span>
+                )}
+              </label>
+              {previewMode && activeEditor === "predictionHi" ? (
+                <div
+                  className="min-h-[200px] p-4 border border-gray-300 rounded-md overflow-auto prose max-w-none"
+                  dangerouslySetInnerHTML={{
+                    __html: renderMarkdown(predictionHi),
+                  }}
+                />
+              ) : (
+                <textarea
+                  id="prediction_hi"
+                  value={predictionHi}
+                  onChange={(e) => setPredictionHi(e.target.value)}
+                  onFocus={() => setActiveEditor("predictionHi")}
+                  className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
+                  rows={10}
+                  placeholder="भविष्यवाणी का वर्णन हिंदी में करें..."
+                />
+              )}
+              {formErrors.predictionHi && (
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.predictionHi}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -455,12 +511,12 @@ const EditYearPrediction: React.FC = () => {
           className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
           disabled={loading}
         >
-          {loading ? "Updating..." : "Update"}
+          {loading ? "Updating..." : "Update Prediction"}
         </button>
 
         {addedSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
-            Prediction updated successfully!
+            Year Prediction updated successfully!
           </div>
         )}
         {error && <div className="mt-4 text-red-600">{error}</div>}

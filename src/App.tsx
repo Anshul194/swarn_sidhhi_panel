@@ -38,6 +38,8 @@ import RajyogsList from "./pages/Content/numerology/rajyog/RajyogList";
 import EditRajyog from "./pages/Content/numerology/rajyog/EditRajyog";
 import EditPlanet from "./pages/Content/Planet/EditPlanet";
 import PlanetList from "./pages/Content/Planet/PlanetList";
+import AddTag from "./pages/Content/Tag/AddTag";
+import TagList from "./pages/Content/Tag/TagList";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -158,21 +160,16 @@ export default function App() {
               <Route path="/content/add" element={<AddArticle></AddArticle>} />
               <Route path="/content/all" element={<ArticleList />} />
               <Route path="/articles/edit" element={<EditArticle />} />
+              <Route path="/content/tags/add" element={<AddTag />} />
+              <Route path="/content/tags/list" element={<TagList />} />
 
               <Route path="/kundli/rashi/add" element={<AddRashi></AddRashi>} />
               <Route path="/kundli/rashi/list" element={<RashiList />} />
               <Route path="/kundli/rashi/edit" element={<EditRashi />} />
               <Route path="/kundli/planet/add" element={<AddPlanet />} />
 
-
-               <Route
-                path="/kundli/planet/list"
-                element={<PlanetList />}
-              />
-              <Route
-                path="/kundli/planet/edit"
-                element={<EditPlanet />}
-              />
+              <Route path="/kundli/planet/list" element={<PlanetList />} />
+              <Route path="/kundli/planet/edit" element={<EditPlanet />} />
               <Route
                 path="/kundli/planet/list"
                 element={<div>Planet List</div>}
