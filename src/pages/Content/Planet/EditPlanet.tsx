@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Bold,
   Italic,
@@ -15,23 +14,23 @@ import {
   FileText,
   Languages,
 } from "lucide-react";
-import { createPlanet } from "../../../store/slices/planet";
+import toast from "react-hot-toast";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import type { RootState } from "../../../store";
-import type { AppDispatch } from "../../../store";
-
-const AddPlanet: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.planet);
+const EditPlanet: React.FC = () => {
+  const location = useLocation();
+  const planet = location.state?.planet;
+  const planetId = planet?.id || location.state?.planetId;
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // Form state
+  const [title, setTitle] = useState("");
+  const [titleHi, setTitleHi] = useState("");
+  const [content, setContent] = useState("");
+  const [contentHi, setContentHi] = useState("");
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [descriptionEn, setDescriptionEn] = useState("");
-  const [descriptionHi, setDescriptionHi] = useState("");
-  const [shortDescription, setShortDescription] = useState("");
-  const [shortDescriptionEn, setShortDescriptionEn] = useState("");
-  const [shortDescriptionHi, setShortDescriptionHi] = useState("");
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [addedSuccess, setAddedSuccess] = useState(false);
 
@@ -48,43 +47,43 @@ const AddPlanet: React.FC = () => {
     after: string = "",
     placeholder: string = ""
   ) => {
-    let textarea: HTMLTextAreaElement | null = null;
-    if (activeLanguage === "en") {
-      if (activeEditor === "content") {
-        textarea = document.getElementById("description_en") as HTMLTextAreaElement;
-      } else {
-        textarea = document.getElementById("short_description_en") as HTMLTextAreaElement;
-      }
-    } else {
-      if (activeEditor === "content") {
-        textarea = document.getElementById("description_hi") as HTMLTextAreaElement;
-      } else {
-        textarea = document.getElementById("short_description_hi") as HTMLTextAreaElement;
-      }
-    }
+    const textarea = document.getElementById(
+      activeLanguage === "en"
+        ? activeEditor === "content"
+          ? "content"
+          : "title"
+        : activeEditor === "content"
+        ? "content_hi"
+        : "title_hi"
+    ) as HTMLTextAreaElement;
+
     if (!textarea) return;
+
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = textarea.value.substring(start, end);
     const textToInsert = selectedText || placeholder;
     const newText = before + textToInsert + after;
+
     const currentValue = textarea.value;
     const newValue =
       currentValue.substring(0, start) + newText + currentValue.substring(end);
+
     // Update the appropriate state
     if (activeLanguage === "en") {
       if (activeEditor === "content") {
-        setDescriptionEn(newValue);
+        setContent(newValue);
       } else {
-        setShortDescriptionEn(newValue);
+        setTitle(newValue);
       }
     } else {
       if (activeEditor === "content") {
-        setDescriptionHi(newValue);
+        setContentHi(newValue);
       } else {
-        setShortDescriptionHi(newValue);
+        setTitleHi(newValue);
       }
     }
+
     // Set cursor position
     setTimeout(() => {
       const newStart = start + before.length;
@@ -147,11 +146,11 @@ const AddPlanet: React.FC = () => {
       .replace(/^- (.*$)/gim, "<li>$1</li>")
       .replace(/^(\d+)\. (.*$)/gim, "<li>$1. $2</li>")
       .replace(
-        /\[([^\]]+)\]\(([^\)]+)\)/g,
+        /\[([^\]]+)\]\(([^)]+)\)/g,
         '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
       )
       .replace(
-        /!\[([^\]]*)\]\(([^\)]+)\)/g,
+        /!\[([^\]]*)\]\(([^)]+)\)/g,
         '<img src="$2" alt="$1" style="max-width: 100%; height: auto;" />'
       )
       .replace(/\n/g, "<br>");
@@ -160,48 +159,94 @@ const AddPlanet: React.FC = () => {
   // Validate form
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
-    if (!name.trim()) errors.name = "Name is required";
-    if (!descriptionEn.trim()) errors.description_en = "Description (English) is required";
-    if (!descriptionHi.trim()) errors.description_hi = "Description (Hindi) is required";
+    if (!title.trim()) errors.title = "Title is required";
+    if (!content.trim()) errors.content = "Content is required";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-
-    dispatch(
-      createPlanet({
-        name,
-        description: descriptionEn, // fallback to English for main description
-        description_en: descriptionEn,
-        description_hi: descriptionHi,
-        short_description: shortDescriptionEn, // fallback to English for main short description
-        short_description_en: shortDescriptionEn,
-        short_description_hi: shortDescriptionHi,
-      })
-    ).then((action: any) => {
-      if (createPlanet.fulfilled.match(action)) {
-        setAddedSuccess(true);
-        setName("");
-        setDescription("");
-        setDescriptionEn("");
-        setDescriptionHi("");
-        setShortDescription("");
-        setShortDescriptionEn("");
-        setShortDescriptionHi("");
-        setTimeout(() => setAddedSuccess(false), 2500);
-      }
-    });
+    setLoading(true);
+    setError("");
+    try {
+      const token = localStorage.getItem("token") || "";
+      await axios.put(
+        `https://test.swarnsiddhi.com/admin/api/v1/content/kundli/planets/${planetId}/`,
+        {
+          name,
+          short_description: title,
+          short_description_en: title,
+          short_description_hi: titleHi,
+          description: content,
+          description_en: content,
+          description_hi: contentHi,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setAddedSuccess(true);
+      toast.success("Planet updated successfully!");
+      setTimeout(() => setAddedSuccess(false), 2500);
+    } catch (err) {
+      // @ts-expect-error
+      setError(err?.response?.data?.message || "Failed to update planet");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    // If planet is passed in location.state, use it, otherwise fetch by ID
+    const fetchPlanet = async () => {
+      if (planet) {
+        setTitle(planet.short_description || "");
+        setTitleHi(planet.short_description_hi || "");
+        setContent(planet.description || "");
+        setContentHi(planet.description_hi || "");
+        setName(planet.name || "");
+      } else if (planetId) {
+        try {
+          const token = localStorage.getItem("token") || "";
+          const res = await axios.get(
+            `https://test.swarnsiddhi.com/admin/api/v1/content/kundli/planets/${planetId}/`,
+            {
+              headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const data = res.data?.data || {};
+          setTitle(data.short_description || "");
+          setTitleHi(data.short_description_hi || "");
+          setContent(data.description || "");
+          setContentHi(data.description_hi || "");
+          setName(data.name || "");
+        } catch (err) {
+          // @ts-expect-error
+          toast.error(err?.response?.data?.message || "Failed to fetch planet");
+        }
+      } else {
+        toast.error("No planet ID provided");
+        navigate("/kundli/planet/all");
+      }
+    };
+    fetchPlanet();
+    // eslint-disable-next-line
+  }, [planet, planetId, navigate]);
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
         <Edit3 className="h-8 w-8" />
-        Add Planet - Markdown Editor
+        Edit Planet - Markdown Editor
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -285,7 +330,6 @@ const AddPlanet: React.FC = () => {
 
             <select
               id="name"
-              type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               onFocus={() => {
@@ -294,22 +338,27 @@ const AddPlanet: React.FC = () => {
               }}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               aria-required="true"
+              required
               aria-describedby="title-error"
             >
-              <option value="">Select Planet</option>
+              <option value="">Select Rashi</option>
+
               {[
-                "sun",
-                "moon",
-                "mars",
-                "mercury",
-                "jupiter",
-                "venus",
-                "saturn",
-                "rahu",
-                "ketu",
-              ].map((planet) => (
-                <option key={planet} value={planet}>
-                  {planet}
+                "Aries",
+                "Taurus",
+                "Gemini",
+                "Cancer",
+                "Leo",
+                "Virgo",
+                "Libra",
+                "Scorpio",
+                "Sagittarius",
+                "Capricorn",
+                "Aquarius",
+                "Pisces",
+              ].map((rashi) => (
+                <option key={rashi} value={rashi}>
+                  {rashi}
                 </option>
               ))}
             </select>
@@ -333,9 +382,9 @@ const AddPlanet: React.FC = () => {
               />
             ) : (
               <textarea
-                id="short_description_en"
-                value={shortDescriptionEn}
-                onChange={(e) => setShortDescriptionEn(e.target.value)}
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 onFocus={() => {
                   setActiveEditor("title");
                   setActiveLanguage("en");
@@ -373,9 +422,9 @@ const AddPlanet: React.FC = () => {
               />
             ) : (
               <textarea
-                id="short_description_hi"
-                value={shortDescriptionHi}
-                onChange={(e) => setShortDescriptionHi(e.target.value)}
+                id="title_hi"
+                value={titleHi}
+                onChange={(e) => setTitleHi(e.target.value)}
                 onFocus={() => {
                   setActiveEditor("title");
                   setActiveLanguage("hi");
@@ -411,9 +460,9 @@ const AddPlanet: React.FC = () => {
               />
             ) : (
               <textarea
-                id="description_en"
-                value={descriptionEn}
-                onChange={(e) => setDescriptionEn(e.target.value)}
+                id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 onFocus={() => {
                   setActiveEditor("content");
                   setActiveLanguage("en");
@@ -451,9 +500,9 @@ const AddPlanet: React.FC = () => {
               />
             ) : (
               <textarea
-                id="description_hi"
-                value={descriptionHi}
-                onChange={(e) => setDescriptionHi(e.target.value)}
+                id="content_hi"
+                value={contentHi}
+                onChange={(e) => setContentHi(e.target.value)}
                 onFocus={() => {
                   setActiveEditor("content");
                   setActiveLanguage("hi");
@@ -469,14 +518,14 @@ const AddPlanet: React.FC = () => {
         <button
           type="submit"
           className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
-          aria-label="Add article"
+          aria-label="Update planet"
           disabled={loading}
         >
-          {loading ? "Adding..." : "Add Article"}
+          {loading ? "Updating..." : "Update Planet"}
         </button>
         {addedSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
-            Article added successfully!
+            Planet updated successfully!
           </div>
         )}
         {error && <div className="mt-4 text-red-600">{error}</div>}
@@ -485,4 +534,4 @@ const AddPlanet: React.FC = () => {
   );
 };
 
-export default AddPlanet;
+export default EditPlanet;

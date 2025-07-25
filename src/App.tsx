@@ -36,6 +36,8 @@ import EditMissingNumber from "./pages/Content/numerology/missingNumberRemedies/
 import AddRajyog from "./pages/Content/numerology/rajyog/AddRajyog";
 import RajyogsList from "./pages/Content/numerology/rajyog/RajyogList";
 import EditRajyog from "./pages/Content/numerology/rajyog/EditRajyog";
+import EditPlanet from "./pages/Content/Planet/EditPlanet";
+import PlanetList from "./pages/Content/Planet/PlanetList";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -161,6 +163,16 @@ export default function App() {
               <Route path="/kundli/rashi/list" element={<RashiList />} />
               <Route path="/kundli/rashi/edit" element={<EditRashi />} />
               <Route path="/kundli/planet/add" element={<AddPlanet />} />
+
+
+               <Route
+                path="/kundli/planet/list"
+                element={<PlanetList />}
+              />
+              <Route
+                path="/kundli/planet/edit"
+                element={<EditPlanet />}
+              />
               <Route
                 path="/kundli/planet/list"
                 element={<div>Planet List</div>}
