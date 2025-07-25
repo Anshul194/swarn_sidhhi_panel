@@ -50,7 +50,7 @@ export const fetchRashis = createAsyncThunk<
       if (searchInput) params.append("search", searchInput);
 
       const response = await axiosInstance.get(
-        `/content/kundli/rashis?${params.toString()}`,
+        `/content/kundli/rashis/?${params.toString()}`,
         {
           headers: {
             Accept: "application/json",

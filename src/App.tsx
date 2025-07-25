@@ -20,6 +20,8 @@ import EditArticle from "./pages/Content/EditArticle";
 import AddArticle from "./pages/Content/AddArticle";
 import EditRashi from "./pages/Content/Rashi/EditRashi";
 import AddPlanet from "./pages/Content/Planet/AddPlanet";
+import PlanetList from "./pages/Content/Planet/PlanetList";
+import EditPlanet from "./pages/Content/Planet/EditPlanet";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -150,7 +152,11 @@ export default function App() {
               />
               <Route
                 path="/kundli/planet/list"
-                element={<div>Planet List</div>}
+                element={<PlanetList />}
+              />
+              <Route
+                path="/kundli/planet/edit"
+                element={<EditPlanet />}
               />
 
               {/* Forms */}
