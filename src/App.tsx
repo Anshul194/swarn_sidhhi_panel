@@ -24,7 +24,6 @@ import EntranceAnalysisList from "./pages/Content/vastu/entranceAnalysis/Entranc
 import EntranceList from "./pages/Content/vastu/entrance/EntranceList";
 import EditVastuEntrance from "./pages/Content/vastu/entranceAnalysis/EditEntrance";
 import AddPersonality from "./pages/Content/numerology/personality/AddPersonality";
-import PersonalityList from "./pages/Content/numerology/personality/personalityList";
 import EditPersonality from "./pages/Content/numerology/personality/EditPersonality";
 import AddYearPrediction from "./pages/Content/numerology/yearPredictions/AddYearPredictions";
 import YearPredictionsList from "./pages/Content/numerology/yearPredictions/YearPredictionsList";
