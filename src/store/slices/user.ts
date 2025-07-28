@@ -48,7 +48,7 @@ export const fetchAllUsers = createAsyncThunk<
 
       // Always pass all query params as required by the API
       const response = await axiosInstance.get(
-        `/users?${queryParams.toString()}`,
+        `/users/?${queryParams.toString()}`,
         {
           headers: {
             "Content-Type": "application/json",
