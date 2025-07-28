@@ -75,7 +75,7 @@ export const fetchUserById = createAsyncThunk<
   { rejectValue: string }
 >("users/fetchById", async (user_id, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get(`/users/${user_id}`, {
+    const response = await axiosInstance.get(`/users/${user_id}/`, {
       headers: {
         Accept: "application/json",
       },
