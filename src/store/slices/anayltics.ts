@@ -23,7 +23,7 @@ export const fetchAnalytics = createAsyncThunk(
     ) => {
         try {
             const response = await axiosInstance.get(
-                `/users/analytics?period=${period}`,
+                `/users/analytics/?period=${period}`,
                 {
                     headers: {
                         Accept: 'application/json',
