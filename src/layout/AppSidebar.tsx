@@ -42,129 +42,112 @@ const navItems: NavItem[] = [
   },
   {
     icon: <ListIcon />,
-    name: "User Management",
-    subItems: [
-      // { name: "Add User", path: "/users/add" },
-      { name: "User List", path: "/users/all" },
-    ],
+    name: "User List",
+    path: "/users/all"
+    ,
   },
+  // {
+  //   icon: <PageIcon />,
+  //   name: "Add Articles",
+  //   path: "/content/add"
+  // },
   {
-    icon: <PageIcon />,
-    name: "Content Management",
-    subItems: [
-      { name: "Add Articles", path: "/content/add" },
-      { name: "Articles List", path: "/content/all" },
-      { name: "Add Tags", path: "/content/tags/add" },
-      { name: "Tags List", path: "/content/tags/list" },
+    icon: <ListIcon />,
+    name: "Articles List",
+    path: "/content/all"
+  },
+  // {
+  //   icon: <PageIcon />,
+  //   name: "Add Tags",
+  //   path: "/content/tags/add"
+  // },
+  {
+    icon: <ListIcon />,
+    name: "Tags List",
+    path: "/content/tags/list"
+  },
+//   {
+//   icon: <PageIcon />,
+//   name: "Add Rashi",
+//   path: "/kundli/rashi/add"
+// },
+{
+  icon: <ListIcon />,
+  name: "Rashi List",
+  path: "/kundli/rashi/list"
+},
+// {
+//   icon: <PageIcon />,
+//   name: "Add Planet",
+//   path: "/kundli/planet/add"
+// },
+{
+  icon: <ListIcon />,
+  name: "Planet List",
+  path: "/kundli/planet/list"
+},
 
-      {
-        name: "Rashi & Planet",
-        path: "/content/rashi-planet-folder",
-        subItems: [
-          { name: "Add Rashi", path: "/kundli/rashi/add" },
-          { name: "Rashi List", path: "/kundli/rashi/list" },
-          { name: "Add Planet", path: "/kundli/planet/add" },
-          { name: "Planet List", path: "/kundli/planet/list" },
-        ],
-      },
-    ],
-  },
-  {
-    icon: <PageIcon />,
-    name: "Vastu Management",
-    subItems: [
-      {
-        name: "Entrance Analysis",
-        path: "/vastu/entrance/list",
-        subItems: [
-          {
-            name: "Add Entrance Analysis",
-            path: "/vastu/entrance/analysis/add",
-          },
-          {
-            name: "Entrance Analysis List",
-            path: "/vastu/entrance/analysis/list",
-          },
-        ],
-      },
+//   {
+//   icon: <PageIcon />,
+//   name: "Add Entrance Analysis",
+//   path: "/vastu/entrance/analysis/add"
+// },
+{
+  icon: <ListIcon />,
+  name: "Entrance Analysis List",
+  path: "/vastu/entrance/analysis/list"
+},
+{
+  icon: <ListIcon />,
+  name: "Entrance List",
+  path: "/vastu/entrance/list"
+},
+// {
+//   icon: <PageIcon />,
+//   name: "Add Personality",
+//   path: "/numerology/personality/add"
+// },
+{
+  icon: <ListIcon />,
+  name: "Personality List",
+  path: "/numerology/personality/list"
+},
+// {
+//   icon: <PageIcon />,
+//   name: "Add Year Prediction",
+//   path: "/numerology/year-prediction/add"
+// },
+{
+  icon: <ListIcon />,
+  name: "Year Prediction List",
+  path: "/numerology/year-prediction/list"
+},
+// {
+//   icon: <PageIcon />,
+//   name: "Add Missing Number Remedy",
+//   path: "/numerology/missing-number-remedies/add"
+// },
+{
+  icon: <ListIcon />,
+  name: "Missing Number Remedies List",
+  path: "/numerology/missing-number-remedies/list"
+},
+// {
+//   icon: <PageIcon />,
+//   name: "Add Loshu Rajyog",
+//   path: "/numerology/rajyogs/add"
+// },
+{
+  icon: <ListIcon />,
+  name: "Loshu Rajyogs List",
+  path: "/numerology/rajyogs/list"
+},
+{
+  icon: <ListIcon />,
+  name: "Overview",
+  path: "/analytics/user"
+}
 
-      {
-        name: "Vastu Element",
-        path: "/vastu/elements/list",
-        subItems: [
-          // { name: "Add Entrance", path: "/vastu/entrance/add" },
-          { name: "Entrance List", path: "/vastu/entrance/list" },
-        ],
-      },
-    ],
-  },
-  {
-    icon: <PageIcon />,
-    name: "Numerology Management",
-    subItems: [
-      {
-        name: "Personality",
-        path: "/numerology/personality/list",
-        subItems: [
-          {
-            name: "Add Personality",
-            path: "/numerology/personality/add",
-          },
-          {
-            name: "Personality List",
-            path: "/numerology/personality/list",
-          },
-        ],
-      },
-      {
-        name: "Year Prediction",
-        path: "/numerology/year-prediction/list",
-        subItems: [
-          {
-            name: "Add Year Prediction",
-            path: "/numerology/year-prediction/add",
-          },
-          {
-            name: "Year Prediction List",
-            path: "/numerology/year-prediction/list",
-          },
-        ],
-      },
-      {
-        name: "Missing Number Remedies",
-        path: "/numerology/missing-number-remedies/list",
-        subItems: [
-          {
-            name: "Add Missing Number Remedy",
-            path: "/numerology/missing-number-remedies/add",
-          },
-          {
-            name: "Missing Number Remedies List",
-            path: "/numerology/missing-number-remedies/list",
-          },
-        ],
-      },
-      {
-        name: "Loshu Rajyogs",
-        path: "/numerology/rajyogs/list",
-        subItems: [
-          {
-            name: "Add Loshu Rajyog",
-            path: "/numerology/rajyogs/add",
-          },
-          {
-            name: "Loshu Rajyogs List",
-            path: "/numerology/rajyogs/list",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    icon: <PieChartIcon />,
-    name: "Analytics",
-    subItems: [{ name: "Overview", path: "/analytics/user" }],
-  },
 ];
 
 const AppSidebar: React.FC = () => {

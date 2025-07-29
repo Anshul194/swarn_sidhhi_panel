@@ -338,7 +338,7 @@ const EditPlanet: React.FC = () => {
               required
               aria-describedby="title-error"
             >
-              <option value="">Select Rashi</option>
+              <option value="">Select Planet</option>
 
               {[
                 "sun",

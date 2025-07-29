@@ -28,7 +28,7 @@ const AddArticle: React.FC = () => {
   const [content, setContent] = useState("");
   const [contentHi, setContentHi] = useState("");
   const [category, setCategory] = useState("");
-  const [tags, setTags] = useState("");
+  const [tags, setTags] = useState([]);
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [image, setImage] = useState<File | null>(null);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
@@ -452,13 +452,35 @@ const AddArticle: React.FC = () => {
             >
               Tags (comma-separated):
             </label>
-            <select
+            {/* <select
               id="tags"
+              multiple
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select tags</option>
+              {fetchedTags?.map((item) => (
+                <option key={item.id} value={item.id}>
+                  <input type="checkbox" />
+                  {item.name}
+                </option>
+              ))}
+            </select> */}
+
+            <select
+              id="tags"
+              multiple
+              value={tags}
+              onChange={(e) => {
+                const selected = Array.from(
+                  e.target.selectedOptions,
+                  (option) => option.value
+                );
+                setTags(selected);
+              }}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 h-40"
+            >
               {fetchedTags?.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
