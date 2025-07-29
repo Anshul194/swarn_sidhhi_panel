@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchArticles, deleteArticle } from "../../store/slices/content";
-import { Search, RotateCcw, Pencil, Trash, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, RotateCcw, Pencil, Trash, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -118,9 +118,18 @@ const ArticleList: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
           Article List
         </h1>
-        <span className="text-gray-500 text-sm dark:text-gray-400">
-          Total: {articles?.length}
-        </span>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate("/content/add")}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md bg-blue-600 text-white  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <Plus className="h-4 w-4" />
+            Add Articles
+          </button>
+          <span className="text-gray-500 text-sm dark:text-gray-400">
+            Total: {articles?.length}
+          </span>
+        </div>
       </div>
 
       {/* Search & Filter */}

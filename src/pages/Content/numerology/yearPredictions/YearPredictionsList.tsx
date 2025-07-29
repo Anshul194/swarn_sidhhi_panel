@@ -7,6 +7,7 @@ import {
   Trash,
   ChevronLeft,
   ChevronRight,
+  Plus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -121,11 +122,20 @@ const YearPredictionsList: React.FC = () => {
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-          Personality List
+          Year Prediction List
         </h1>
+        <div className="flex items-center gap-4">
+        <button
+            onClick={() => navigate("/numerology/year-prediction/add")}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md bg-blue-600 text-white  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <Plus className="h-4 w-4" />
+            Add Year Prediction
+          </button>
         <span className="text-gray-500 text-sm dark:text-gray-400">
           Total: {pagination?.totalCount}
         </span>
+        </div>
       </div>
 
       {/* Search & Filter */}

@@ -482,14 +482,14 @@ const AddRashi: React.FC = () => {
         <button
           type="submit"
           className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
-          aria-label="Add article"
+          aria-label="Add rashi"
           disabled={loading}
         >
-          {loading ? "Adding..." : "Add Article"}
+          {loading ? "Adding..." : "Add Rashi"}
         </button>
         {addedSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
-            Article added successfully!
+            Rashi added successfully!
           </div>
         )}
         {error && <div className="mt-4 text-red-600">{error}</div>}

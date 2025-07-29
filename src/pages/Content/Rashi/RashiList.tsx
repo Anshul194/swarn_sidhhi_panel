@@ -7,6 +7,7 @@ import {
   Trash,
   ChevronLeft,
   ChevronRight,
+  Plus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { deleteRashi, fetchRashis } from "../../../store/slices/rashi";
@@ -119,9 +120,18 @@ const RashiList: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
           Rashi List
         </h1>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate("/kundli/rashi/add")}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md bg-blue-600 text-white  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <Plus className="h-4 w-4" />
+            Add Rashi
+          </button>
         <span className="text-gray-500 text-sm dark:text-gray-400">
           Total: {rashis?.length}
         </span>
+        </div>
       </div>
 
       {/* Search & Filter */}
