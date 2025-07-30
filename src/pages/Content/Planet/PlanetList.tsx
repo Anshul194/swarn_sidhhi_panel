@@ -3,14 +3,11 @@ import axios from "axios";
 import {
   Search,
   RotateCcw,
-  Pencil,
-  Trash,
   ChevronLeft,
   ChevronRight,
   Plus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 
 const PlanetList: React.FC = () => {
   const navigate = useNavigate();
@@ -21,13 +18,15 @@ const PlanetList: React.FC = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   // Data states
-  const [planets, setPlanets] = useState<Array<{ id: number; name: string }>>([]);
+  const [planets, setPlanets] = useState<Array<{ id: number; name: string }>>(
+    []
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [pagination, setPagination] = useState<{ totalPages: number; total: number }>({ totalPages: 1, total: 0 });
-  // Popup state
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [planetToDelete, setPlanetToDelete] = useState<{ id: number; name: string } | null>(null);
+  const [pagination, setPagination] = useState<{
+    totalPages: number;
+    total: number;
+  }>({ totalPages: 1, total: 0 });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -35,18 +34,21 @@ const PlanetList: React.FC = () => {
       setLoading(true);
       setError("");
       axios
-        .get(`https://test.swarnsiddhi.com/admin/api/v1/content/kundli/planets/`, {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            search: searchInput,
-            category: categoryFilter,
-            page,
-            limit,
-          },
-        })
+        .get(
+          `https://test.swarnsiddhi.com/admin/api/v1/content/kundli/planets/`,
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            params: {
+              search: searchInput,
+              category: categoryFilter,
+              page,
+              limit,
+            },
+          }
+        )
         .then((res) => {
           console.log("Planet API response:", res.data);
           // API response: { message, data: { results: [...], pagination: {...} } }
@@ -69,63 +71,6 @@ const PlanetList: React.FC = () => {
     setCategoryFilter("");
     setPage(1);
     setLimit(10);
-  };
-
-  const handleDeleteClick = (planet: { id: number; name: string }) => {
-    setPlanetToDelete(planet);
-    setShowDeletePopup(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!planetToDelete) return;
-    const token = localStorage.getItem("token") || "";
-    setLoading(true);
-    try {
-      await axios.delete(
-        `https://test.swarnsiddhi.com/admin/api/v1/content/kundli/planets/${planetToDelete.id}/`,
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      toast.success("Planet deleted successfully");
-      setShowDeletePopup(false);
-      setPlanetToDelete(null);
-      // Refetch planets
-      const res = await axios.get(
-        `https://test.swarnsiddhi.com/admin/api/v1/content/kundli/planets/`,
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            search: searchInput,
-            category: categoryFilter,
-            page,
-            limit,
-          },
-        }
-      );
-      console.log("Planet API response after delete:", res.data);
-      setPlanets(res.data?.data?.results || []);
-      setPagination({
-        totalPages: res.data?.data?.pagination?.total_pages || 1,
-        total: res.data?.data?.pagination?.count || 0,
-      });
-    } catch (err) {
-      // @ts-expect-error: err may not have a response property, but we want to show the error message if present
-      toast.error(err?.response?.data?.message || "Failed to delete planet");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setShowDeletePopup(false);
-    setPlanetToDelete(null);
   };
 
   // Pagination numbers
@@ -157,9 +102,9 @@ const PlanetList: React.FC = () => {
             <Plus className="h-4 w-4" />
             Add Planet
           </button>
-        <span className="text-gray-500 text-sm dark:text-gray-400">
-          Total: {pagination?.total}
-        </span>
+          <span className="text-gray-500 text-sm dark:text-gray-400">
+            Total: {pagination?.total}
+          </span>
         </div>
       </div>
 
@@ -222,9 +167,6 @@ const PlanetList: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
                 Name
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                Actions
-              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
@@ -233,32 +175,17 @@ const PlanetList: React.FC = () => {
                 <tr
                   key={planet?.id || idx}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                  onClick={() =>
+                    navigate(`/kundli/planet/edit`, {
+                      state: { planetId: planet?.id },
+                    })
+                  }
                 >
                   <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                     {(page - 1) * limit + idx + 1}
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                     {planet?.name || "-"}
-                  </td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    <button
-                      className="text-blue-500 hover:text-blue-700 transition-colors"
-                    onClick={() =>
-                      navigate(`/kundli/planet/edit`, {
-                        state: { planetId: planet?.id },
-                      })
-                    }
-                      title="Edit Planet"
-                    >
-                      <Pencil className="h-5 w-5" />
-                    </button>
-                    <button
-                      className="text-red-500 hover:text-red-700 transition-colors"
-                      onClick={() => handleDeleteClick(planet)}
-                      title="Delete Planet"
-                    >
-                      <Trash className="h-5 w-5" />
-                    </button>
                   </td>
                 </tr>
               ))
@@ -323,31 +250,6 @@ const PlanetList: React.FC = () => {
           ))}
         </select>
       </div>
-
-      {/* Delete Confirmation Popup */}
-      {showDeletePopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-transparent backdrop-blur-sm z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
-            <h2 className="text-lg font-semibold mb-4">
-              Are you sure you want to delete?
-            </h2>
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-                onClick={handleCancelDelete}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
-                onClick={handleConfirmDelete}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

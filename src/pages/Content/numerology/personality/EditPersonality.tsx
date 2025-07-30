@@ -19,6 +19,7 @@ import {
 import {
   fetchPersonalityById,
   updatePersonality,
+  deletePersonality,
 } from "../../../../store/slices/personality";
 import { useLocation, useNavigate } from "react-router";
 import toast from "react-hot-toast";
@@ -120,6 +121,42 @@ const EditPersonality: React.FC = () => {
       textarea.setSelectionRange(newStart, newEnd);
       textarea.focus();
     }, 0);
+  };
+
+  // DELETE: popup state and handlers
+  // DELETE: popup state and handlers for Personality
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [personalityToDelete, setPersonalityToDelete] = useState<
+    string | number | undefined
+  >(undefined);
+
+  // Open confirmation popup and set personality to delete
+  const handleDeleteClick = (
+    personalityIdToDelete: string | number | undefined
+  ) => {
+    if (!personalityIdToDelete) return;
+    setPersonalityToDelete(personalityIdToDelete);
+    setShowDeletePopup(true);
+  };
+
+  // Cancel delete popup
+  const handleCancelDelete = () => {
+    setShowDeletePopup(false);
+    setPersonalityToDelete(undefined);
+  };
+
+  // Confirm deletion, call Personality API, close popup, redirect to personality list with toast
+  const handleConfirmDelete = async () => {
+    if (!personalityToDelete) return;
+    try {
+      await dispatch(deletePersonality(personalityToDelete));
+      setShowDeletePopup(false);
+      setPersonalityToDelete(undefined);
+      toast.success("Personality Deleted Successfully");
+      navigate("/numerology/personality/list", { state: { deleted: true } });
+    } catch (err) {
+      toast.error("Failed to delete personality. Please try again.");
+    }
   };
 
   const markdownButtons = [
@@ -530,15 +567,24 @@ const EditPersonality: React.FC = () => {
             )}
           </div>
         </div>
-
-        <button
-          type="submit"
-          className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
-          disabled={loading}
-        >
-          {loading ? "Updating..." : "Update"}
-        </button>
-
+        <div className="flex flex-col md:flex-row gap-4">
+          <button
+            type="submit"
+            className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Update"}
+          </button>
+          <button
+            type="button"
+            className="w-full md:w-auto px-6 py-3 rounded-md font-medium text-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-600 text-white hover:bg-red-700"
+            aria-label="Delete article"
+            onClick={() => handleDeleteClick(personalityId)}
+            disabled={loading || !personalityId}
+          >
+            Delete Article
+          </button>
+        </div>
         {addedSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
             Rashi added successfully!
@@ -546,6 +592,30 @@ const EditPersonality: React.FC = () => {
         )}
         {error && <div className="mt-4 text-red-600">{error}</div>}
       </form>
+      {/* DELETE: Delete Confirmation Popup */}
+      {showDeletePopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-transparent backdrop-blur-sm z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4">
+              Are you sure you want to delete?
+            </h2>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                onClick={handleCancelDelete}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+                onClick={handleConfirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

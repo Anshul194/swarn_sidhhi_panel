@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { fetchArticleById, updateArticle } from "../../store/slices/content";
 import { RootState } from "../../store/store";
 import {
@@ -135,6 +135,50 @@ const EditArticle: React.FC = () => {
       textarea.setSelectionRange(newStart, newEnd);
       textarea.focus();
     }, 0);
+  };
+
+  // DELETE: popup state and handlers
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [articleToDelete, setArticleToDelete] = useState<
+    string | number | undefined
+  >(undefined);
+
+  // Open confirmation popup and set article to delete
+  const handleDeleteClick = (
+    articleIdToDelete: string | number | undefined
+  ) => {
+    if (!articleIdToDelete) return;
+    setArticleToDelete(articleIdToDelete);
+    setShowDeletePopup(true);
+  };
+
+  // Cancel delete popup
+  const handleCancelDelete = () => {
+    setShowDeletePopup(false);
+    setArticleToDelete(undefined);
+  };
+
+  // Confirm deletion, call API, close popup, redirect to list with toast
+  const handleConfirmDelete = async () => {
+    if (!articleToDelete) return;
+    try {
+      const token = localStorage.getItem("token") || "";
+      const baseUrl = import.meta.env.VITE_BASE_URL || "";
+      const { deleteArticle } = await import("../../store/slices/content");
+      await dispatch(
+        deleteArticle({
+          token,
+          baseUrl,
+          articleId: articleToDelete,
+        })
+      );
+      setShowDeletePopup(false);
+      setArticleToDelete(undefined);
+      toast.success("Article Deleted Successfully");
+      navigate("/content/all", { state: { deleted: true } });
+    } catch (err) {
+      toast.error("Failed to delete article. Please try again.");
+    }
   };
 
   const markdownButtons = [
@@ -817,26 +861,62 @@ const EditArticle: React.FC = () => {
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`w-full md:w-auto px-6 py-3 rounded-md font-medium text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            isSubmitting
-              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-700"
-          }`}
-          aria-label="Update article"
-        >
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700"></div>
-              Updating...
-            </span>
-          ) : (
-            "Update Article"
-          )}
-        </button>
+        <div className="flex flex-col md:flex-row gap-4">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full md:w-auto px-6 py-3 rounded-md font-medium text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              isSubmitting
+                ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+            aria-label="Update article"
+          >
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700"></div>
+                Updating...
+              </span>
+            ) : (
+              "Update Article"
+            )}
+          </button>
+          {/* DELETE: delete button beside update */}
+          <button
+            type="button"
+            className="w-full md:w-auto px-6 py-3 rounded-md font-medium text-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-600 text-white hover:bg-red-700"
+            aria-label="Delete article"
+            onClick={() => handleDeleteClick(selectedArticle?.id)}
+            disabled={isSubmitting || !selectedArticle?.id}
+          >
+            Delete Article
+          </button>
+        </div>
       </form>
+      {/* DELETE: Delete Confirmation Popup */}
+      {showDeletePopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-transparent backdrop-blur-sm z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4">
+              Are you sure you want to delete?
+            </h2>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                onClick={handleCancelDelete}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+                onClick={handleConfirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

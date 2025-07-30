@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createArticle } from "../../store/slices/content";
 import { RootState } from "../../store/store";
@@ -28,7 +28,31 @@ const AddArticle: React.FC = () => {
   const [content, setContent] = useState("");
   const [contentHi, setContentHi] = useState("");
   const [category, setCategory] = useState("");
-  const [tags, setTags] = useState([]);
+  // Tags state as array of strings (IDs)
+  const [tags, setTags] = useState<string[]>([]);
+  // Dropdown state for tags
+  const [showTagsDropdown, setShowTagsDropdown] = useState(false);
+
+  // Ref for dropdown to handle outside click
+  const tagsDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (
+        tagsDropdownRef.current &&
+        !tagsDropdownRef.current.contains(e.target as Node)
+      ) {
+        setShowTagsDropdown(false);
+      }
+    };
+    if (showTagsDropdown) {
+      document.addEventListener("mousedown", handleClick);
+    } else {
+      document.removeEventListener("mousedown", handleClick);
+    }
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showTagsDropdown]);
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [image, setImage] = useState<File | null>(null);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
@@ -184,7 +208,8 @@ const AddArticle: React.FC = () => {
     formData.append("title_hi", titleHi);
     formData.append("content", content);
     formData.append("content_hi", contentHi);
-    formData.append("tags", tags);
+    // Join tags as comma-separated string for backend
+    formData.append("tags", tags.join(","));
     if (thumbnail) formData.append("thumbnail", thumbnail);
     if (image) formData.append("image", image);
 
@@ -198,7 +223,7 @@ const AddArticle: React.FC = () => {
           setTitleHi("");
           setContent("");
           setContentHi("");
-          setTags("");
+          setTags([]);
           setThumbnail(null);
           setImage(null);
           setTimeout(() => setAddedSuccess(false), 2500);
@@ -452,41 +477,58 @@ const AddArticle: React.FC = () => {
             >
               Tags (comma-separated):
             </label>
-            {/* <select
-              id="tags"
-              multiple
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select tags</option>
-              {fetchedTags?.map((item) => (
-                <option key={item.id} value={item.id}>
-                  <input type="checkbox" />
-                  {item.name}
-                </option>
-              ))}
-            </select> */}
-
-            <select
-              id="tags"
-              multiple
-              value={tags}
-              onChange={(e) => {
-                const selected = Array.from(
-                  e.target.selectedOptions,
-                  (option) => option.value
-                );
-                setTags(selected);
-              }}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 h-40"
-            >
-              {fetchedTags?.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
+            {/* Custom dropdown with checkboxes for tags */}
+            <div className="relative" ref={tagsDropdownRef}>
+              <input
+                type="text"
+                readOnly
+                value={
+                  tags.length > 0
+                    ? tags
+                        .map(
+                          (id) =>
+                            fetchedTags?.find(
+                              (t: any) => String(t.id) === String(id)
+                            )?.name || id
+                        )
+                        .join(", ")
+                    : ""
+                }
+                onClick={() => setShowTagsDropdown((v) => !v)}
+                placeholder="Select tags"
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 cursor-pointer bg-white"
+              />
+              <div
+                className={`absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto transition-all duration-150 ${
+                  showTagsDropdown ? "block" : "hidden"
+                }`}
+              >
+                {fetchedTags?.length ? (
+                  fetchedTags.map((item: any) => (
+                    <label
+                      key={item.id}
+                      className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={tags.includes(String(item.id))}
+                        onChange={() => {
+                          setTags((prev) =>
+                            prev.includes(String(item.id))
+                              ? prev.filter((id) => id !== String(item.id))
+                              : [...prev, String(item.id)]
+                          );
+                        }}
+                        className="mr-2"
+                      />
+                      {item.name}
+                    </label>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-gray-500">No tags found</div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

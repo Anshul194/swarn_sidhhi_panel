@@ -21,6 +21,7 @@ import {
   createMissingNumberRemedy,
   fetchMissingNumberRemedyById,
   updateMissingNumberRemedy,
+  deleteMissingNumberRemedy,
 } from "../../../../store/slices/missingNumber";
 import { useLocation, useNavigate } from "react-router";
 import toast from "react-hot-toast";
@@ -105,6 +106,44 @@ const EditMissingNumber: React.FC = () => {
       textarea.setSelectionRange(newStart, newEnd);
       textarea.focus();
     }, 0);
+  };
+
+  // DELETE: popup state and handlers
+  // DELETE: popup state and handlers for Missing Number
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [missingNumberToDelete, setMissingNumberToDelete] = useState<
+    string | number | undefined
+  >(undefined);
+
+  // Open confirmation popup and set missing number to delete
+  const handleDeleteClick = (
+    missingNumberIdToDelete: string | number | undefined
+  ) => {
+    if (!missingNumberIdToDelete) return;
+    setMissingNumberToDelete(missingNumberIdToDelete);
+    setShowDeletePopup(true);
+  };
+
+  // Cancel delete popup
+  const handleCancelDelete = () => {
+    setShowDeletePopup(false);
+    setMissingNumberToDelete(undefined);
+  };
+
+  // Confirm deletion, call Missing Number API, close popup, redirect to missing number list with toast
+  const handleConfirmDelete = async () => {
+    if (!missingNumberToDelete) return;
+    try {
+      await dispatch(deleteMissingNumberRemedy(missingNumberToDelete));
+      setShowDeletePopup(false);
+      setMissingNumberToDelete(undefined);
+      toast.success("Missing Number Deleted Successfully");
+      navigate("/numerology/missing-number-remedies/list", {
+        state: { deleted: true },
+      });
+    } catch (err) {
+      toast.error("Failed to delete missing number. Please try again.");
+    }
   };
 
   const markdownButtons = [
@@ -435,13 +474,24 @@ const EditMissingNumber: React.FC = () => {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
-          disabled={loading}
-        >
-          {loading ? "Updating..." : "Update Missing Number"}
-        </button>
+        <div className="flex flex-col md:flex-row gap-4">
+          <button
+            type="submit"
+            className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Update Missing Number"}
+          </button>
+          <button
+            type="button"
+            className="w-full md:w-auto px-6 py-3 rounded-md font-medium text-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-600 text-white hover:bg-red-700"
+            aria-label="Delete article"
+            onClick={() => handleDeleteClick(missingNumberId)}
+            disabled={loading || !missingNumberId}
+          >
+            Delete Article
+          </button>
+        </div>
 
         {updateSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
@@ -450,6 +500,30 @@ const EditMissingNumber: React.FC = () => {
         )}
         {error && <div className="mt-4 text-red-600">{error}</div>}
       </form>
+      {/* DELETE: Delete Confirmation Popup */}
+      {showDeletePopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-transparent backdrop-blur-sm z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4">
+              Are you sure you want to delete?
+            </h2>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                onClick={handleCancelDelete}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+                onClick={handleConfirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

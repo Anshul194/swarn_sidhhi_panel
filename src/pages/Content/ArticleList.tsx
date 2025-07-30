@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchArticles, deleteArticle } from "../../store/slices/content";
-import { Search, RotateCcw, Pencil, Trash, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { fetchArticles } from "../../store/slices/content";
+import {
+  Search,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 
 const ArticleList: React.FC = () => {
   const dispatch = useDispatch();
@@ -21,10 +26,6 @@ const ArticleList: React.FC = () => {
   // Pagination states
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-
-  // Popup state
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [articleToDelete, setArticleToDelete] = useState<any>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -61,45 +62,9 @@ const ArticleList: React.FC = () => {
     );
   };
 
-  const handleDeleteClick = (article: any) => {
-    setArticleToDelete(article);
-    setShowDeletePopup(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!articleToDelete) return;
-    const token = localStorage.getItem("token") || "";
-    const baseUrl = import.meta.env.VITE_BASE_URL || "";
-    await dispatch(
-      deleteArticle({
-        token,
-        baseUrl,
-        articleId: articleToDelete.id,
-      })
-    );
-    setShowDeletePopup(false);
-    setArticleToDelete(null);
-    toast.success("Article deleted successfully");
-    dispatch(
-      fetchArticles({
-        token,
-        baseUrl,
-        searchInput,
-        categoryFilter,
-        page,
-        limit,
-      })
-    );
-  };
-
-  const handleCancelDelete = () => {
-    setShowDeletePopup(false);
-    setArticleToDelete(null);
-  };
-
   // Pagination numbers
   const generatePageNumbers = () => {
-    console.log("Generating page numbers for pagination",pagination);
+    console.log("Generating page numbers for pagination", pagination);
     const totalPages = pagination?.totalPages || 1;
     const current = page;
     const maxPages = 5;
@@ -191,9 +156,6 @@ const ArticleList: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
                 Title
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                Actions
-              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
@@ -201,32 +163,17 @@ const ArticleList: React.FC = () => {
               <tr
                 key={article?.id || idx}
                 className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                onClick={() =>
+                  navigate("/articles/edit", {
+                    state: { articleId: article?.id },
+                  })
+                }
               >
                 <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   {(page - 1) * limit + idx + 1}
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                   {article?.title || "-"}
-                </td>
-                <td className="px-6 py-4 text-right space-x-2">
-                  <button
-                    className="text-blue-500 hover:text-blue-700 transition-colors"
-                    onClick={() =>
-                      navigate("/articles/edit", {
-                        state: { articleId: article?.id },
-                      })
-                    }
-                    title="Edit Article"
-                  >
-                    <Pencil className="h-5 w-5" />
-                  </button>
-                  <button
-                    className="text-red-500 hover:text-red-700 transition-colors"
-                    onClick={() => handleDeleteClick(article)}
-                    title="Delete Article"
-                  >
-                    <Trash className="h-5 w-5" />
-                  </button>
                 </td>
               </tr>
             ))}
@@ -271,39 +218,19 @@ const ArticleList: React.FC = () => {
         </button>
         <select
           value={limit}
-          onChange={e => { setLimit(Number(e.target.value)); setPage(1); }}
+          onChange={(e) => {
+            setLimit(Number(e.target.value));
+            setPage(1);
+          }}
           className="ml-2 px-2 py-1 border border-gray-300 rounded dark:border-gray-700"
         >
-          {[10, 20, 50, 100].map(sz => (
-            <option key={sz} value={sz}>{sz} / page</option>
+          {[10, 20, 50, 100].map((sz) => (
+            <option key={sz} value={sz}>
+              {sz} / page
+            </option>
           ))}
         </select>
       </div>
-
-      {/* Delete Confirmation Popup */}
-      {showDeletePopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-transparent backdrop-blur-sm z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
-            <h2 className="text-lg font-semibold mb-4">
-              Are you sure you want to delete?
-            </h2>
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-                onClick={handleCancelDelete}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
-                onClick={handleConfirmDelete}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

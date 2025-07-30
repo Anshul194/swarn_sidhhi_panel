@@ -128,9 +128,9 @@ const RashiList: React.FC = () => {
             <Plus className="h-4 w-4" />
             Add Rashi
           </button>
-        <span className="text-gray-500 text-sm dark:text-gray-400">
-          Total: {rashis?.length}
-        </span>
+          <span className="text-gray-500 text-sm dark:text-gray-400">
+            Total: {rashis?.length}
+          </span>
         </div>
       </div>
 
@@ -193,9 +193,6 @@ const RashiList: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
                 Name
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                Actions
-              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
@@ -203,32 +200,17 @@ const RashiList: React.FC = () => {
               <tr
                 key={rashi?._id || idx}
                 className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                onClick={() =>
+                  navigate("/kundli/rashi/edit", {
+                    state: { rashiId: rashi?.id },
+                  })
+                }
               >
                 <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   {(page - 1) * limit + idx + 1}
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                   {rashi?.name || "-"}
-                </td>
-                <td className="px-6 py-4 text-right space-x-2">
-                  <button
-                    className="text-blue-500 hover:text-blue-700 transition-colors"
-                    onClick={() =>
-                      navigate("/kundli/rashi/edit", {
-                        state: { rashiId: rashi?.id },
-                      })
-                    }
-                    title="Edit Article"
-                  >
-                    <Pencil className="h-5 w-5" />
-                  </button>
-                  <button
-                    className="text-red-500 hover:text-red-700 transition-colors"
-                    onClick={() => handleDeleteClick(rashi)}
-                    title="Delete Article"
-                  >
-                    <Trash className="h-5 w-5" />
-                  </button>
                 </td>
               </tr>
             ))}

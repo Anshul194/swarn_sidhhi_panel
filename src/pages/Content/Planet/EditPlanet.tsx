@@ -93,6 +93,49 @@ const EditPlanet: React.FC = () => {
     }, 0);
   };
 
+  // DELETE: popup state and handlers for Planet
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [planetToDelete, setPlanetToDelete] = useState<
+    string | number | undefined
+  >(undefined);
+
+  // Open confirmation popup and set planet to delete
+  const handleDeleteClick = (planetIdToDelete: string | number | undefined) => {
+    if (!planetIdToDelete) return;
+    setPlanetToDelete(planetIdToDelete);
+    setShowDeletePopup(true);
+  };
+
+  // Cancel delete popup
+  const handleCancelDelete = () => {
+    setShowDeletePopup(false);
+    setPlanetToDelete(undefined);
+  };
+
+  // Confirm deletion, call API, close popup, redirect to planet list with toast
+  const handleConfirmDelete = async () => {
+    if (!planetToDelete) return;
+    try {
+      const token = localStorage.getItem("token") || "";
+      await axios.delete(
+        `https://test.swarnsiddhi.com/admin/api/v1/content/kundli/planets/${planetToDelete}/`,
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setShowDeletePopup(false);
+      setPlanetToDelete(undefined);
+      toast.success("Planet Deleted Successfully");
+      navigate("/kundli/planet/list", { state: { deleted: true } });
+    } catch (err) {
+      // @ts-expect-error
+      toast.error(err?.response?.data?.message || "Failed to delete planet");
+    }
+  };
+
   const markdownButtons = [
     {
       icon: Bold,
@@ -473,15 +516,25 @@ const EditPlanet: React.FC = () => {
             )}
           </div>
         </div>
-
-        <button
-          type="submit"
-          className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
-          aria-label="Update planet"
-          disabled={loading}
-        >
-          {loading ? "Updating..." : "Update Planet"}
-        </button>
+        <div className="flex flex-col md:flex-row gap-4">
+          <button
+            type="submit"
+            className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
+            aria-label="Update planet"
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Update Planet"}
+          </button>
+          <button
+            type="button"
+            className="w-full md:w-auto px-6 py-3 rounded-md font-medium text-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-600 text-white hover:bg-red-700"
+            aria-label="Delete planet"
+            onClick={() => handleDeleteClick(planetId)}
+            disabled={loading || !planetId}
+          >
+            Delete Planet
+          </button>
+        </div>
         {addedSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
             Planet updated successfully!
@@ -489,6 +542,30 @@ const EditPlanet: React.FC = () => {
         )}
         {error && <div className="mt-4 text-red-600">{error}</div>}
       </form>
+      {/* DELETE: Delete Confirmation Popup */}
+      {showDeletePopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-transparent backdrop-blur-sm z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4">
+              Are you sure you want to delete?
+            </h2>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                onClick={handleCancelDelete}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+                onClick={handleConfirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
