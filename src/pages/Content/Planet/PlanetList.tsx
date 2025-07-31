@@ -6,6 +6,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
+  LayoutGrid,
+  List,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -17,6 +19,8 @@ const PlanetList: React.FC = () => {
   // Pagination states
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  // View mode: 'table' or 'grid'
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   // Data states
   const [planets, setPlanets] = useState<Array<{ id: number; name: string }>>(
     []
@@ -102,6 +106,31 @@ const PlanetList: React.FC = () => {
             <Plus className="h-4 w-4" />
             Add Planet
           </button>
+          {/* View toggle buttons */}
+          <div className="flex justify-end gap-2 ">
+            <button
+              onClick={() => setViewMode("table")}
+              className={`p-2 rounded-md border border-gray-300 dark:border-gray-600 ${
+                viewMode === "table"
+                  ? "bg-gray-200 dark:bg-gray-700"
+                  : "bg-white dark:bg-gray-900"
+              } hover:bg-gray-100 dark:hover:bg-gray-800`}
+              title="Table View"
+            >
+              <List className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-2 rounded-md border border-gray-300 dark:border-gray-600 ${
+                viewMode === "grid"
+                  ? "bg-gray-200 dark:bg-gray-700"
+                  : "bg-white dark:bg-gray-900"
+              } hover:bg-gray-100 dark:hover:bg-gray-800`}
+              title="Grid View"
+            >
+              <LayoutGrid className="h-5 w-5" />
+            </button>
+          </div>
           <span className="text-gray-500 text-sm dark:text-gray-400">
             Total: {pagination?.total}
           </span>
@@ -156,49 +185,75 @@ const PlanetList: React.FC = () => {
       {/* Error State */}
       {error && <div className="text-red-500 text-center py-4">{error}</div>}
 
-      {/* Table */}
-      <div className="bg-white shadow rounded-lg overflow-x-auto dark:bg-gray-900">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                #
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                Name
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
-            {planets && planets.length > 0 ? (
-              planets.map((planet, idx) => (
-                <tr
-                  key={planet?.id || idx}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-800"
-                  onClick={() =>
-                    navigate(`/kundli/planet/edit`, {
-                      state: { planetId: planet?.id },
-                    })
-                  }
-                >
-                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                    {(page - 1) * limit + idx + 1}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                    {planet?.name || "-"}
+      {/* Table or Grid View */}
+      {viewMode === "table" ? (
+        <div className="bg-white shadow rounded-lg overflow-x-auto dark:bg-gray-900">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                  #
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                  Name
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
+              {planets && planets.length > 0 ? (
+                planets.map((planet, idx) => (
+                  <tr
+                    key={planet?.id || idx}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                    onClick={() =>
+                      navigate(`/kundli/planet/edit`, {
+                        state: { planetId: planet?.id },
+                      })
+                    }
+                  >
+                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                      {(page - 1) * limit + idx + 1}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                      {planet?.name || "-"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="text-center py-6 text-gray-400">
+                    No planets found.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={3} className="text-center py-6 text-gray-400">
-                  No planets found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 py-4">
+          {planets && planets.length > 0 ? (
+            planets.map((planet, idx) => (
+              <div
+                key={planet?.id || idx}
+                className="border border-gray-400 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition"
+                onClick={() =>
+                  navigate(`/kundli/planet/edit`, {
+                    state: { planetId: planet?.id },
+                  })
+                }
+              >
+                <div className="text-xl font-semibold text-gray-800 text-center mb-1">
+                  {planet?.name || "-"}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-6 text-gray-400">
+              No planets found.
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="flex justify-end gap-2 mt-4">

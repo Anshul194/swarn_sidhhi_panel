@@ -20,7 +20,9 @@ import { useNavigate } from "react-router-dom";
 const UserList: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { users, loading, error, pagination, search, status } = useSelector((state: any) => state.users);
+  const { users, loading, error, pagination, search, status } = useSelector(
+    (state: any) => state.users
+  );
 
   const [searchInput, setSearchInput] = useState(search || "");
   // Add filter states
@@ -114,20 +116,21 @@ const UserList: React.FC = () => {
     );
     setBlockDialog({ open: false, user: null, reason: "" });
     // Optionally refetch users after blocking/unblocking
-    dispatch(fetchAllUsers({
-      // page: pagination.page,
-      // page_size: pagination.limit,
-      // search: searchInput,
-      // is_premium: isPremium === "" ? undefined : isPremium === "true",
-      // is_active: isActive === "" ? undefined : isActive === "true",
-      // is_blocked: isBlocked === "" ? undefined : isBlocked === "true",
-      // created_after: createdAfter || undefined,
-      // created_before: createdBefore || undefined,
-      // sort_by: sortBy,
-      // sort_order: sortOrder as "asc" | "desc",
-    }));
-  setBlockDialog({ open: false, user: null, reason: "" });
-
+    dispatch(
+      fetchAllUsers({
+        // page: pagination.page,
+        // page_size: pagination.limit,
+        // search: searchInput,
+        // is_premium: isPremium === "" ? undefined : isPremium === "true",
+        // is_active: isActive === "" ? undefined : isActive === "true",
+        // is_blocked: isBlocked === "" ? undefined : isBlocked === "true",
+        // created_after: createdAfter || undefined,
+        // created_before: createdBefore || undefined,
+        // sort_by: sortBy,
+        // sort_order: sortOrder as "asc" | "desc",
+      })
+    );
+    setBlockDialog({ open: false, user: null, reason: "" });
   };
 
   // Pagination numbers
@@ -147,7 +150,9 @@ const UserList: React.FC = () => {
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">User List</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
+          User List
+        </h1>
         <span className="text-gray-500 text-sm dark:text-gray-400">
           Total: {pagination.total}
         </span>
@@ -170,7 +175,7 @@ const UserList: React.FC = () => {
             <span className="text-sm">Premium:</span>
             <select
               value={isPremium}
-              onChange={e => setIsPremium(e.target.value)}
+              onChange={(e) => setIsPremium(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2"
             >
               <option value="">All</option>
@@ -182,7 +187,7 @@ const UserList: React.FC = () => {
             <span className="text-sm">Active:</span>
             <select
               value={isActive}
-              onChange={e => setIsActive(e.target.value)}
+              onChange={(e) => setIsActive(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2"
             >
               <option value="">All</option>
@@ -194,7 +199,7 @@ const UserList: React.FC = () => {
             <span className="text-sm">Blocked:</span>
             <select
               value={isBlocked}
-              onChange={e => setIsBlocked(e.target.value)}
+              onChange={(e) => setIsBlocked(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2"
             >
               <option value="">All</option>
@@ -209,7 +214,7 @@ const UserList: React.FC = () => {
             <input
               type="date"
               value={createdAfter}
-              onChange={e => setCreatedAfter(e.target.value)}
+              onChange={(e) => setCreatedAfter(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2"
             />
           </div>
@@ -218,7 +223,7 @@ const UserList: React.FC = () => {
             <input
               type="date"
               value={createdBefore}
-              onChange={e => setCreatedBefore(e.target.value)}
+              onChange={(e) => setCreatedBefore(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2"
             />
           </div>
@@ -226,7 +231,7 @@ const UserList: React.FC = () => {
             <span className="text-sm">Sort By:</span>
             <select
               value={sortBy}
-              onChange={e => setSortBy(e.target.value)}
+              onChange={(e) => setSortBy(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2"
             >
               <option value="created_at">Created At</option>
@@ -239,7 +244,7 @@ const UserList: React.FC = () => {
             <span className="text-sm">Order:</span>
             <select
               value={sortOrder}
-              onChange={e => setSortOrder(e.target.value)}
+              onChange={(e) => setSortOrder(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2"
             >
               <option value="desc">Desc</option>
@@ -267,43 +272,67 @@ const UserList: React.FC = () => {
       <div className="bg-white shadow rounded-lg overflow-x-auto dark:bg-gray-900">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
-        <tr>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">#</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">UserName</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Name</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Email</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Status</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Blocked</th>
-          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Actions</th>
-        </tr>
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                #
+              </th>
+              {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">UserName</th> */}
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                Plan
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                Coins
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                Status
+              </th>
+              {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Blocked</th>
+          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Actions</th> */}
+            </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
-        {users.map((user: any, idx: number) => (
-          <tr key={user.id || idx} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-            <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-          {user.id || (pagination.page - 1) * pagination.limit + idx + 1}
-            </td>
-            <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+            {users.map((user: any, idx: number) => (
+              <tr
+                key={user.id || idx}
+                className="hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                  {user.id ||
+                    (pagination.page - 1) * pagination.limit + idx + 1}
+                </td>
+                {/* <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
           {user.username || user.user_name || "-"}
-            </td>
-            <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-          {user.name || user.full_name || "-"}
-            </td>
-            <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-          {user.email || "-"}
-            </td>
-            <td className="px-6 py-4 text-sm">
-          {user.is_active ? (
-            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-              Active
-            </span>
-          ) : (
-            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-              Inactive
-            </span>
-          )}
-            </td>
-            <td className="px-6 py-4 text-sm text-center">
+            </td> */}
+                <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                  {user.name || user.full_name || "-"}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                  {user.email || "-"}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                  {user.plan || "-"}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                  {user.coins || "-"}
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  {user.is_active ? (
+                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                      Inactive
+                    </span>
+                  )}
+                </td>
+                {/* <td className="px-6 py-4 text-sm text-center">
           {user.is_blocked ? (
             <span title="Blocked" className="inline-flex items-center gap-1 text-red-600">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -351,9 +380,9 @@ const UserList: React.FC = () => {
               </svg>
             )}
           </button>
-            </td>
-          </tr>
-        ))}
+            </td> */}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -400,9 +429,7 @@ const UserList: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm bg-opacity-30">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">
-              {blockDialog.user?.is_blocked
-                ? "Unblock User"
-                : "Block User"}
+              {blockDialog.user?.is_blocked ? "Unblock User" : "Block User"}
             </h2>
             <p className="mb-4">
               {blockDialog.user?.is_blocked
@@ -418,8 +445,8 @@ const UserList: React.FC = () => {
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   rows={2}
                   value={blockDialog.reason}
-                  onChange={e =>
-                    setBlockDialog(d => ({ ...d, reason: e.target.value }))
+                  onChange={(e) =>
+                    setBlockDialog((d) => ({ ...d, reason: e.target.value }))
                   }
                   required
                 />
@@ -428,7 +455,9 @@ const UserList: React.FC = () => {
             <div className="flex justify-end gap-2">
               <button
                 className="px-4 py-2 rounded bg-gray-200 text-gray-700"
-                onClick={() => setBlockDialog({ open: false, user: null, reason: "" })}
+                onClick={() =>
+                  setBlockDialog({ open: false, user: null, reason: "" })
+                }
               >
                 Cancel
               </button>
@@ -440,7 +469,8 @@ const UserList: React.FC = () => {
                 }`}
                 onClick={handleBlockConfirm}
                 disabled={
-                  !blockDialog.user?.is_blocked && blockDialog.reason.trim() === ""
+                  !blockDialog.user?.is_blocked &&
+                  blockDialog.reason.trim() === ""
                 }
               >
                 {blockDialog.user?.is_blocked ? "Unblock" : "Block"}

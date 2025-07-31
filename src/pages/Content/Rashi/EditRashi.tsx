@@ -20,7 +20,7 @@ import {
   fetchRashiById,
   updateRashi,
 } from "../../../store/slices/rashi";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router";
 import { deleteRashi } from "../../../store/slices/rashi";
 
@@ -129,6 +129,8 @@ const EditRashi: React.FC = () => {
       await dispatch(deleteRashi(rashiToDelete));
       setShowDeletePopup(false);
       setRashiToDelete(undefined);
+      toast.success("Rashi Deleted Successfully");
+
       navigate("/kundli/rashi/list", { state: { deleted: true } });
     } catch (err) {
       toast.error("Failed to delete rashi. Please try again.");

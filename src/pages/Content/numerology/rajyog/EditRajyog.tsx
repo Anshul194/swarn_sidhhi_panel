@@ -354,7 +354,7 @@ const EditRajyog: React.FC = () => {
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
         <Crown className="h-8 w-8 text-yellow-600" />
-        Edit Rajyog - Yoga Configuration
+        Edit Rajyog - {titleEn} - {yog}
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -474,8 +474,8 @@ const EditRajyog: React.FC = () => {
           </div>
 
           {/* Title Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mt-4">
+            {/* <div>
               <label
                 htmlFor="title"
                 className="block text-sm font-medium text-gray-700 mb-2"
@@ -490,7 +490,7 @@ const EditRajyog: React.FC = () => {
                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 placeholder="General title"
               />
-            </div>
+            </div> */}
 
             <div>
               <label

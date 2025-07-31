@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -21,6 +21,23 @@ import {
 import { fetchTags } from "../../store/slices/tag";
 
 const EditArticle: React.FC = () => {
+  // State for custom tag input
+  const [customTagInput, setCustomTagInput] = useState("");
+
+  // Handler to add custom tag
+  const handleAddCustomTag = () => {
+    const trimmed = customTagInput.trim();
+    if (
+      trimmed &&
+      !tags.includes(trimmed) &&
+      !fetchedTags?.some(
+        (t: { id: string | number; name: string }) => t.name === trimmed
+      )
+    ) {
+      setTags((prev: string[]) => [...prev, trimmed]);
+      setCustomTagInput("");
+    }
+  };
   const location = useLocation();
   const navigate = useNavigate();
   const articleId = location.state?.articleId;
@@ -28,6 +45,29 @@ const EditArticle: React.FC = () => {
   const { selectedArticle, loading, error } = useSelector(
     (state: RootState) => state.content
   );
+  // Dropdown state for tags
+  const [showTagsDropdown, setShowTagsDropdown] = useState(false);
+
+  // Ref for dropdown to handle outside click
+  const tagsDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (
+        tagsDropdownRef.current &&
+        !tagsDropdownRef.current.contains(e.target as Node)
+      ) {
+        setShowTagsDropdown(false);
+      }
+    };
+    if (showTagsDropdown) {
+      document.addEventListener("mousedown", handleClick);
+    } else {
+      document.removeEventListener("mousedown", handleClick);
+    }
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showTagsDropdown]);
 
   // Form state
   const [title, setTitle] = useState("");
@@ -35,7 +75,7 @@ const EditArticle: React.FC = () => {
   const [content, setContent] = useState("");
   const [contentHi, setContentHi] = useState("");
   const [category, setCategory] = useState("");
-  const [tags, setTags] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [image, setImage] = useState<File | null>(null);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
@@ -53,10 +93,10 @@ const EditArticle: React.FC = () => {
   );
   useEffect(() => {
     // Fetch tags when component mounts
-    if (!fetchedTags.length || fetchTags.length === 0) {
+    if (!fetchedTags.length) {
       dispatch(fetchTags());
     }
-  }, [dispatch]);
+  }, [dispatch, fetchedTags.length]);
 
   // Fetch article when component mounts
   useEffect(() => {
@@ -79,7 +119,11 @@ const EditArticle: React.FC = () => {
       setContent(selectedArticle.content || "");
       setContentHi(selectedArticle.content_hi || "");
       setCategory(selectedArticle.category || "");
-      setTags(selectedArticle.tags?.join(", ") || "");
+      setTags(
+        Array.isArray(selectedArticle.tags)
+          ? selectedArticle.tags.map(String)
+          : []
+      );
       setArticleLoaded(true);
       // thumbnail and image are not set here, only on file input change
     }
@@ -276,7 +320,7 @@ const EditArticle: React.FC = () => {
       formData.append("content", content);
       formData.append("content_hi", contentHi);
       formData.append("category", category);
-      formData.append("tags", tags);
+      formData.append("tags", tags.join(","));
       if (thumbnail) formData.append("thumbnail", thumbnail);
       if (image) formData.append("image", image);
 
@@ -675,192 +719,340 @@ const EditArticle: React.FC = () => {
             )}
           </div>
         </div>
-
-        {/* Content Fields */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label
-              htmlFor="content"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Content (English){" "}
-              {activeLanguage === "en" && activeEditor === "content" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "content" ? (
-              <div
-                className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
-              />
-            ) : (
-              <textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("content");
-                  setActiveLanguage("en");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={15}
-                aria-required="true"
-                aria-describedby="content-error"
-                placeholder="Enter your markdown content here..."
-              />
-            )}
-            {formErrors.content && (
-              <p id="content-error" className="mt-1 text-sm text-red-600">
-                {formErrors.content}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="content_hi"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Content (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "content" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "content" ? (
-              <div
-                className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(contentHi) }}
-              />
-            ) : (
-              <textarea
-                id="content_hi"
-                value={contentHi}
-                onChange={(e) => setContentHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("content");
-                  setActiveLanguage("hi");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={15}
-                placeholder="यहाँ अपना मार्कडाउन कंटेंट लिखें..."
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Other fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label
-              htmlFor="category"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Category:
-            </label>
-            <input
-              id="category"
-              type="text"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              aria-required="true"
-              aria-describedby="category-error"
-            />
-            {formErrors.category && (
-              <p id="category-error" className="mt-1 text-sm text-red-600">
-                {formErrors.category}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="tags"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Tags (comma-separated):
-            </label>
-            <select
-              id="tags"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select tags</option>
-              {fetchedTags?.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* File uploads */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label
-              htmlFor="thumbnail"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Thumbnail:
-            </label>
-            <input
-              id="thumbnail"
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e, setThumbnail)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            />
-            {selectedArticle?.thumbnail && (
-              <p className="mt-1 text-sm">
-                Current:{" "}
-                <a
-                  href={selectedArticle.thumbnail}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="col-span-2">
+            {/* Content Fields */}
+            <div className="grid grid-cols-1 gap-6 mb-6 ">
+              <div>
+                <label
+                  htmlFor="content"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  View Thumbnail
-                </a>
-              </p>
-            )}
-          </div>
+                  Content (English){" "}
+                  {activeLanguage === "en" && activeEditor === "content" && (
+                    <span className="text-blue-600 text-xs">← Active</span>
+                  )}
+                </label>
+                {previewMode &&
+                activeLanguage === "en" &&
+                activeEditor === "content" ? (
+                  <div
+                    className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: renderMarkdown(content),
+                    }}
+                  />
+                ) : (
+                  <textarea
+                    id="content"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    onFocus={() => {
+                      setActiveEditor("content");
+                      setActiveLanguage("en");
+                    }}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
+                    rows={10}
+                    aria-required="true"
+                    aria-describedby="content-error"
+                    placeholder="Enter your markdown content here..."
+                  />
+                )}
+                {formErrors.content && (
+                  <p id="content-error" className="mt-1 text-sm text-red-600">
+                    {formErrors.content}
+                  </p>
+                )}
+              </div>
 
-          <div>
-            <label
-              htmlFor="image"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Image:
-            </label>
-            <input
-              id="image"
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e, setImage)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            />
-            {selectedArticle?.image && (
-              <p className="mt-1 text-sm">
-                Current:{" "}
-                <a
-                  href={selectedArticle.image}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+              <div>
+                <label
+                  htmlFor="content_hi"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  View Image
-                </a>
-              </p>
-            )}
+                  Content (Hindi){" "}
+                  {activeLanguage === "hi" && activeEditor === "content" && (
+                    <span className="text-blue-600 text-xs">← Active</span>
+                  )}
+                </label>
+                {previewMode &&
+                activeLanguage === "hi" &&
+                activeEditor === "content" ? (
+                  <div
+                    className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: renderMarkdown(contentHi),
+                    }}
+                  />
+                ) : (
+                  <textarea
+                    id="content_hi"
+                    value={contentHi}
+                    onChange={(e) => setContentHi(e.target.value)}
+                    onFocus={() => {
+                      setActiveEditor("content");
+                      setActiveLanguage("hi");
+                    }}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
+                    rows={10}
+                    placeholder="यहाँ अपना मार्कडाउन कंटेंट लिखें..."
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Other fields */}
+            <div className="grid grid-cols-1 gap-6 mb-6">
+              <div>
+                <label
+                  htmlFor="category"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Category:
+                </label>
+                <input
+                  id="category"
+                  type="text"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  aria-required="true"
+                  aria-describedby="category-error"
+                />
+                {formErrors.category && (
+                  <p id="category-error" className="mt-1 text-sm text-red-600">
+                    {formErrors.category}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="tags"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Tags (comma-separated):
+                </label>
+                {/* Custom dropdown with checkboxes for tags and custom tag add */}
+                <div className="relative" ref={tagsDropdownRef}>
+                  {/* Dropdown opens upward, taller, sticky add section (fixed) */}
+                  <div
+                    className={`absolute z-10 bottom-full mb-1 w-full bg-white border border-gray-300 rounded-md shadow-lg transition-all duration-150 ${
+                      showTagsDropdown ? "block" : "hidden"
+                    }`}
+                    style={{
+                      minHeight: 120,
+                      maxHeight: 370,
+                      display: showTagsDropdown ? "block" : "none",
+                    }}
+                  >
+                    {/* Sticky add section at the top, outside scrollable area */}
+                    <div
+                      className="flex items-center gap-2 px-3 py-2 border-b border-gray-200 bg-gray-50 sticky top-0 z-20"
+                      style={{
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 20,
+                        background: "#f9fafb",
+                      }}
+                    >
+                      <input
+                        type="text"
+                        value={customTagInput}
+                        onChange={(e) => setCustomTagInput(e.target.value)}
+                        placeholder="Add custom tag"
+                        className="flex-1 px-2 py-1 border border-gray-300 rounded-md text-sm"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddCustomTag();
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                        onClick={handleAddCustomTag}
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {/* Scrollable tag list below sticky add section */}
+                    <div className="max-h-[320px] overflow-auto">
+                      {fetchedTags?.length ? (
+                        fetchedTags.map(
+                          (item: { id: string | number; name: string }) => (
+                            <label
+                              key={item.id}
+                              className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={tags.includes(String(item.id))}
+                                onChange={() => {
+                                  setTags((prev: string[]) =>
+                                    prev.includes(String(item.id))
+                                      ? prev.filter(
+                                          (id) => id !== String(item.id)
+                                        )
+                                      : [...prev, String(item.id)]
+                                  );
+                                }}
+                                className="mr-2"
+                              />
+                              {item.name}
+                            </label>
+                          )
+                        )
+                      ) : (
+                        <div className="px-3 py-2 text-gray-500">
+                          No tags found
+                        </div>
+                      )}
+                      {/* Show custom tags (not in fetchedTags) */}
+                      {tags
+                        .filter(
+                          (id) =>
+                            !fetchedTags?.some(
+                              (t: { id: string | number; name: string }) =>
+                                String(t.id) === String(id)
+                            )
+                        )
+                        .map((customTag) => (
+                          <label
+                            key={customTag}
+                            className="flex items-center px-3 py-2 bg-blue-50 hover:bg-blue-100 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={true}
+                              onChange={() => {
+                                setTags((prev: string[]) =>
+                                  prev.filter((id) => id !== customTag)
+                                );
+                              }}
+                              className="mr-2"
+                            />
+                            <span className="italic text-blue-700">
+                              {customTag}
+                            </span>
+                          </label>
+                        ))}
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    readOnly
+                    value={
+                      tags.length > 0
+                        ? tags
+                            .map(
+                              (id) =>
+                                fetchedTags?.find(
+                                  (t: { id: string | number; name: string }) =>
+                                    String(t.id) === String(id)
+                                )?.name || id
+                            )
+                            .join(", ")
+                        : ""
+                    }
+                    onClick={() => setShowTagsDropdown((v) => !v)}
+                    placeholder="Select tags"
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 cursor-pointer bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="content-center">
+            {/* File uploads */}
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6">
+              <div>
+                <label
+                  htmlFor="thumbnail"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Thumbnail:
+                </label>
+                <input
+                  id="thumbnail"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e, setThumbnail)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                />
+                {/* Show preview of uploaded thumbnail or current thumbnail */}
+                {(thumbnail || selectedArticle?.thumbnail) && (
+                  <div className="mt-2 flex items-center gap-3">
+                    <span className="text-sm text-gray-600">Preview:</span>
+                    {thumbnail ? (
+                      <img
+                        src={URL.createObjectURL(thumbnail)}
+                        alt="Thumbnail Preview"
+                        className="h-[150px] w-3xs object-cover rounded border border-gray-300"
+                      />
+                    ) : (
+                      <a
+                        href={selectedArticle.thumbnail}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        <img
+                          src={selectedArticle.thumbnail}
+                          alt="Current Thumbnail"
+                          className="h-[150px] w-3xs object-cover rounded border border-gray-300"
+                        />
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="image"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Image:
+                </label>
+                <input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e, setImage)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                />
+                {/* Show preview of uploaded image or current image */}
+                {(image || selectedArticle?.image) && (
+                  <div className="mt-2 flex items-center gap-3">
+                    <span className="text-sm text-gray-600">Preview:</span>
+                    {image ? (
+                      <img
+                        src={URL.createObjectURL(image)}
+                        alt="Image Preview"
+                        className="h-[150px] w-3xs object-cover rounded border border-gray-300"
+                      />
+                    ) : (
+                      <a
+                        href={selectedArticle.image}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        <img
+                          src={selectedArticle.image}
+                          alt="Current Image"
+                          className="h-[150px] h-3xs w-3xs object-cover rounded border border-gray-300"
+                        />
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-
         <div className="flex flex-col md:flex-row gap-4">
           <button
             type="submit"

@@ -7,6 +7,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
+  Eye,
+  Share2,
+  MessageSquareText,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -156,6 +159,12 @@ const ArticleList: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
                 Title
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                State
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                Status
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
@@ -174,6 +183,12 @@ const ArticleList: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                   {article?.title || "-"}
+                </td>
+                <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                  {article?.state || "-"}
+                </td>
+                <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                  {article?.status || "-"}
                 </td>
               </tr>
             ))}
