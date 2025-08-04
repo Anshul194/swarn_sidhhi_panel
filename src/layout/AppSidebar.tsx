@@ -43,8 +43,7 @@ const navItems: NavItem[] = [
   {
     icon: <ListIcon />,
     name: "User List",
-    path: "/users/all"
-    ,
+    path: "/users/all",
   },
   // {
   //   icon: <PageIcon />,
@@ -54,7 +53,7 @@ const navItems: NavItem[] = [
   {
     icon: <ListIcon />,
     name: "Articles List",
-    path: "/content/all"
+    path: "/content/all",
   },
   // {
   //   icon: <PageIcon />,
@@ -64,90 +63,95 @@ const navItems: NavItem[] = [
   {
     icon: <ListIcon />,
     name: "Tags List",
-    path: "/content/tags/list"
+    path: "/content/tags/list",
   },
-//   {
-//   icon: <PageIcon />,
-//   name: "Add Rashi",
-//   path: "/kundli/rashi/add"
-// },
-{
-  icon: <ListIcon />,
-  name: "Rashi List",
-  path: "/kundli/rashi/list"
-},
-// {
-//   icon: <PageIcon />,
-//   name: "Add Planet",
-//   path: "/kundli/planet/add"
-// },
-{
-  icon: <ListIcon />,
-  name: "Planet List",
-  path: "/kundli/planet/list"
-},
+  //   {
+  //   icon: <PageIcon />,
+  //   name: "Add Rashi",
+  //   path: "/kundli/rashi/add"
+  // },
+  {
+    icon: <ListIcon />,
+    name: "Rashi List",
+    path: "/kundli/rashi/list",
+  },
+  // {
+  //   icon: <PageIcon />,
+  //   name: "Add Planet",
+  //   path: "/kundli/planet/add"
+  // },
+  {
+    icon: <ListIcon />,
+    name: "Planet List",
+    path: "/kundli/planet/list",
+  },
 
-//   {
-//   icon: <PageIcon />,
-//   name: "Add Entrance Analysis",
-//   path: "/vastu/entrance/analysis/add"
-// },
-{
-  icon: <ListIcon />,
-  name: "Entrance Analysis List",
-  path: "/vastu/entrance/analysis/list"
-},
-{
-  icon: <ListIcon />,
-  name: "Entrance List",
-  path: "/vastu/entrance/list"
-},
-// {
-//   icon: <PageIcon />,
-//   name: "Add Personality",
-//   path: "/numerology/personality/add"
-// },
-{
-  icon: <ListIcon />,
-  name: "Personality List",
-  path: "/numerology/personality/list"
-},
-// {
-//   icon: <PageIcon />,
-//   name: "Add Year Prediction",
-//   path: "/numerology/year-prediction/add"
-// },
-{
-  icon: <ListIcon />,
-  name: "Year Prediction List",
-  path: "/numerology/year-prediction/list"
-},
-// {
-//   icon: <PageIcon />,
-//   name: "Add Missing Number Remedy",
-//   path: "/numerology/missing-number-remedies/add"
-// },
-{
-  icon: <ListIcon />,
-  name: "Missing Number Remedies List",
-  path: "/numerology/missing-number-remedies/list"
-},
-// {
-//   icon: <PageIcon />,
-//   name: "Add Loshu Rajyog",
-//   path: "/numerology/rajyogs/add"
-// },
-{
-  icon: <ListIcon />,
-  name: "Loshu Rajyogs List",
-  path: "/numerology/rajyogs/list"
-},
-{
-  icon: <ListIcon />,
-  name: "Overview",
-  path: "/analytics/user"
-}
+  //   {
+  //   icon: <PageIcon />,
+  //   name: "Add Entrance Analysis",
+  //   path: "/vastu/entrance/analysis/add"
+  // },
+  {
+    icon: <ListIcon />,
+    name: "Entrance Analysis List",
+    path: "/vastu/entrance/analysis/list",
+  },
+  {
+    icon: <ListIcon />,
+    name: "Entrance List",
+    path: "/vastu/entrance/list",
+  },
+  // {
+  //   icon: <PageIcon />,
+  //   name: "Add Personality",
+  //   path: "/numerology/personality/add"
+  // },
+  {
+    icon: <ListIcon />,
+    name: "Personality List",
+    path: "/numerology/personality/list",
+  },
+  // {
+  //   icon: <PageIcon />,
+  //   name: "Add Year Prediction",
+  //   path: "/numerology/year-prediction/add"
+  // },
+  {
+    icon: <ListIcon />,
+    name: "Year Prediction List",
+    path: "/numerology/year-prediction/list",
+  },
+  // {
+  //   icon: <PageIcon />,
+  //   name: "Add Missing Number Remedy",
+  //   path: "/numerology/missing-number-remedies/add"
+  // },
+  {
+    icon: <ListIcon />,
+    name: "Missing Number Remedies List",
+    path: "/numerology/missing-number-remedies/list",
+  },
+  // {
+  //   icon: <PageIcon />,
+  //   name: "Add Loshu Rajyog",
+  //   path: "/numerology/rajyogs/add"
+  // },
 
+  {
+    icon: <ListIcon />,
+    name: "Numbers List",
+    path: "/numerology/numbers/list",
+  },
+  {
+    icon: <ListIcon />,
+    name: "Loshu Rajyogs List",
+    path: "/numerology/rajyogs/list",
+  },
+  {
+    icon: <ListIcon />,
+    name: "Overview",
+    path: "/analytics/user",
+  },
 ];
 
 const AppSidebar: React.FC = () => {

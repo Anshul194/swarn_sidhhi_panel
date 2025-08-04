@@ -40,6 +40,8 @@ import EditPlanet from "./pages/Content/Planet/EditPlanet";
 import PlanetList from "./pages/Content/Planet/PlanetList";
 import AddTag from "./pages/Content/Tag/AddTag";
 import TagList from "./pages/Content/Tag/TagList";
+import NumbersList from "./pages/Content/numerology/numbers/NumbersList";
+import EditNumbers from "./pages/Content/numerology/numbers/EditNumbers";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -224,6 +226,14 @@ export default function App() {
               <Route
                 path="/numerology/missing-number-remedies/edit"
                 element={<EditMissingNumber />}
+              />
+              <Route
+                path="/numerology/numbers/list"
+                element={<NumbersList />}
+              />
+              <Route
+                path="/numerology/numbers/edit"
+                element={<EditNumbers />}
               />
               <Route path="/numerology/rajyogs/add" element={<AddRajyog />} />
               <Route

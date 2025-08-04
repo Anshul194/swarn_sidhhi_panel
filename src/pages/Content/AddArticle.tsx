@@ -19,6 +19,23 @@ import {
 import { fetchTags } from "../../store/slices/tag";
 
 const AddArticle: React.FC = () => {
+  // State for custom tag input
+  const [customTagInput, setCustomTagInput] = useState("");
+
+  // Handler to add custom tag
+  const handleAddCustomTag = () => {
+    const trimmed = customTagInput.trim();
+    if (
+      trimmed &&
+      !tags.includes(trimmed) &&
+      !fetchedTags?.some(
+        (t: { id: string | number; name: string }) => t.name === trimmed
+      )
+    ) {
+      setTags((prev: string[]) => [...prev, trimmed]);
+      setCustomTagInput("");
+    }
+  };
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state: RootState) => state.content);
 
@@ -319,7 +336,7 @@ const AddArticle: React.FC = () => {
         )}
 
         {/* Title Fields */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-6">
           <div>
             <label
               htmlFor="title"
@@ -391,179 +408,285 @@ const AddArticle: React.FC = () => {
             )}
           </div>
         </div>
-
-        {/* Content Fields */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label
-              htmlFor="content"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Content (English){" "}
-              {activeLanguage === "en" && activeEditor === "content" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "content" ? (
-              <div
-                className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
-              />
-            ) : (
-              <textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("content");
-                  setActiveLanguage("en");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={15}
-                aria-required="true"
-                aria-describedby="content-error"
-                placeholder="Enter your markdown content here..."
-              />
-            )}
-            {formErrors.content && (
-              <p id="content-error" className="mt-1 text-sm text-red-600">
-                {formErrors.content}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="content_hi"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Content (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "content" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "content" ? (
-              <div
-                className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(contentHi) }}
-              />
-            ) : (
-              <textarea
-                id="content_hi"
-                value={contentHi}
-                onChange={(e) => setContentHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("content");
-                  setActiveLanguage("hi");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={15}
-                placeholder="यहाँ अपना मार्कडाउन कंटेंट लिखें..."
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Other fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label
-              htmlFor="tags"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Tags (comma-separated):
-            </label>
-            {/* Custom dropdown with checkboxes for tags */}
-            <div className="relative" ref={tagsDropdownRef}>
-              <input
-                type="text"
-                readOnly
-                value={
-                  tags.length > 0
-                    ? tags
-                        .map(
-                          (id) =>
-                            fetchedTags?.find(
-                              (t: any) => String(t.id) === String(id)
-                            )?.name || id
-                        )
-                        .join(", ")
-                    : ""
-                }
-                onClick={() => setShowTagsDropdown((v) => !v)}
-                placeholder="Select tags"
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 cursor-pointer bg-white"
-              />
-              <div
-                className={`absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto transition-all duration-150 ${
-                  showTagsDropdown ? "block" : "hidden"
-                }`}
-              >
-                {fetchedTags?.length ? (
-                  fetchedTags.map((item: any) => (
-                    <label
-                      key={item.id}
-                      className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={tags.includes(String(item.id))}
-                        onChange={() => {
-                          setTags((prev) =>
-                            prev.includes(String(item.id))
-                              ? prev.filter((id) => id !== String(item.id))
-                              : [...prev, String(item.id)]
-                          );
-                        }}
-                        className="mr-2"
-                      />
-                      {item.name}
-                    </label>
-                  ))
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="col-span-2">
+            {/* Content Fields */}
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-6">
+              <div>
+                <label
+                  htmlFor="content"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Content (English){" "}
+                  {activeLanguage === "en" && activeEditor === "content" && (
+                    <span className="text-blue-600 text-xs">← Active</span>
+                  )}
+                </label>
+                {previewMode &&
+                activeLanguage === "en" &&
+                activeEditor === "content" ? (
+                  <div
+                    className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: renderMarkdown(content),
+                    }}
+                  />
                 ) : (
-                  <div className="px-3 py-2 text-gray-500">No tags found</div>
+                  <textarea
+                    id="content"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    onFocus={() => {
+                      setActiveEditor("content");
+                      setActiveLanguage("en");
+                    }}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
+                    rows={10}
+                    aria-required="true"
+                    aria-describedby="content-error"
+                    placeholder="Enter your markdown content here..."
+                  />
+                )}
+                {formErrors.content && (
+                  <p id="content-error" className="mt-1 text-sm text-red-600">
+                    {formErrors.content}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="content_hi"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Content (Hindi){" "}
+                  {activeLanguage === "hi" && activeEditor === "content" && (
+                    <span className="text-blue-600 text-xs">← Active</span>
+                  )}
+                </label>
+                {previewMode &&
+                activeLanguage === "hi" &&
+                activeEditor === "content" ? (
+                  <div
+                    className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: renderMarkdown(contentHi),
+                    }}
+                  />
+                ) : (
+                  <textarea
+                    id="content_hi"
+                    value={contentHi}
+                    onChange={(e) => setContentHi(e.target.value)}
+                    onFocus={() => {
+                      setActiveEditor("content");
+                      setActiveLanguage("hi");
+                    }}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
+                    rows={10}
+                    placeholder="यहाँ अपना मार्कडाउन कंटेंट लिखें..."
+                  />
                 )}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* File uploads */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label
-              htmlFor="thumbnail"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Thumbnail:
-            </label>
-            <input
-              id="thumbnail"
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e, setThumbnail)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            />
+            {/* Other fields */}
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6">
+              <div>
+                <label
+                  htmlFor="tags"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Tags (comma-separated):
+                </label>
+                {/* Custom dropdown with checkboxes for tags and custom tag add */}
+                <div className="relative" ref={tagsDropdownRef}>
+                  {/* Dropdown opens upward, taller, sticky add section (fixed) */}
+                  <div
+                    className={`absolute z-10 bottom-full mb-1 w-full bg-white border border-gray-300 rounded-md shadow-lg transition-all duration-150 ${
+                      showTagsDropdown ? "block" : "hidden"
+                    }`}
+                    style={{
+                      minHeight: 120,
+                      maxHeight: 370,
+                      display: showTagsDropdown ? "block" : "none",
+                    }}
+                  >
+                    {/* Sticky add section at the top, outside scrollable area */}
+                    <div
+                      className="flex items-center gap-2 px-3 py-2 border-b border-gray-200 bg-gray-50 sticky top-0 z-20"
+                      style={{
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 20,
+                        background: "#f9fafb",
+                      }}
+                    >
+                      <input
+                        type="text"
+                        value={customTagInput}
+                        onChange={(e) => setCustomTagInput(e.target.value)}
+                        placeholder="Add custom tag"
+                        className="flex-1 px-2 py-1 border border-gray-300 rounded-md text-sm"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddCustomTag();
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                        onClick={handleAddCustomTag}
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {/* Scrollable tag list below sticky add section */}
+                    <div className="max-h-[320px] overflow-auto">
+                      {fetchedTags?.length ? (
+                        fetchedTags.map(
+                          (item: { id: string | number; name: string }) => (
+                            <label
+                              key={item.id}
+                              className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={tags.includes(String(item.id))}
+                                onChange={() => {
+                                  setTags((prev: string[]) =>
+                                    prev.includes(String(item.id))
+                                      ? prev.filter(
+                                          (id) => id !== String(item.id)
+                                        )
+                                      : [...prev, String(item.id)]
+                                  );
+                                }}
+                                className="mr-2"
+                              />
+                              {item.name}
+                            </label>
+                          )
+                        )
+                      ) : (
+                        <div className="px-3 py-2 text-gray-500">
+                          No tags found
+                        </div>
+                      )}
+                      {/* Show custom tags (not in fetchedTags) */}
+                      {tags
+                        .filter(
+                          (id) =>
+                            !fetchedTags?.some(
+                              (t: { id: string | number; name: string }) =>
+                                String(t.id) === String(id)
+                            )
+                        )
+                        .map((customTag) => (
+                          <label
+                            key={customTag}
+                            className="flex items-center px-3 py-2 bg-blue-50 hover:bg-blue-100 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={true}
+                              onChange={() => {
+                                setTags((prev: string[]) =>
+                                  prev.filter((id) => id !== customTag)
+                                );
+                              }}
+                              className="mr-2"
+                            />
+                            <span className="italic text-blue-700">
+                              {customTag}
+                            </span>
+                          </label>
+                        ))}
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    readOnly
+                    value={
+                      tags.length > 0
+                        ? tags
+                            .map(
+                              (id) =>
+                                fetchedTags?.find(
+                                  (t: { id: string | number; name: string }) =>
+                                    String(t.id) === String(id)
+                                )?.name || id
+                            )
+                            .join(", ")
+                        : ""
+                    }
+                    onClick={() => setShowTagsDropdown((v) => !v)}
+                    placeholder="Select tags"
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 cursor-pointer bg-white"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
+          {/* File uploads */}
+          <div className="content-center">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6">
+              <div>
+                <label
+                  htmlFor="thumbnail"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Thumbnail:
+                </label>
+                <input
+                  id="thumbnail"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e, setThumbnail)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                />
+                {/* Show preview of uploaded thumbnail */}
+                {thumbnail && (
+                  <div className="mt-2 flex items-center gap-3">
+                    <span className="text-sm text-gray-600">Preview:</span>
+                    <img
+                      src={URL.createObjectURL(thumbnail)}
+                      alt="Thumbnail Preview"
+                      className="h-[150px] w-3xs object-cover rounded border border-gray-300"
+                    />
+                  </div>
+                )}
+              </div>
 
-          <div>
-            <label
-              htmlFor="image"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Image:
-            </label>
-            <input
-              id="image"
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e, setImage)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            />
+              <div>
+                <label
+                  htmlFor="image"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Image:
+                </label>
+                <input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e, setImage)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                />
+                {/* Show preview of uploaded image */}
+                {image && (
+                  <div className="mt-2 flex items-center gap-3">
+                    <span className="text-sm text-gray-600">Preview:</span>
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt="Image Preview"
+                      className="h-[150px] w-3xs object-cover rounded border border-gray-300"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
