@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import TiptapEditor from "../../../components/TiptapEditor";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -14,6 +15,7 @@ import {
   Edit3,
   FileText,
   Languages,
+  Pencil,
 } from "lucide-react";
 import {
   createRashi,
@@ -42,9 +44,53 @@ const EditRashi: React.FC = () => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [addedSuccess, setAddedSuccess] = useState(false);
 
+  // Tiptap modal states for title/content
+  const [showTitleEditModal, setShowTitleEditModal] = useState(false);
+  const [tiptapModalTitle, setTiptapModalTitle] = useState("");
+  const [showTitleHiEditModal, setShowTitleHiEditModal] = useState(false);
+  const [tiptapModalTitleHi, setTiptapModalTitleHi] = useState("");
+  const [showContentEditModal, setShowContentEditModal] = useState(false);
+  const [tiptapModalContent, setTiptapModalContent] = useState("");
+  const [showContentHiEditModal, setShowContentHiEditModal] = useState(false);
+  const [tiptapModalContentHi, setTiptapModalContentHi] = useState("");
+
+  // Modal open/close handlers
+  const handleOpenTitleEdit = () => {
+    setTiptapModalTitle(title);
+    setShowTitleEditModal(true);
+  };
+  const handleSaveTitleEdit = () => {
+    setTitle(tiptapModalTitle);
+    setShowTitleEditModal(false);
+  };
+  const handleOpenTitleHiEdit = () => {
+    setTiptapModalTitleHi(titleHi);
+    setShowTitleHiEditModal(true);
+  };
+  const handleSaveTitleHiEdit = () => {
+    setTitleHi(tiptapModalTitleHi);
+    setShowTitleHiEditModal(false);
+  };
+  const handleOpenContentEdit = () => {
+    setTiptapModalContent(content);
+    setShowContentEditModal(true);
+  };
+  const handleSaveContentEdit = () => {
+    setContent(tiptapModalContent);
+    setShowContentEditModal(false);
+  };
+  const handleOpenContentHiEdit = () => {
+    setTiptapModalContentHi(contentHi);
+    setShowContentHiEditModal(true);
+  };
+  const handleSaveContentHiEdit = () => {
+    setContentHi(tiptapModalContentHi);
+    setShowContentHiEditModal(false);
+  };
+
   // Editor state
   const [activeLanguage, setActiveLanguage] = useState<"en" | "hi">("en");
-  const [previewMode, setPreviewMode] = useState(false);
+  const previewMode = true;
   const [activeEditor, setActiveEditor] = useState<"content" | "title">(
     "content"
   );
@@ -331,27 +377,10 @@ const EditRashi: React.FC = () => {
               <option value="content">Description</option>
             </select>
           </div>
-
-          <button
-            type="button"
-            onClick={() => setPreviewMode(!previewMode)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium ${
-              previewMode
-                ? "bg-green-600 text-white hover:bg-green-700"
-                : "bg-gray-600 text-white hover:bg-gray-700"
-            }`}
-          >
-            {previewMode ? (
-              <Edit3 className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-            {previewMode ? "Edit" : "Preview"}
-          </button>
         </div>
 
         {/* Markdown Toolbar */}
-        {!previewMode && (
+        {/* {!previewMode && (
           <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-100 rounded-lg">
             {markdownButtons.map((button, index) => (
               <button
@@ -366,7 +395,7 @@ const EditRashi: React.FC = () => {
               </button>
             ))}
           </div>
-        )}
+        )} */}
 
         {/* Title Fields */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -375,9 +404,8 @@ const EditRashi: React.FC = () => {
               htmlFor="name"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Name (English){" "}
+              Name (English)
             </label>
-
             <select
               id="name"
               value={name}
@@ -392,7 +420,6 @@ const EditRashi: React.FC = () => {
               aria-describedby="title-error"
             >
               <option value="">Select Rashi</option>
-
               {[
                 "Aries",
                 "Taurus",
@@ -416,16 +443,18 @@ const EditRashi: React.FC = () => {
           <div>
             <label
               htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
             >
-              Short Description (English){" "}
-              {activeLanguage === "en" && activeEditor === "title" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Short Description (English)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={handleOpenTitleEdit}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "title" ? (
+            {previewMode ? (
               <div
                 className="min-h-[2.5rem] p-2 border border-gray-300 rounded-md bg-gray-50"
                 dangerouslySetInnerHTML={{ __html: renderMarkdown(title) }}
@@ -451,21 +480,51 @@ const EditRashi: React.FC = () => {
                 {formErrors.title}
               </p>
             )}
+            {/* Title Edit Modal Popup with Tiptap */}
+            {showTitleEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Short Description (English)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalTitle}
+                    onChange={setTiptapModalTitle}
+                    height="80px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowTitleEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                      onClick={handleSaveTitleEdit}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
           <div>
             <label
               htmlFor="title_hi"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
             >
-              Short Description (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "title" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Short Description (Hindi)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={handleOpenTitleHiEdit}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "title" ? (
+            {previewMode ? (
               <div
                 className="min-h-[2.5rem] p-2 border border-gray-300 rounded-md bg-gray-50"
                 dangerouslySetInnerHTML={{ __html: renderMarkdown(titleHi) }}
@@ -486,6 +545,35 @@ const EditRashi: React.FC = () => {
                 placeholder="Enter your markdown content here..."
               />
             )}
+            {/* Title Hi Edit Modal Popup with Tiptap */}
+            {showTitleHiEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Short Description (Hindi)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalTitleHi}
+                    onChange={setTiptapModalTitleHi}
+                    height="80px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowTitleHiEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                      onClick={handleSaveTitleHiEdit}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -494,18 +582,20 @@ const EditRashi: React.FC = () => {
           <div>
             <label
               htmlFor="content"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
             >
-              Content (English){" "}
-              {activeLanguage === "en" && activeEditor === "content" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Content (English)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={handleOpenContentEdit}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "content" ? (
+            {previewMode ? (
               <div
-                className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
+                className="h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
                 dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
               />
             ) : (
@@ -529,23 +619,53 @@ const EditRashi: React.FC = () => {
                 {formErrors.content}
               </p>
             )}
+            {/* Content Edit Modal Popup with Tiptap */}
+            {showContentEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl mx-auto">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Content (English)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalContent}
+                    onChange={setTiptapModalContent}
+                    height="300px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowContentEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                      onClick={handleSaveContentEdit}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
           <div>
             <label
               htmlFor="content_hi"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
             >
-              Content (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "content" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Content (Hindi)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={handleOpenContentHiEdit}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "content" ? (
+            {previewMode ? (
               <div
-                className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
+                className="h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
                 dangerouslySetInnerHTML={{ __html: renderMarkdown(contentHi) }}
               />
             ) : (
@@ -561,6 +681,35 @@ const EditRashi: React.FC = () => {
                 rows={15}
                 placeholder="यहाँ अपना मार्कडाउन कंटेंट लिखें..."
               />
+            )}
+            {/* Content Hi Edit Modal Popup with Tiptap */}
+            {showContentHiEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl mx-auto">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Content (Hindi)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalContentHi}
+                    onChange={setTiptapModalContentHi}
+                    height="150px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowContentHiEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                      onClick={handleSaveContentHiEdit}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>

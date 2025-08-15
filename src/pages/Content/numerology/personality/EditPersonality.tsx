@@ -1,21 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-import {
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  Link2,
-  Image,
-  Code,
-  Quote,
-  Eye,
-  Edit3,
-  FileText,
-  Languages,
-  User,
-} from "lucide-react";
+import { Edit3, Pencil } from "lucide-react";
 import {
   fetchPersonalityById,
   updatePersonality,
@@ -24,18 +9,17 @@ import {
 import { useLocation, useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import { RootState } from "../../../../store";
+import TiptapEditor from "../../../../components/TiptapEditor";
 
 const EditPersonality: React.FC = () => {
   const dispatch = useDispatch();
   const { selectedPersonality, loading, error } = useSelector(
     (state: RootState) => state.personality
   );
-  // Form state - removed title, titleHi, content, contentHi
   const [mulank, setMulank] = useState(0);
   const location = useLocation();
   const personalityId = location.state?.personalityId;
   const navigate = useNavigate();
-  // Personality fields
   const [positiveSide, setPositiveSide] = useState("");
   const [positiveSideHi, setPositiveSideHi] = useState("");
   const [negativeSide, setNegativeSide] = useState("");
@@ -44,84 +28,15 @@ const EditPersonality: React.FC = () => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [addedSuccess, setAddedSuccess] = useState(false);
 
-  // Editor state - updated to only include positive and negative
-  const [activeLanguage, setActiveLanguage] = useState<"en" | "hi">("en");
-  const [previewMode, setPreviewMode] = useState(false);
-  const [activeEditor, setActiveEditor] = useState<"positive" | "negative">(
-    "positive"
-  );
-
-  // Markdown helper functions
-  const insertMarkdown = (
-    before: string,
-    after: string = "",
-    placeholder: string = ""
-  ) => {
-    let textareaId = "";
-
-    // Determine the correct textarea ID based on active language and editor
-    if (activeLanguage === "en") {
-      switch (activeEditor) {
-        case "positive":
-          textareaId = "positive_side";
-          break;
-        case "negative":
-          textareaId = "negative_side";
-          break;
-      }
-    } else {
-      switch (activeEditor) {
-        case "positive":
-          textareaId = "positive_side_hi";
-          break;
-        case "negative":
-          textareaId = "negative_side_hi";
-          break;
-      }
-    }
-
-    const textarea = document.getElementById(textareaId) as HTMLTextAreaElement;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    const textToInsert = selectedText || placeholder;
-    const newText = before + textToInsert + after;
-
-    const currentValue = textarea.value;
-    const newValue =
-      currentValue.substring(0, start) + newText + currentValue.substring(end);
-
-    // Update the appropriate state
-    if (activeLanguage === "en") {
-      switch (activeEditor) {
-        case "positive":
-          setPositiveSide(newValue);
-          break;
-        case "negative":
-          setNegativeSide(newValue);
-          break;
-      }
-    } else {
-      switch (activeEditor) {
-        case "positive":
-          setPositiveSideHi(newValue);
-          break;
-        case "negative":
-          setNegativeSideHi(newValue);
-          break;
-      }
-    }
-
-    // Set cursor position
-    setTimeout(() => {
-      const newStart = start + before.length;
-      const newEnd = newStart + textToInsert.length;
-      textarea.setSelectionRange(newStart, newEnd);
-      textarea.focus();
-    }, 0);
-  };
+  // Popup state for editing positive/negative sides
+  const [showPositiveEditModal, setShowPositiveEditModal] = useState(false);
+  const [showPositiveHiEditModal, setShowPositiveHiEditModal] = useState(false);
+  const [showNegativeEditModal, setShowNegativeEditModal] = useState(false);
+  const [showNegativeHiEditModal, setShowNegativeHiEditModal] = useState(false);
+  const [tiptapModalPositive, setTiptapModalPositive] = useState("");
+  const [tiptapModalPositiveHi, setTiptapModalPositiveHi] = useState("");
+  const [tiptapModalNegative, setTiptapModalNegative] = useState("");
+  const [tiptapModalNegativeHi, setTiptapModalNegativeHi] = useState("");
 
   // DELETE: popup state and handlers
   // DELETE: popup state and handlers for Personality
@@ -157,69 +72,6 @@ const EditPersonality: React.FC = () => {
     } catch (err) {
       toast.error("Failed to delete personality. Please try again.");
     }
-  };
-
-  const markdownButtons = [
-    {
-      icon: Bold,
-      label: "Bold",
-      action: () => insertMarkdown("**", "**", "bold text"),
-    },
-    {
-      icon: Italic,
-      label: "Italic",
-      action: () => insertMarkdown("_", "_", "italic text"),
-    },
-    {
-      icon: List,
-      label: "Bullet List",
-      action: () => insertMarkdown("- ", "", "list item"),
-    },
-    {
-      icon: ListOrdered,
-      label: "Numbered List",
-      action: () => insertMarkdown("1. ", "", "list item"),
-    },
-    {
-      icon: Link2,
-      label: "Link",
-      action: () => insertMarkdown("[", "](url)", "link text"),
-    },
-    {
-      icon: Image,
-      label: "Image",
-      action: () => insertMarkdown("![", "](image-url)", "alt text"),
-    },
-    {
-      icon: Code,
-      label: "Code",
-      action: () => insertMarkdown("`", "`", "code"),
-    },
-    {
-      icon: Quote,
-      label: "Quote",
-      action: () => insertMarkdown("> ", "", "quote text"),
-    },
-  ];
-
-  // Render markdown as HTML (simple implementation)
-  const renderMarkdown = (text: string) => {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/_(.*?)_/g, "<em>$1</em>")
-      .replace(/`(.*?)`/g, "<code>$1</code>")
-      .replace(/^> (.*$)/gim, "<blockquote>$1</blockquote>")
-      .replace(/^- (.*$)/gim, "<li>$1</li>")
-      .replace(/^(\d+)\. (.*$)/gim, "<li>$1. $2</li>")
-      .replace(
-        /\[([^\]]+)\]\(([^\)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-      )
-      .replace(
-        /!\[([^\]]*)\]\(([^\)]+)\)/g,
-        '<img src="$2" alt="$1" style="max-width: 100%; height: auto;" />'
-      )
-      .replace(/\n/g, "<br>");
   };
 
   // Validate form - removed title and content validation
@@ -311,88 +163,8 @@ const EditPersonality: React.FC = () => {
         <Edit3 className="h-8 w-8" />
         Edit Personality - Personality Traits
       </h2>
-
       <form onSubmit={handleSubmit}>
-        {/* Language and Editor Controls */}
-        <div className="flex flex-wrap gap-4 mb-6 p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Languages className="h-5 w-5 text-blue-600" />
-            <label className="text-sm font-medium text-gray-700">
-              Language:
-            </label>
-            <select
-              value={activeLanguage}
-              onChange={(e) => setActiveLanguage(e.target.value as "en" | "hi")}
-              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="en">English</option>
-              <option value="hi">Hindi</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <label className="text-sm font-medium text-gray-700">Editor:</label>
-            <select
-              value={activeEditor}
-              onChange={(e) =>
-                setActiveEditor(e.target.value as "positive" | "negative")
-              }
-              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="positive">Positive Side</option>
-              <option value="negative">Negative Side</option>
-            </select>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setPreviewMode(!previewMode)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium ${
-              previewMode
-                ? "bg-green-600 text-white hover:bg-green-700"
-                : "bg-gray-600 text-white hover:bg-gray-700"
-            }`}
-          >
-            {previewMode ? (
-              <Edit3 className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-            {previewMode ? "Edit" : "Preview"}
-          </button>
-        </div>
-
-        {/* Markdown Toolbar */}
-        {!previewMode && (
-          <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-100 rounded-lg">
-            {markdownButtons.map((button, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={button.action}
-                className="flex items-center gap-1 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                title={button.label}
-              >
-                <button.icon className="h-4 w-4" />
-                <span className="hidden sm:inline">{button.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Name Field */}
-
-        {/* Personality Section Header */}
-        <div className="mb-4">
-          <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-            <User className="h-6 w-6" />
-            Personality Traits
-          </h3>
-          <p className="text-sm text-gray-600 mt-1">
-            Describe the positive and negative personality traits for this rashi
-          </p>
-        </div>
+        {/* Mulank Field */}
         <div className="mb-6">
           <label
             htmlFor="mulank"
@@ -419,73 +191,112 @@ const EditPersonality: React.FC = () => {
               htmlFor="positive_side"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Positive Side (English) *{" "}
-              {activeLanguage === "en" && activeEditor === "positive" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Positive Side (English) *
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={() => {
+                  setTiptapModalPositive(positiveSide);
+                  setShowPositiveEditModal(true);
+                }}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "positive" ? (
-              <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-green-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(positiveSide),
-                }}
-              />
-            ) : (
-              <textarea
-                id="positive_side"
-                value={positiveSide}
-                onChange={(e) => setPositiveSide(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("positive");
-                  setActiveLanguage("en");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-green-50"
-                rows={10}
-                placeholder="Describe positive personality traits using markdown..."
-              />
-            )}
+            <div
+              className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-green-50 overflow-auto prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: positiveSide }}
+            />
             {formErrors.positiveSide && (
               <p className="mt-1 text-sm text-red-600">
                 {formErrors.positiveSide}
               </p>
             )}
+            {/* Positive Side Edit Modal Popup with Tiptap */}
+            {showPositiveEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Positive Side (English)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalPositive}
+                    onChange={setTiptapModalPositive}
+                    height="200px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowPositiveEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                      onClick={() => {
+                        setPositiveSide(tiptapModalPositive);
+                        setShowPositiveEditModal(false);
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
           <div>
             <label
               htmlFor="positive_side_hi"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Positive Side (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "positive" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Positive Side (Hindi)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={() => {
+                  setTiptapModalPositiveHi(positiveSideHi);
+                  setShowPositiveHiEditModal(true);
+                }}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "positive" ? (
-              <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-green-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(positiveSideHi),
-                }}
-              />
-            ) : (
-              <textarea
-                id="positive_side_hi"
-                value={positiveSideHi}
-                onChange={(e) => setPositiveSideHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("positive");
-                  setActiveLanguage("hi");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-green-50"
-                rows={10}
-                placeholder="सकारात्मक व्यक्तित्व लक्षणों का वर्णन करें..."
-              />
+            <div
+              className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-green-50 overflow-auto prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: positiveSideHi }}
+            />
+            {/* Positive Side Hi Edit Modal Popup with Tiptap */}
+            {showPositiveHiEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Positive Side (Hindi)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalPositiveHi}
+                    onChange={setTiptapModalPositiveHi}
+                    height="200px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowPositiveHiEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                      onClick={() => {
+                        setPositiveSideHi(tiptapModalPositiveHi);
+                        setShowPositiveHiEditModal(false);
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -497,73 +308,112 @@ const EditPersonality: React.FC = () => {
               htmlFor="negative_side"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Negative Side (English) *{" "}
-              {activeLanguage === "en" && activeEditor === "negative" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Negative Side (English) *
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={() => {
+                  setTiptapModalNegative(negativeSide);
+                  setShowNegativeEditModal(true);
+                }}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "negative" ? (
-              <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-red-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(negativeSide),
-                }}
-              />
-            ) : (
-              <textarea
-                id="negative_side"
-                value={negativeSide}
-                onChange={(e) => setNegativeSide(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("negative");
-                  setActiveLanguage("en");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-red-50"
-                rows={10}
-                placeholder="Describe negative personality traits using markdown..."
-              />
-            )}
+            <div
+              className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-red-50 overflow-auto prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: negativeSide }}
+            />
             {formErrors.negativeSide && (
               <p className="mt-1 text-sm text-red-600">
                 {formErrors.negativeSide}
               </p>
             )}
+            {/* Negative Side Edit Modal Popup with Tiptap */}
+            {showNegativeEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Negative Side (English)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalNegative}
+                    onChange={setTiptapModalNegative}
+                    height="200px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowNegativeEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                      onClick={() => {
+                        setNegativeSide(tiptapModalNegative);
+                        setShowNegativeEditModal(false);
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
           <div>
             <label
               htmlFor="negative_side_hi"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Negative Side (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "negative" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Negative Side (Hindi)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={() => {
+                  setTiptapModalNegativeHi(negativeSideHi);
+                  setShowNegativeHiEditModal(true);
+                }}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "negative" ? (
-              <div
-                className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-red-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(negativeSideHi),
-                }}
-              />
-            ) : (
-              <textarea
-                id="negative_side_hi"
-                value={negativeSideHi}
-                onChange={(e) => setNegativeSideHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("negative");
-                  setActiveLanguage("hi");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-red-50"
-                rows={10}
-                placeholder="नकारात्मक व्यक्तित्व लक्षणों का वर्णन करें..."
-              />
+            <div
+              className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-red-50 overflow-auto prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: negativeSideHi }}
+            />
+            {/* Negative Side Hi Edit Modal Popup with Tiptap */}
+            {showNegativeHiEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Negative Side (Hindi)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalNegativeHi}
+                    onChange={setTiptapModalNegativeHi}
+                    height="200px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowNegativeHiEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                      onClick={() => {
+                        setNegativeSideHi(tiptapModalNegativeHi);
+                        setShowNegativeHiEditModal(false);
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -578,16 +428,16 @@ const EditPersonality: React.FC = () => {
           <button
             type="button"
             className="w-full md:w-auto px-6 py-3 rounded-md font-medium text-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-600 text-white hover:bg-red-700"
-            aria-label="Delete article"
+            aria-label="Delete personality"
             onClick={() => handleDeleteClick(personalityId)}
             disabled={loading || !personalityId}
           >
-            Delete Article
+            Delete Personality
           </button>
         </div>
         {addedSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
-            Rashi added successfully!
+            Personality added successfully!
           </div>
         )}
         {error && <div className="mt-4 text-red-600">{error}</div>}

@@ -42,7 +42,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <ListIcon />,
-    name: "User List",
+    name: "Users",
     path: "/users/all",
   },
   // {
@@ -52,7 +52,7 @@ const navItems: NavItem[] = [
   // },
   {
     icon: <ListIcon />,
-    name: "Articles List",
+    name: "Articles",
     path: "/content/all",
   },
   // {
@@ -62,7 +62,7 @@ const navItems: NavItem[] = [
   // },
   {
     icon: <ListIcon />,
-    name: "Tags List",
+    name: "Tags",
     path: "/content/tags/list",
   },
   //   {
@@ -72,7 +72,7 @@ const navItems: NavItem[] = [
   // },
   {
     icon: <ListIcon />,
-    name: "Rashi List",
+    name: "Rashi",
     path: "/kundli/rashi/list",
   },
   // {
@@ -82,7 +82,7 @@ const navItems: NavItem[] = [
   // },
   {
     icon: <ListIcon />,
-    name: "Planet List",
+    name: "Planet",
     path: "/kundli/planet/list",
   },
 
@@ -93,12 +93,12 @@ const navItems: NavItem[] = [
   // },
   {
     icon: <ListIcon />,
-    name: "Entrance Analysis List",
+    name: "Entrance Analysis",
     path: "/vastu/entrance/analysis/list",
   },
   {
     icon: <ListIcon />,
-    name: "Entrance List",
+    name: "Entrance",
     path: "/vastu/entrance/list",
   },
   // {
@@ -108,7 +108,7 @@ const navItems: NavItem[] = [
   // },
   {
     icon: <ListIcon />,
-    name: "Personality List",
+    name: "Personality",
     path: "/numerology/personality/list",
   },
   // {
@@ -118,7 +118,7 @@ const navItems: NavItem[] = [
   // },
   {
     icon: <ListIcon />,
-    name: "Year Prediction List",
+    name: "Year Prediction",
     path: "/numerology/year-prediction/list",
   },
   // {
@@ -128,7 +128,7 @@ const navItems: NavItem[] = [
   // },
   {
     icon: <ListIcon />,
-    name: "Missing Number Remedies List",
+    name: "Missing Number Remedies",
     path: "/numerology/missing-number-remedies/list",
   },
   // {
@@ -139,12 +139,12 @@ const navItems: NavItem[] = [
 
   {
     icon: <ListIcon />,
-    name: "Numbers List",
+    name: "Numbers",
     path: "/numerology/numbers/list",
   },
   {
     icon: <ListIcon />,
-    name: "Loshu Rajyogs List",
+    name: "Loshu Rajyogs",
     path: "/numerology/rajyogs/list",
   },
   {

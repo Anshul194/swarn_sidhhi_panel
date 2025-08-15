@@ -8,7 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   deleteEntrance,
@@ -17,7 +17,7 @@ import {
 
 const EntranceList: React.FC = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { entrances, loading, error, pagination } = useSelector(
     (state: any) => state?.entranceChoice
   );

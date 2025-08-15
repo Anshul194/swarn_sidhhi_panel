@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  Link2,
-  Image,
-  Code,
-  Quote,
-  Eye,
-  Edit3,
-  FileText,
-  Languages,
-} from "lucide-react";
+import TiptapEditor from "../../../components/TiptapEditor";
+import { Pencil, Edit3, Languages } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import Link from "@tiptap/extension-link";
+import Heading from "@tiptap/extension-heading";
+import ListItem from "@tiptap/extension-list-item";
+import BulletList from "@tiptap/extension-bullet-list";
+import OrderedList from "@tiptap/extension-ordered-list";
+import Blockquote from "@tiptap/extension-blockquote";
+import CodeBlock from "@tiptap/extension-code-block";
 
 const EditPlanet: React.FC = () => {
   const location = useLocation();
@@ -27,7 +25,7 @@ const EditPlanet: React.FC = () => {
 
   // Form state
   const [title, setTitle] = useState("");
-  const [titleHi, setTitleHi] = useState("");
+  // Removed unused titleHi state
   const [content, setContent] = useState("");
   const [contentHi, setContentHi] = useState("");
   const [name, setName] = useState("");
@@ -36,62 +34,173 @@ const EditPlanet: React.FC = () => {
 
   // Editor state
   const [activeLanguage, setActiveLanguage] = useState<"en" | "hi">("en");
-  const [previewMode, setPreviewMode] = useState(false);
-  const [activeEditor, setActiveEditor] = useState<"content" | "title">(
-    "content"
-  );
+  // Always preview mode (no toggle)
+  const [previewMode] = useState(true);
+  // Tiptap modal popups
+  const [showTitleEditModal, setShowTitleEditModal] = useState(false);
+  // Removed unused showTitleHiEditModal
+  const [showContentEditModal, setShowContentEditModal] = useState(false);
+  const [showContentHiEditModal, setShowContentHiEditModal] = useState(false);
+  const [tiptapModalTitle, setTiptapModalTitle] = useState("");
+  // Removed unused tiptapModalTitleHi and setTiptapModalTitleHi
+  const [tiptapModalContent, setTiptapModalContent] = useState("");
+  const [tiptapModalContentHi, setTiptapModalContentHi] = useState("");
+  const tiptapEditorTitle = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Link,
+      Heading,
+      ListItem,
+      BulletList,
+      OrderedList,
+      Blockquote,
+      CodeBlock,
+    ],
+    content: tiptapModalTitle,
+    onUpdate: ({ editor }) => setTiptapModalTitle(editor.getHTML()),
+    editable: true,
+  });
 
-  // Markdown helper functions
-  const insertMarkdown = (
-    before: string,
-    after: string = "",
-    placeholder: string = ""
-  ) => {
-    const textarea = document.getElementById(
-      activeLanguage === "en"
-        ? activeEditor === "content"
-          ? "content"
-          : "title"
-        : activeEditor === "content"
-        ? "content_hi"
-        : "title_hi"
-    ) as HTMLTextAreaElement;
-
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    const textToInsert = selectedText || placeholder;
-    const newText = before + textToInsert + after;
-
-    const currentValue = textarea.value;
-    const newValue =
-      currentValue.substring(0, start) + newText + currentValue.substring(end);
-
-    // Update the appropriate state
-    if (activeLanguage === "en") {
-      if (activeEditor === "content") {
-        setContent(newValue);
-      } else {
-        setTitle(newValue);
-      }
-    } else {
-      if (activeEditor === "content") {
-        setContentHi(newValue);
-      } else {
-        setTitleHi(newValue);
-      }
-    }
-
-    // Set cursor position
+  // Toolbar button definitions
+  const tiptapToolbarButtons = (editor) => [
+    {
+      label: "Bold",
+      icon: <b>B</b>,
+      active: editor?.isActive("bold"),
+      action: () => editor?.chain().focus().toggleBold().run(),
+    },
+    {
+      label: "Italic",
+      icon: <i>I</i>,
+      active: editor?.isActive("italic"),
+      action: () => editor?.chain().focus().toggleItalic().run(),
+    },
+    {
+      label: "Underline",
+      icon: <u>U</u>,
+      active: editor?.isActive("underline"),
+      action: () => editor?.chain().focus().toggleUnderline().run(),
+    },
+    {
+      label: "Heading",
+      icon: <span style={{ fontWeight: "bold" }}>H</span>,
+      active:
+        editor?.isActive("heading", { level: 1 }) ||
+        editor?.isActive("heading", { level: 2 }) ||
+        editor?.isActive("heading", { level: 3 }),
+      action: () => editor?.chain().focus().toggleHeading({ level: 2 }).run(),
+    },
+    {
+      label: "Bullet List",
+      icon: <span>&bull; List</span>,
+      active: editor?.isActive("bulletList"),
+      action: () => editor?.chain().focus().toggleBulletList().run(),
+    },
+    {
+      label: "Ordered List",
+      icon: <span>1. List</span>,
+      active: editor?.isActive("orderedList"),
+      action: () => editor?.chain().focus().toggleOrderedList().run(),
+    },
+    {
+      label: "Blockquote",
+      icon: <span>"</span>,
+      active: editor?.isActive("blockquote"),
+      action: () => editor?.chain().focus().toggleBlockquote().run(),
+    },
+    {
+      label: "Code",
+      icon: <span>{"< >"}</span>,
+      active: editor?.isActive("code"),
+      action: () => editor?.chain().focus().toggleCode().run(),
+    },
+    {
+      label: "Link",
+      icon: <span>🔗</span>,
+      active: editor?.isActive("link"),
+      action: () => {
+        const url = window.prompt("Enter URL");
+        if (url) editor?.chain().focus().setLink({ href: url }).run();
+      },
+    },
+    {
+      label: "Clear Format",
+      icon: <span>✖</span>,
+      active: false,
+      action: () => editor?.chain().focus().unsetAllMarks().run(),
+    },
+  ];
+  // Removed unused tiptapEditorTitleHi
+  const tiptapEditorContent = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Link,
+      Heading,
+      ListItem,
+      BulletList,
+      OrderedList,
+      Blockquote,
+      CodeBlock,
+    ],
+    content: tiptapModalContent,
+    onUpdate: ({ editor }) => setTiptapModalContent(editor.getHTML()),
+    editable: true,
+  });
+  const tiptapEditorContentHi = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Link,
+      Heading,
+      ListItem,
+      BulletList,
+      OrderedList,
+      Blockquote,
+      CodeBlock,
+    ],
+    content: tiptapModalContentHi,
+    onUpdate: ({ editor }) => setTiptapModalContentHi(editor.getHTML()),
+    editable: true,
+  });
+  // Modal open/close handlers
+  const handleOpenTitleEdit = () => {
+    setTiptapModalTitle(title);
+    setShowTitleEditModal(true);
     setTimeout(() => {
-      const newStart = start + before.length;
-      const newEnd = newStart + textToInsert.length;
-      textarea.setSelectionRange(newStart, newEnd);
-      textarea.focus();
-    }, 0);
+      if (tiptapEditorTitle) tiptapEditorTitle.commands.setContent(title || "");
+    }, 100);
   };
+  const handleSaveTitleEdit = () => {
+    setTitle(tiptapModalTitle);
+    setShowTitleEditModal(false);
+  };
+  const handleOpenContentEdit = () => {
+    setTiptapModalContent(content);
+    setShowContentEditModal(true);
+    setTimeout(() => {
+      if (tiptapEditorContent)
+        tiptapEditorContent.commands.setContent(content || "");
+    }, 100);
+  };
+  const handleSaveContentEdit = () => {
+    setContent(tiptapModalContent);
+    setShowContentEditModal(false);
+  };
+  const handleOpenContentHiEdit = () => {
+    setTiptapModalContentHi(contentHi);
+    setShowContentHiEditModal(true);
+    setTimeout(() => {
+      if (tiptapEditorContentHi)
+        tiptapEditorContentHi.commands.setContent(contentHi || "");
+    }, 100);
+  };
+  const handleSaveContentHiEdit = () => {
+    setContentHi(tiptapModalContentHi);
+    setShowContentHiEditModal(false);
+  };
+  // ...existing code...
 
   // DELETE: popup state and handlers for Planet
   const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -131,73 +240,14 @@ const EditPlanet: React.FC = () => {
       toast.success("Planet Deleted Successfully");
       navigate("/kundli/planet/list", { state: { deleted: true } });
     } catch (err) {
-      // @ts-expect-error
+      // @ts-expect-error: error object may not have response property
       toast.error(err?.response?.data?.message || "Failed to delete planet");
     }
   };
 
-  const markdownButtons = [
-    {
-      icon: Bold,
-      label: "Bold",
-      action: () => insertMarkdown("**", "**", "bold text"),
-    },
-    {
-      icon: Italic,
-      label: "Italic",
-      action: () => insertMarkdown("_", "_", "italic text"),
-    },
-    {
-      icon: List,
-      label: "Bullet List",
-      action: () => insertMarkdown("- ", "", "list item"),
-    },
-    {
-      icon: ListOrdered,
-      label: "Numbered List",
-      action: () => insertMarkdown("1. ", "", "list item"),
-    },
-    {
-      icon: Link2,
-      label: "Link",
-      action: () => insertMarkdown("[", "](url)", "link text"),
-    },
-    {
-      icon: Image,
-      label: "Image",
-      action: () => insertMarkdown("![", "](image-url)", "alt text"),
-    },
-    {
-      icon: Code,
-      label: "Code",
-      action: () => insertMarkdown("`", "`", "code"),
-    },
-    {
-      icon: Quote,
-      label: "Quote",
-      action: () => insertMarkdown("> ", "", "quote text"),
-    },
-  ];
+  // ...removed markdownButtons and insertMarkdown logic...
 
-  // Render markdown as HTML (simple implementation)
-  const renderMarkdown = (text: string) => {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/_(.*?)_/g, "<em>$1</em>")
-      .replace(/`(.*?)`/g, "<code>$1</code>")
-      .replace(/^> (.*$)/gim, "<blockquote>$1</blockquote>")
-      .replace(/^- (.*$)/gim, "<li>$1</li>")
-      .replace(/^(\d+)\. (.*$)/gim, "<li>$1. $2</li>")
-      .replace(
-        /\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-      )
-      .replace(
-        /!\[([^\]]*)\]\(([^)]+)\)/g,
-        '<img src="$2" alt="$1" style="max-width: 100%; height: auto;" />'
-      )
-      .replace(/\n/g, "<br>");
-  };
+  // ...removed renderMarkdown logic...
 
   // Validate form
   const validateForm = () => {
@@ -235,7 +285,7 @@ const EditPlanet: React.FC = () => {
       toast.success("Planet updated successfully!");
       setTimeout(() => setAddedSuccess(false), 2500);
     } catch (err) {
-      // @ts-expect-error
+      // @ts-expect-error: error object may not have response property
       setError(err?.response?.data?.message || "Failed to update planet");
     } finally {
       setLoading(false);
@@ -247,7 +297,7 @@ const EditPlanet: React.FC = () => {
     const fetchPlanet = async () => {
       if (planet) {
         setTitle(planet.short_description || "");
-        setTitleHi(planet.short_description_hi || "");
+        // Removed setTitleHi (no Hindi title modal)
         setContent(planet.description || "");
         setContentHi(planet.description_hi || "");
         setName(planet.name || "");
@@ -270,7 +320,7 @@ const EditPlanet: React.FC = () => {
           setContentHi(data.description_hi || "");
           setName(data.name || "");
         } catch (err) {
-          // @ts-expect-error
+          // @ts-expect-error: error object may not have response property
           toast.error(err?.response?.data?.message || "Failed to fetch planet");
         }
       } else {
@@ -279,7 +329,7 @@ const EditPlanet: React.FC = () => {
       }
     };
     fetchPlanet();
-    // eslint-disable-next-line
+    // (removed unused eslint-disable-next-line)
   }, [planet, planetId, navigate]);
 
   return (
@@ -290,7 +340,7 @@ const EditPlanet: React.FC = () => {
       </h2>
 
       <form onSubmit={handleSubmit}>
-        {/* Language and Editor Controls */}
+        {/* Language Control Only */}
         <div className="flex flex-wrap gap-4 mb-6 p-4 bg-blue-50 rounded-lg">
           <div className="flex items-center gap-2">
             <Languages className="h-5 w-5 text-blue-600" />
@@ -306,83 +356,27 @@ const EditPlanet: React.FC = () => {
               <option value="hi">Hindi</option>
             </select>
           </div>
-
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <label className="text-sm font-medium text-gray-700">Editor:</label>
-            <select
-              value={activeEditor}
-              onChange={(e) =>
-                setActiveEditor(e.target.value as "content" | "title")
-              }
-              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="title">Short Des</option>
-              <option value="content">Description</option>
-            </select>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setPreviewMode(!previewMode)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium ${
-              previewMode
-                ? "bg-green-600 text-white hover:bg-green-700"
-                : "bg-gray-600 text-white hover:bg-gray-700"
-            }`}
-          >
-            {previewMode ? (
-              <Edit3 className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-            {previewMode ? "Edit" : "Preview"}
-          </button>
         </div>
 
-        {/* Markdown Toolbar */}
-        {!previewMode && (
-          <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-100 rounded-lg">
-            {markdownButtons.map((button, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={button.action}
-                className="flex items-center gap-1 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                title={button.label}
-              >
-                <button.icon className="h-4 w-4" />
-                <span className="hidden sm:inline">{button.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Title Fields */}
+        {/* Title Fields - always show both, no activeEditor logic */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="col-span-2">
             <label
               htmlFor="name"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Name (English){" "}
+              Name (English)
             </label>
-
             <select
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              onFocus={() => {
-                setActiveEditor("title");
-                setActiveLanguage("en");
-              }}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               aria-required="true"
               required
               aria-describedby="title-error"
             >
               <option value="">Select Planet</option>
-
               {[
                 "sun",
                 "moon",
@@ -403,116 +397,158 @@ const EditPlanet: React.FC = () => {
           <div className="col-span-2">
             <label
               htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
             >
-              Description (General){" "}
-              {activeLanguage === "en" && activeEditor === "title" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Description (General)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={handleOpenTitleEdit}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "title" ? (
-              <div
-                className="min-h-[2.5rem] p-2 border border-gray-300 rounded-md bg-gray-50"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(title) }}
-              />
-            ) : (
-              <textarea
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("title");
-                  setActiveLanguage("en");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={6}
-                aria-required="true"
-                aria-describedby="content-error"
-                placeholder="Enter your markdown content here..."
-              />
-            )}
+            <div
+              className="min-h-[2.5rem] p-2 border border-gray-300 rounded-md bg-gray-50"
+              dangerouslySetInnerHTML={{ __html: title }}
+            />
             {formErrors.title && (
               <p id="title-error" className="mt-1 text-sm text-red-600">
                 {formErrors.title}
               </p>
             )}
+            {/* Title Edit Modal Popup with Tiptap */}
+            {showTitleEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Description (General)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalContent}
+                    onChange={setTiptapModalContent}
+                    height="80px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowTitleEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                      onClick={handleSaveTitleEdit}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Content Fields */}
+        {/* Content Fields - always show both, no activeEditor logic */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div>
             <label
               htmlFor="content"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
             >
-              Description (English){" "}
-              {activeLanguage === "en" && activeEditor === "content" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Description (English)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={handleOpenContentEdit}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "content" ? (
-              <div
-                className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
-              />
-            ) : (
-              <textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("content");
-                  setActiveLanguage("en");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={15}
-                aria-required="true"
-                aria-describedby="content-error"
-                placeholder="Enter your markdown content here..."
-              />
-            )}
+            <div
+              className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
             {formErrors.content && (
               <p id="content-error" className="mt-1 text-sm text-red-600">
                 {formErrors.content}
               </p>
             )}
+            {/* Content Edit Modal Popup with Tiptap */}
+            {showContentEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Description (English)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalContent}
+                    onChange={setTiptapModalContent}
+                    height="300px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowContentEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                      onClick={handleSaveContentEdit}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
           <div>
             <label
               htmlFor="content_hi"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
             >
-              Description (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "content" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
+              Description (Hindi)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={handleOpenContentHiEdit}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
             </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "content" ? (
-              <div
-                className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(contentHi) }}
-              />
-            ) : (
-              <textarea
-                id="content_hi"
-                value={contentHi}
-                onChange={(e) => setContentHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("content");
-                  setActiveLanguage("hi");
-                }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={15}
-                placeholder="यहाँ अपना मार्कडाउन कंटेंट लिखें..."
-              />
+            <div
+              className="min-h-[300px] p-4 border border-gray-300 rounded-md bg-gray-50 overflow-auto prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: contentHi }}
+            />
+            {/* Content Hi Edit Modal Popup with Tiptap */}
+            {showContentHiEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Description (Hindi)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalContentHi}
+                    onChange={setTiptapModalContentHi}
+                    height="300px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowContentHiEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                      onClick={handleSaveContentHiEdit}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>

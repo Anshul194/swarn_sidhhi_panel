@@ -1,22 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { Edit3, Pencil } from "lucide-react";
 import {
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  Link2,
-  Image,
-  Code,
-  Quote,
-  Eye,
-  Edit3,
-  FileText,
-  Languages,
-} from "lucide-react";
-import {
-  createEntrance,
   fetchEntranceById,
   updateEntrance,
   deleteEntrance,
@@ -24,6 +10,9 @@ import {
 import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router";
 import { RootState } from "../../../../store";
+// Make sure the path is correct; update if needed, for example:
+import TiptapEditor from "../../../../components/TiptapEditor";
+// Or, if the file does not exist, create it at the specified path.
 
 const EditVastuEntrance: React.FC = () => {
   const dispatch = useDispatch();
@@ -49,57 +38,11 @@ const EditVastuEntrance: React.FC = () => {
     "content"
   );
 
-  // Markdown helper functions
-  const insertMarkdown = (
-    before: string,
-    after: string = "",
-    placeholder: string = ""
-  ) => {
-    const textarea = document.getElementById(
-      activeLanguage === "en"
-        ? activeEditor === "content"
-          ? "content"
-          : "title"
-        : activeEditor === "content"
-        ? "content_hi"
-        : "title_hi"
-    ) as HTMLTextAreaElement;
-
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    const textToInsert = selectedText || placeholder;
-    const newText = before + textToInsert + after;
-
-    const currentValue = textarea.value;
-    const newValue =
-      currentValue.substring(0, start) + newText + currentValue.substring(end);
-
-    // Update the appropriate state
-    if (activeLanguage === "en") {
-      if (activeEditor === "content") {
-        // setContent(newValue);
-      } else {
-        setTitle(newValue);
-      }
-    } else {
-      if (activeEditor === "content") {
-        // setContentHi(newValue);
-      } else {
-        setTitleHi(newValue);
-      }
-    }
-
-    // Set cursor position
-    setTimeout(() => {
-      const newStart = start + before.length;
-      const newEnd = newStart + textToInsert.length;
-      textarea.setSelectionRange(newStart, newEnd);
-      textarea.focus();
-    }, 0);
-  };
+  // Popup state for editing title and titleHi
+  const [showTitleEditModal, setShowTitleEditModal] = useState(false);
+  const [showTitleHiEditModal, setShowTitleHiEditModal] = useState(false);
+  const [tiptapModalTitle, setTiptapModalTitle] = useState("");
+  const [tiptapModalTitleHi, setTiptapModalTitleHi] = useState("");
 
   // DELETE: popup state and handlers
   // DELETE: popup state and handlers for Entrance
@@ -135,69 +78,6 @@ const EditVastuEntrance: React.FC = () => {
     } catch (err) {
       toast.error("Failed to delete entrance. Please try again.");
     }
-  };
-
-  const markdownButtons = [
-    {
-      icon: Bold,
-      label: "Bold",
-      action: () => insertMarkdown("**", "**", "bold text"),
-    },
-    {
-      icon: Italic,
-      label: "Italic",
-      action: () => insertMarkdown("_", "_", "italic text"),
-    },
-    {
-      icon: List,
-      label: "Bullet List",
-      action: () => insertMarkdown("- ", "", "list item"),
-    },
-    {
-      icon: ListOrdered,
-      label: "Numbered List",
-      action: () => insertMarkdown("1. ", "", "list item"),
-    },
-    {
-      icon: Link2,
-      label: "Link",
-      action: () => insertMarkdown("[", "](url)", "link text"),
-    },
-    {
-      icon: Image,
-      label: "Image",
-      action: () => insertMarkdown("![", "](image-url)", "alt text"),
-    },
-    {
-      icon: Code,
-      label: "Code",
-      action: () => insertMarkdown("`", "`", "code"),
-    },
-    {
-      icon: Quote,
-      label: "Quote",
-      action: () => insertMarkdown("> ", "", "quote text"),
-    },
-  ];
-
-  // Render markdown as HTML (simple implementation)
-  const renderMarkdown = (text: string) => {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/_(.*?)_/g, "<em>$1</em>")
-      .replace(/`(.*?)`/g, "<code>$1</code>")
-      .replace(/^> (.*$)/gim, "<blockquote>$1</blockquote>")
-      .replace(/^- (.*$)/gim, "<li>$1</li>")
-      .replace(/^(\d+)\. (.*$)/gim, "<li>$1. $2</li>")
-      .replace(
-        /\[([^\]]+)\]\(([^\)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-      )
-      .replace(
-        /!\[([^\]]*)\]\(([^\)]+)\)/g,
-        '<img src="$2" alt="$1" style="max-width: 100%; height: auto;" />'
-      )
-      .replace(/\n/g, "<br>");
   };
 
   // Validate form
@@ -252,9 +132,9 @@ const EditVastuEntrance: React.FC = () => {
         toast.error("Failed to fetch entrance");
       }
     } else {
-      // If no rashiId is provided, redirect to content/all
-      toast.error("No rashi ID provided");
-      navigate("/kundli/rashi/all");
+      // If no entranceId is provided, redirect to content/all
+      toast.error("No Vastu Entrance ID provided");
+      navigate("/vastu/entrance/analysis/list");
     }
   };
   useEffect(() => {
@@ -275,78 +155,9 @@ const EditVastuEntrance: React.FC = () => {
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
         <Edit3 className="h-8 w-8" />
-        Edit vastu Entrance - Markdown Editor
+        Edit vastu Entrance
       </h2>
-
       <form onSubmit={handleSubmit}>
-        {/* Language and Editor Controls */}
-        <div className="flex flex-wrap gap-4 mb-6 p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Languages className="h-5 w-5 text-blue-600" />
-            <label className="text-sm font-medium text-gray-700">
-              Language:
-            </label>
-            <select
-              value={activeLanguage}
-              onChange={(e) => setActiveLanguage(e.target.value as "en" | "hi")}
-              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="en">English</option>
-              <option value="hi">Hindi</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <label className="text-sm font-medium text-gray-700">Editor:</label>
-            <select
-              value={activeEditor}
-              onChange={(e) =>
-                setActiveEditor(e.target.value as "content" | "title")
-              }
-              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="title">Short Des</option>
-              <option value="content">Description</option>
-            </select>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setPreviewMode(!previewMode)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium ${
-              previewMode
-                ? "bg-green-600 text-white hover:bg-green-700"
-                : "bg-gray-600 text-white hover:bg-gray-700"
-            }`}
-          >
-            {previewMode ? (
-              <Edit3 className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-            {previewMode ? "Edit" : "Preview"}
-          </button>
-        </div>
-
-        {/* Markdown Toolbar */}
-        {!previewMode && (
-          <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-100 rounded-lg">
-            {markdownButtons.map((button, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={button.action}
-                className="flex items-center gap-1 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                title={button.label}
-              >
-                <button.icon className="h-4 w-4" />
-                <span className="hidden sm:inline">{button.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
-
         {/* Title Fields */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="col-span-2">
@@ -376,73 +187,112 @@ const EditVastuEntrance: React.FC = () => {
               htmlFor="title"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Meaning (English){" "}
-              {activeLanguage === "en" && activeEditor === "title" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "en" &&
-            activeEditor === "title" ? (
-              <div
-                className="min-h-[2.5rem] p-2 border border-gray-300 rounded-md bg-gray-50"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(title) }}
-              />
-            ) : (
-              <textarea
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("title");
-                  setActiveLanguage("en");
+              Meaning (English)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={() => {
+                  setTiptapModalTitle(title);
+                  setShowTitleEditModal(true);
                 }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={6}
-                aria-required="true"
-                aria-describedby="content-error"
-                placeholder="Enter your markdown content here..."
-              />
-            )}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+            </label>
+            <div
+              className="h-[200px] p-2 border border-gray-300 rounded-md bg-gray-50"
+              dangerouslySetInnerHTML={{ __html: title }}
+            />
             {formErrors.title && (
               <p id="title-error" className="mt-1 text-sm text-red-600">
                 {formErrors.title}
               </p>
             )}
+            {/* Title Edit Modal Popup with Tiptap */}
+            {showTitleEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Meaning (English)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalTitle}
+                    onChange={setTiptapModalTitle}
+                    height="300px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowTitleEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                      onClick={() => {
+                        setTitle(tiptapModalTitle);
+                        setShowTitleEditModal(false);
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
           <div>
             <label
               htmlFor="title_hi"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Meaning (Hindi){" "}
-              {activeLanguage === "hi" && activeEditor === "title" && (
-                <span className="text-blue-600 text-xs">← Active</span>
-              )}
-            </label>
-            {previewMode &&
-            activeLanguage === "hi" &&
-            activeEditor === "title" ? (
-              <div
-                className="min-h-[2.5rem] p-2 border border-gray-300 rounded-md bg-gray-50"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(titleHi) }}
-              />
-            ) : (
-              <textarea
-                id="title_hi"
-                value={titleHi}
-                onChange={(e) => setTitleHi(e.target.value)}
-                onFocus={() => {
-                  setActiveEditor("title");
-                  setActiveLanguage("hi");
+              Meaning (Hindi)
+              <button
+                type="button"
+                className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                onClick={() => {
+                  setTiptapModalTitleHi(titleHi);
+                  setShowTitleHiEditModal(true);
                 }}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm"
-                rows={6}
-                aria-required="true"
-                aria-describedby="content-error"
-                placeholder="Enter your markdown content here..."
-              />
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+            </label>
+            <div
+              className="h-[200px]  p-2 border border-gray-300 rounded-md bg-gray-50"
+              dangerouslySetInnerHTML={{ __html: titleHi }}
+            />
+            {/* Title Hi Edit Modal Popup with Tiptap */}
+            {showTitleHiEditModal && (
+              <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Edit Meaning (Hindi)
+                  </h3>
+                  <TiptapEditor
+                    value={tiptapModalTitleHi}
+                    onChange={setTiptapModalTitleHi}
+                    height="300px"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                      onClick={() => setShowTitleHiEditModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                      onClick={() => {
+                        setTitleHi(tiptapModalTitleHi);
+                        setShowTitleHiEditModal(false);
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -450,7 +300,7 @@ const EditVastuEntrance: React.FC = () => {
           <button
             type="submit"
             className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
-            aria-label="Add article"
+            aria-label="Add entrance"
             disabled={loading}
           >
             {loading ? "updating..." : "Update"}
@@ -458,16 +308,16 @@ const EditVastuEntrance: React.FC = () => {
           <button
             type="button"
             className="w-full md:w-auto px-6 py-3 rounded-md font-medium text-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-600 text-white hover:bg-red-700"
-            aria-label="Delete article"
+            aria-label="Delete entrance"
             onClick={() => handleDeleteClick(entranceId)}
             disabled={loading || !entranceId}
           >
-            Delete Article
+            Delete Entrance
           </button>
         </div>
         {addedSuccess && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 font-medium text-center">
-            Article added successfully!
+            vastu Entrance added successfully!
           </div>
         )}
         {error && <div className="mt-4 text-red-600">{error}</div>}

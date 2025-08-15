@@ -1,23 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  Link2,
-  Image,
-  Code,
-  Quote,
-  Eye,
-  Edit3,
-  FileText,
-  Languages,
-  Crown,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
+import { Crown, CheckCircle, XCircle, Pencil } from "lucide-react";
+import TiptapEditor from "../../../../components/TiptapEditor";
 import { RootState } from "../../../../store";
 import {
   createRajyog,
@@ -58,83 +43,73 @@ const EditRajyog: React.FC = () => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [addedSuccess, setAddedSuccess] = useState(false);
 
-  // Editor state - updated for present and missing descriptions
-  const [activeLanguage, setActiveLanguage] = useState<"en" | "hi">("en");
-  const [previewMode, setPreviewMode] = useState(false);
-  const [activeEditor, setActiveEditor] = useState<"present" | "missing">(
-    "present"
-  );
+  // Preview mode state
+  const [previewMode, setPreviewMode] = useState(true);
 
-  // Markdown helper functions
-  const insertMarkdown = (
-    before: string,
-    after: string = "",
-    placeholder: string = ""
-  ) => {
-    let textareaId = "";
+  // Modal states for editing descriptions
+  const [showPresentEnEditModal, setShowPresentEnEditModal] = useState(false);
+  const [showPresentHiEditModal, setShowPresentHiEditModal] = useState(false);
+  const [showMissingEnEditModal, setShowMissingEnEditModal] = useState(false);
+  const [showMissingHiEditModal, setShowMissingHiEditModal] = useState(false);
 
-    // Determine the correct textarea ID based on active language and editor
-    if (activeLanguage === "en") {
-      switch (activeEditor) {
-        case "present":
-          textareaId = "present_description_en";
-          break;
-        case "missing":
-          textareaId = "missing_description_en";
-          break;
-      }
-    } else {
-      switch (activeEditor) {
-        case "present":
-          textareaId = "present_description_hi";
-          break;
-        case "missing":
-          textareaId = "missing_description_hi";
-          break;
-      }
-    }
+  // Modal temp values
+  const [modalPresentEn, setModalPresentEn] = useState("");
+  const [modalPresentHi, setModalPresentHi] = useState("");
+  const [modalMissingEn, setModalMissingEn] = useState("");
+  const [modalMissingHi, setModalMissingHi] = useState("");
 
-    const textarea = document.getElementById(textareaId) as HTMLTextAreaElement;
-    if (!textarea) return;
+  // Modal open/close handlers
+  const handleOpenPresentEnEdit = () => {
+    setModalPresentEn(presentDescriptionEn);
+    setShowPresentEnEditModal(true);
+  };
+  const handleSavePresentEnEdit = () => {
+    setPresentDescriptionEn(modalPresentEn);
+    setShowPresentEnEditModal(false);
+  };
+  const handleOpenPresentHiEdit = () => {
+    setModalPresentHi(presentDescriptionHi);
+    setShowPresentHiEditModal(true);
+  };
+  const handleSavePresentHiEdit = () => {
+    setPresentDescriptionHi(modalPresentHi);
+    setShowPresentHiEditModal(false);
+  };
+  const handleOpenMissingEnEdit = () => {
+    setModalMissingEn(missingDescriptionEn);
+    setShowMissingEnEditModal(true);
+  };
+  const handleSaveMissingEnEdit = () => {
+    setMissingDescriptionEn(modalMissingEn);
+    setShowMissingEnEditModal(false);
+  };
+  const handleOpenMissingHiEdit = () => {
+    setModalMissingHi(missingDescriptionHi);
+    setShowMissingHiEditModal(true);
+  };
+  const handleSaveMissingHiEdit = () => {
+    setMissingDescriptionHi(modalMissingHi);
+    setShowMissingHiEditModal(false);
+  };
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    const textToInsert = selectedText || placeholder;
-    const newText = before + textToInsert + after;
-
-    const currentValue = textarea.value;
-    const newValue =
-      currentValue.substring(0, start) + newText + currentValue.substring(end);
-
-    // Update the appropriate state
-    if (activeLanguage === "en") {
-      switch (activeEditor) {
-        case "present":
-          setPresentDescriptionEn(newValue);
-          break;
-        case "missing":
-          setMissingDescriptionEn(newValue);
-          break;
-      }
-    } else {
-      switch (activeEditor) {
-        case "present":
-          setPresentDescriptionHi(newValue);
-          break;
-        case "missing":
-          setMissingDescriptionHi(newValue);
-          break;
-      }
-    }
-
-    // Set cursor position
-    setTimeout(() => {
-      const newStart = start + before.length;
-      const newEnd = newStart + textToInsert.length;
-      textarea.setSelectionRange(newStart, newEnd);
-      textarea.focus();
-    }, 0);
+  // Simple markdown renderer for preview
+  const renderMarkdown = (text: string) => {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/_(.*?)_/g, "<em>$1</em>")
+      .replace(/`(.*?)`/g, "<code>$1</code>")
+      .replace(/^> (.*$)/gim, "<blockquote>$1</blockquote>")
+      .replace(/^- (.*$)/gim, "<li>$1</li>")
+      .replace(/^\d+\. (.*$)/gim, "<li>$1</li>")
+      .replace(
+        /\[([^\]]+)\]\(([^\)]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+      )
+      .replace(
+        /!\[([^\]]*)\]\(([^\)]+)\)/g,
+        '<img src="$2" alt="$1" style="max-width: 100%; height: auto;" />'
+      )
+      .replace(/\n/g, "<br>");
   };
 
   // DELETE: popup state and handlers
@@ -171,68 +146,7 @@ const EditRajyog: React.FC = () => {
     }
   };
 
-  const markdownButtons = [
-    {
-      icon: Bold,
-      label: "Bold",
-      action: () => insertMarkdown("**", "**", "bold text"),
-    },
-    {
-      icon: Italic,
-      label: "Italic",
-      action: () => insertMarkdown("_", "_", "italic text"),
-    },
-    {
-      icon: List,
-      label: "Bullet List",
-      action: () => insertMarkdown("- ", "", "list item"),
-    },
-    {
-      icon: ListOrdered,
-      label: "Numbered List",
-      action: () => insertMarkdown("1. ", "", "list item"),
-    },
-    {
-      icon: Link2,
-      label: "Link",
-      action: () => insertMarkdown("[", "](url)", "link text"),
-    },
-    {
-      icon: Image,
-      label: "Image",
-      action: () => insertMarkdown("![", "](image-url)", "alt text"),
-    },
-    {
-      icon: Code,
-      label: "Code",
-      action: () => insertMarkdown("`", "`", "code"),
-    },
-    {
-      icon: Quote,
-      label: "Quote",
-      action: () => insertMarkdown("> ", "", "quote text"),
-    },
-  ];
-
-  // Render markdown as HTML (simple implementation)
-  const renderMarkdown = (text: string) => {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/_(.*?)_/g, "<em>$1</em>")
-      .replace(/`(.*?)`/g, "<code>$1</code>")
-      .replace(/^> (.*$)/gim, "<blockquote>$1</blockquote>")
-      .replace(/^- (.*$)/gim, "<li>$1</li>")
-      .replace(/^(\d+)\. (.*$)/gim, "<li>$1. $2</li>")
-      .replace(
-        /\[([^\]]+)\]\(([^\)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-      )
-      .replace(
-        /!\[([^\]]*)\]\(([^\)]+)\)/g,
-        '<img src="$2" alt="$1" style="max-width: 100%; height: auto;" />'
-      )
-      .replace(/\n/g, "<br>");
-  };
+  // ...existing code...
 
   // Validate form
   const validateForm = () => {
@@ -286,6 +200,7 @@ const EditRajyog: React.FC = () => {
     ).then((action: any) => {
       if (createRajyog.fulfilled.match(action)) {
         setAddedSuccess(true);
+
         // Reset form
         setYog("");
         setTitle("");
@@ -357,75 +272,20 @@ const EditRajyog: React.FC = () => {
         Edit Rajyog - {titleEn} - {yog}
       </h2>
 
+      <div className="flex justify-end mb-4">
+        <button
+          type="button"
+          className={`px-4 py-2 rounded-md font-medium ${
+            previewMode
+              ? "bg-green-600 text-white hover:bg-green-700"
+              : "bg-gray-600 text-white hover:bg-gray-700"
+          }`}
+          onClick={() => setPreviewMode(!previewMode)}
+        >
+          {previewMode ? "Edit" : "Preview"}
+        </button>
+      </div>
       <form onSubmit={handleSubmit}>
-        {/* Language and Editor Controls */}
-        <div className="flex flex-wrap gap-4 mb-6 p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Languages className="h-5 w-5 text-blue-600" />
-            <label className="text-sm font-medium text-gray-700">
-              Language:
-            </label>
-            <select
-              value={activeLanguage}
-              onChange={(e) => setActiveLanguage(e.target.value as "en" | "hi")}
-              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="en">English</option>
-              <option value="hi">Hindi</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <label className="text-sm font-medium text-gray-700">Editor:</label>
-            <select
-              value={activeEditor}
-              onChange={(e) =>
-                setActiveEditor(e.target.value as "present" | "missing")
-              }
-              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="present">Present Description</option>
-              <option value="missing">Missing Description</option>
-            </select>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setPreviewMode(!previewMode)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium ${
-              previewMode
-                ? "bg-green-600 text-white hover:bg-green-700"
-                : "bg-gray-600 text-white hover:bg-gray-700"
-            }`}
-          >
-            {previewMode ? (
-              <Edit3 className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-            {previewMode ? "Edit" : "Preview"}
-          </button>
-        </div>
-
-        {/* Markdown Toolbar */}
-        {!previewMode && (
-          <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-100 rounded-lg">
-            {markdownButtons.map((button, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={button.action}
-                className="flex items-center gap-1 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                title={button.label}
-              >
-                <button.icon className="h-4 w-4" />
-                <span className="hidden sm:inline">{button.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
-
         {/* Basic Information */}
         <div className="mb-6 p-4 bg-yellow-50 rounded-lg">
           <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
@@ -542,21 +402,22 @@ const EditRajyog: React.FC = () => {
           <p className="text-sm text-gray-600 mb-4">
             Describe what happens when this yoga is present in the grid
           </p>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
               <label
                 htmlFor="present_description_en"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
               >
-                Present Description (English) *{" "}
-                {activeLanguage === "en" && activeEditor === "present" && (
-                  <span className="text-blue-600 text-xs">← Active</span>
-                )}
+                Present Description (English) *
+                <button
+                  type="button"
+                  className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                  onClick={handleOpenPresentEnEdit}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
               </label>
-              {previewMode &&
-              activeLanguage === "en" &&
-              activeEditor === "present" ? (
+              {previewMode ? (
                 <div
                   className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-green-50 overflow-auto prose max-w-none"
                   dangerouslySetInnerHTML={{
@@ -568,14 +429,40 @@ const EditRajyog: React.FC = () => {
                   id="present_description_en"
                   value={presentDescriptionEn}
                   onChange={(e) => setPresentDescriptionEn(e.target.value)}
-                  onFocus={() => {
-                    setActiveEditor("present");
-                    setActiveLanguage("en");
-                  }}
                   className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-green-50"
                   rows={10}
-                  placeholder="Describe what happens when this yoga is present using markdown..."
+                  placeholder="Describe what happens when this yoga is present..."
                 />
+              )}
+              {/* Present English Edit Modal Popup */}
+              {showPresentEnEditModal && (
+                <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                  <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                    <h3 className="text-lg font-semibold mb-4">
+                      Edit Present Description (English)
+                    </h3>
+
+                    <TiptapEditor
+                      value={modalPresentEn}
+                      onChange={setModalPresentEn}
+                      height="200px"
+                    />
+                    <div className="flex justify-end gap-2 mt-4">
+                      <button
+                        className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                        onClick={() => setShowPresentEnEditModal(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                        onClick={handleSavePresentEnEdit}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
               {formErrors.presentDescriptionEn && (
                 <p className="mt-1 text-sm text-red-600">
@@ -583,20 +470,21 @@ const EditRajyog: React.FC = () => {
                 </p>
               )}
             </div>
-
             <div>
               <label
                 htmlFor="present_description_hi"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
               >
-                Present Description (Hindi){" "}
-                {activeLanguage === "hi" && activeEditor === "present" && (
-                  <span className="text-blue-600 text-xs">← Active</span>
-                )}
+                Present Description (Hindi)
+                <button
+                  type="button"
+                  className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                  onClick={handleOpenPresentHiEdit}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
               </label>
-              {previewMode &&
-              activeLanguage === "hi" &&
-              activeEditor === "present" ? (
+              {previewMode ? (
                 <div
                   className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-green-50 overflow-auto prose max-w-none"
                   dangerouslySetInnerHTML={{
@@ -608,14 +496,40 @@ const EditRajyog: React.FC = () => {
                   id="present_description_hi"
                   value={presentDescriptionHi}
                   onChange={(e) => setPresentDescriptionHi(e.target.value)}
-                  onFocus={() => {
-                    setActiveEditor("present");
-                    setActiveLanguage("hi");
-                  }}
                   className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-green-50"
                   rows={10}
                   placeholder="जब यह योग उपस्थित हो तो क्या होता है, इसका वर्णन करें..."
                 />
+              )}
+              {/* Present Hindi Edit Modal Popup */}
+              {showPresentHiEditModal && (
+                <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                  <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                    <h3 className="text-lg font-semibold mb-4">
+                      Edit Present Description (Hindi)
+                    </h3>
+
+                    <TiptapEditor
+                      value={modalPresentHi}
+                      onChange={setModalPresentHi}
+                      height="200px"
+                    />
+                    <div className="flex justify-end gap-2 mt-4">
+                      <button
+                        className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                        onClick={() => setShowPresentHiEditModal(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                        onClick={handleSavePresentHiEdit}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -630,21 +544,22 @@ const EditRajyog: React.FC = () => {
           <p className="text-sm text-gray-600 mb-4">
             Describe what happens when this yoga is missing from the grid
           </p>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
               <label
                 htmlFor="missing_description_en"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
               >
-                Missing Description (English) *{" "}
-                {activeLanguage === "en" && activeEditor === "missing" && (
-                  <span className="text-blue-600 text-xs">← Active</span>
-                )}
+                Missing Description (English) *
+                <button
+                  type="button"
+                  className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                  onClick={handleOpenMissingEnEdit}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
               </label>
-              {previewMode &&
-              activeLanguage === "en" &&
-              activeEditor === "missing" ? (
+              {previewMode ? (
                 <div
                   className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-red-50 overflow-auto prose max-w-none"
                   dangerouslySetInnerHTML={{
@@ -656,14 +571,40 @@ const EditRajyog: React.FC = () => {
                   id="missing_description_en"
                   value={missingDescriptionEn}
                   onChange={(e) => setMissingDescriptionEn(e.target.value)}
-                  onFocus={() => {
-                    setActiveEditor("missing");
-                    setActiveLanguage("en");
-                  }}
                   className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-red-50"
                   rows={10}
-                  placeholder="Describe what happens when this yoga is missing using markdown..."
+                  placeholder="Describe what happens when this yoga is missing..."
                 />
+              )}
+              {/* Missing English Edit Modal Popup */}
+              {showMissingEnEditModal && (
+                <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                  <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                    <h3 className="text-lg font-semibold mb-4">
+                      Edit Missing Description (English)
+                    </h3>
+
+                    <TiptapEditor
+                      value={modalMissingEn}
+                      onChange={setModalMissingEn}
+                      height="200px"
+                    />
+                    <div className="flex justify-end gap-2 mt-4">
+                      <button
+                        className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                        onClick={() => setShowMissingEnEditModal(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                        onClick={handleSaveMissingEnEdit}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
               {formErrors.missingDescriptionEn && (
                 <p className="mt-1 text-sm text-red-600">
@@ -671,20 +612,21 @@ const EditRajyog: React.FC = () => {
                 </p>
               )}
             </div>
-
             <div>
               <label
                 htmlFor="missing_description_hi"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
               >
-                Missing Description (Hindi){" "}
-                {activeLanguage === "hi" && activeEditor === "missing" && (
-                  <span className="text-blue-600 text-xs">← Active</span>
-                )}
+                Missing Description (Hindi)
+                <button
+                  type="button"
+                  className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
+                  onClick={handleOpenMissingHiEdit}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
               </label>
-              {previewMode &&
-              activeLanguage === "hi" &&
-              activeEditor === "missing" ? (
+              {previewMode ? (
                 <div
                   className="min-h-[200px] p-4 border border-gray-300 rounded-md bg-red-50 overflow-auto prose max-w-none"
                   dangerouslySetInnerHTML={{
@@ -696,14 +638,40 @@ const EditRajyog: React.FC = () => {
                   id="missing_description_hi"
                   value={missingDescriptionHi}
                   onChange={(e) => setMissingDescriptionHi(e.target.value)}
-                  onFocus={() => {
-                    setActiveEditor("missing");
-                    setActiveLanguage("hi");
-                  }}
                   className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm bg-red-50"
                   rows={10}
                   placeholder="जब यह योग अनुपस्थित हो तो क्या होता है, इसका वर्णन करें..."
                 />
+              )}
+              {/* Missing Hindi Edit Modal Popup */}
+              {showMissingHiEditModal && (
+                <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
+                  <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                    <h3 className="text-lg font-semibold mb-4">
+                      Edit Missing Description (Hindi)
+                    </h3>
+
+                    <TiptapEditor
+                      value={modalMissingHi}
+                      onChange={setModalMissingHi}
+                      height="200px"
+                    />
+                    <div className="flex justify-end gap-2 mt-4">
+                      <button
+                        className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                        onClick={() => setShowMissingHiEditModal(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                        onClick={handleSaveMissingHiEdit}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           </div>

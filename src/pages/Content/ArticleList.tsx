@@ -171,7 +171,7 @@ const ArticleList: React.FC = () => {
             {articles?.map((article: any, idx: number) => (
               <tr
                 key={article?.id || idx}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                 onClick={() =>
                   navigate("/articles/edit", {
                     state: { articleId: article?.id },
