@@ -101,6 +101,11 @@ const navItems: NavItem[] = [
     name: "Entrance",
     path: "/vastu/entrance/list",
   },
+  {
+    icon: <ListIcon />,
+    name: "Zone",
+    path: "/zone/list",
+  },
   // {
   //   icon: <PageIcon />,
   //   name: "Add Personality",
@@ -146,6 +151,11 @@ const navItems: NavItem[] = [
     icon: <ListIcon />,
     name: "Loshu Rajyogs",
     path: "/numerology/rajyogs/list",
+  },
+  {
+    icon: <ListIcon />,
+    name: "Questions",
+    path: "/questions",
   },
   {
     icon: <ListIcon />,

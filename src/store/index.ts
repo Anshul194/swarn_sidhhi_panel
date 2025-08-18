@@ -12,6 +12,7 @@ import planetReducer from "./slices/planet";
 import missingNumberRemedySlice from "./slices/missingNumber";
 import rajyogSlice from "./slices/rajyogSlice";
 import tagSLice from "./slices/tag";
+import questionReducer from "./slices/questionSlice";
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ export const store = configureStore({
     missingNumber: missingNumberRemedySlice,
     rajyog: rajyogSlice,
     tag: tagSLice,
+    question: questionReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

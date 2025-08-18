@@ -42,6 +42,9 @@ import AddTag from "./pages/Content/Tag/AddTag";
 import TagList from "./pages/Content/Tag/TagList";
 import NumbersList from "./pages/Content/numerology/numbers/NumbersList";
 import EditNumbers from "./pages/Content/numerology/numbers/EditNumbers";
+import QuestionList from "./pages/Question/QuestionList";
+import AddQustion from "./pages/Question/AddQustion";
+import ZoneList from "./pages/Zone/ZoneList";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -157,6 +160,13 @@ export default function App() {
 
               <Route path="/analytics/user" element={<UserAnalytics />} />
 
+
+
+              {/* zone */}
+              <Route path="/zone/list" element={<ZoneList />} />
+
+              {/* Kundli */}
+
               {/* Content Management */}
 
               <Route path="/content/add" element={<AddArticle></AddArticle>} />
@@ -177,6 +187,9 @@ export default function App() {
                 element={<div>Planet List</div>}
               />
 
+              {/* Questions */}
+              <Route path="/questions" element={<QuestionList />} />
+              <Route path="/questions/add" element={<AddQustion />} />
               <Route
                 path="/vastu/entrance/analysis/add"
                 element={<AddVastuEntrance />}
