@@ -168,10 +168,14 @@ export interface UserState {
   searchQuery: string;
   filters: Record<string, any>;
   pagination: {
-    total: number;
+    total_count: number;
     page: number;
-    limit: number;
-    totalPages: number;
+    page_size: number;
+    total_pages: number;
+    // legacy fallback
+    total?: number;
+    limit?: number;
+    totalPages?: number;
   };
 }
 
@@ -183,8 +187,11 @@ const initialState: UserState = {
   searchQuery: "",
   filters: {},
   pagination: {
-    total: 0,
+    total_count: 0,
     page: 1,
+    page_size: 10,
+    total_pages: 0,
+    total: 0,
     limit: 10,
     totalPages: 0,
   },
@@ -223,7 +230,24 @@ const userSlice = createSlice({
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.loading = false;
         state.users = action.payload.users;
-        state.pagination = action.payload.pagination;
+        // Merge pagination keys for compatibility
+        state.pagination = {
+          ...state.pagination,
+          ...action.payload.pagination,
+          total_count:
+            action.payload.pagination.total_count ??
+            action.payload.pagination.total ??
+            0,
+          page: action.payload.pagination.page ?? 1,
+          page_size:
+            action.payload.pagination.page_size ??
+            action.payload.pagination.limit ??
+            10,
+          total_pages:
+            action.payload.pagination.total_pages ??
+            action.payload.pagination.totalPages ??
+            1,
+        };
       })
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.loading = false;

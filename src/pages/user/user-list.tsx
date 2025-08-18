@@ -154,7 +154,7 @@ const UserList: React.FC = () => {
           User List
         </h1>
         <span className="text-gray-500 text-sm dark:text-gray-400">
-          Total: {pagination.total}
+          Total: {pagination.total_count ?? pagination.total ?? 0}
         </span>
       </div>
 
@@ -304,7 +304,7 @@ const UserList: React.FC = () => {
               >
                 <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   {user.id ||
-                    (pagination.page - 1) * pagination.limit + idx + 1}
+                    ((pagination.page ?? 1) - 1) * (pagination.page_size ?? pagination.limit ?? 10) + idx + 1}
                 </td>
                 {/* <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
           {user.username || user.user_name || "-"}
@@ -390,8 +390,8 @@ const UserList: React.FC = () => {
       {/* Pagination */}
       <div className="flex justify-end gap-2 mt-4">
         <button
-          onClick={() => dispatch(setCurrentPage(pagination.page - 1))}
-          disabled={pagination.page === 1}
+          onClick={() => dispatch(setCurrentPage((pagination.page ?? 1) - 1))}
+          disabled={(pagination.page ?? 1) === 1}
           className="p-2 rounded-md border border-gray-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -402,7 +402,7 @@ const UserList: React.FC = () => {
               key={idx}
               onClick={() => dispatch(setCurrentPage(page))}
               className={`px-3 py-1 rounded ${
-                pagination.page === page
+                (pagination.page ?? 1) === page
                   ? "bg-indigo-500 text-white"
                   : "bg-gray-100 dark:bg-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
@@ -416,8 +416,8 @@ const UserList: React.FC = () => {
           )
         )}
         <button
-          onClick={() => dispatch(setCurrentPage(pagination.page + 1))}
-          disabled={pagination.page === pagination.totalPages}
+          onClick={() => dispatch(setCurrentPage((pagination.page ?? 1) + 1))}
+          disabled={(pagination.page ?? 1) === (pagination.total_pages ?? pagination.totalPages ?? 1)}
           className="p-2 rounded-md border border-gray-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800"
         >
           <ChevronRight className="w-5 h-5" />
