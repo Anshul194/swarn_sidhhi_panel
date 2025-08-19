@@ -13,6 +13,7 @@ import missingNumberRemedySlice from "./slices/missingNumber";
 import rajyogSlice from "./slices/rajyogSlice";
 import tagSLice from "./slices/tag";
 import questionReducer from "./slices/questionSlice";
+import zoneReducer from "./slices/Zone";
 
 export const store = configureStore({
   reducer: {
@@ -30,6 +31,7 @@ export const store = configureStore({
     rajyog: rajyogSlice,
     tag: tagSLice,
     question: questionReducer,
+    zone: zoneReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

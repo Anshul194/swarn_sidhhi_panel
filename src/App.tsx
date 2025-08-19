@@ -45,6 +45,7 @@ import EditNumbers from "./pages/Content/numerology/numbers/EditNumbers";
 import QuestionList from "./pages/Question/QuestionList";
 import AddQustion from "./pages/Question/AddQustion";
 import ZoneList from "./pages/Zone/ZoneList";
+import ZoneDetails from "./pages/Zone/ZoneDetails";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -164,6 +165,7 @@ export default function App() {
 
               {/* zone */}
               <Route path="/zone/list" element={<ZoneList />} />
+              <Route path="/zone/:zoneId" element={<ZoneDetails />} />
 
               {/* Kundli */}
 
