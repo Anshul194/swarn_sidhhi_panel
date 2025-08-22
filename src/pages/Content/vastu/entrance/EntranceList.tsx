@@ -124,7 +124,7 @@ const EntranceList: React.FC = () => {
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-          Vastu Entrance List
+        Entrance 
         </h1>
         <div className="flex items-center gap-4">
           {/* View toggle buttons */}
