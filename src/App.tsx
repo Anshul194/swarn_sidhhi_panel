@@ -49,6 +49,13 @@ import ZoneDetails from "./pages/Zone/ZoneDetails";
 import YogsList from "./pages/Yog/YogsList";
 import YogsDetails from "./pages/Yog/YogDetails";
 import PersonalYears from "./pages/PersonalYears/PersonalYears";
+import Analytics from "./pages/Analytics/Analytics";
+import AnalyticsDetails from "./pages/Analytics/AnalyticsDetails";
+import Houses from "./pages/Houses/Houses";
+import EditYog from "./pages/Yog/EditYog";
+import EditEntrance from "./pages/Content/vastu/entrance/EditEntrance";
+import HousesDetails from "./pages/Houses/HousesDetails";
+import PersonalDetails from "./pages/PersonalYears/PersonalDetails";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -207,6 +214,7 @@ export default function App() {
               />
 
               <Route path="/vastu/entrance/list" element={<EntranceList />} />
+              <Route path="/vastu/entrance/edit" element={<EditEntrance />} />
               <Route
                 path="/numerology/personality/add"
                 element={<AddPersonality />}
@@ -248,9 +256,19 @@ export default function App() {
                 element={<NumbersList />}
               />
 
-              <Route path="/yogs/edit" element={<YogsDetails />} />
               <Route path="/yogs/list" element={<YogsList />} />
+              <Route path="/yog/edit" element={<EditYog />} />
               <Route path="/personal-years/list" element={<PersonalYears />} />
+              <Route
+                path="/personal-years/details"
+                element={<PersonalDetails />}
+              />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/analytics/details" element={<AnalyticsDetails />} />
+              {/* Houses */}
+              <Route path="/houses" element={<Houses />} />
+              <Route path="/houses/details" element={<HousesDetails />} />
+
               <Route
                 path="/numerology/numbers/edit"
                 element={<EditNumbers />}
