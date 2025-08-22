@@ -30,13 +30,9 @@ const EditVastuEntrance: React.FC = () => {
   const { selectedEntrance, loading, error } = useSelector(
     (state: RootState) => state.vastuEntrance
   );
+  // Local loading state for update button
+  const [updateLoading, setUpdateLoading] = useState(false);
   const navigate = useNavigate();
-  // Editor state
-  const [activeLanguage, setActiveLanguage] = useState<"en" | "hi">("en");
-  const [previewMode, setPreviewMode] = useState(false);
-  const [activeEditor, setActiveEditor] = useState<"content" | "title">(
-    "content"
-  );
 
   // Popup state for editing title and titleHi
   const [showTitleEditModal, setShowTitleEditModal] = useState(false);
@@ -93,10 +89,11 @@ const EditVastuEntrance: React.FC = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    console.log("Submitting Rashi with data:", {
+    console.log("Submitting Entrance with data:", {
       title,
       titleHi,
     });
+    setUpdateLoading(true);
     dispatch(
       updateEntrance({
         id: entranceId,
@@ -108,8 +105,13 @@ const EditVastuEntrance: React.FC = () => {
         },
       })
     ).then((action: any) => {
+      setUpdateLoading(false);
       if (updateEntrance.fulfilled.match(action)) {
         setAddedSuccess(true);
+        toast.success("Entrance updated successfully");
+        setTimeout(() => {
+          navigate("/vastu/entrance/analysis/list");
+        }, 1000);
         setTitle("");
         setTitleHi("");
         setName("");
@@ -124,7 +126,7 @@ const EditVastuEntrance: React.FC = () => {
       const response = await dispatch(fetchEntranceById(entranceId));
       const data = response.payload;
       if (fetchEntranceById.fulfilled.match(response)) {
-        console.log("Fetched Rashi:", data);
+        console.log("Fetched Entrance:", data);
         setTitle(data.meaning || "");
         setTitleHi(data.meaning_hi || "");
         setName(data.entry || "");
@@ -173,10 +175,6 @@ const EditVastuEntrance: React.FC = () => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              onFocus={() => {
-                setActiveEditor("title");
-                setActiveLanguage("en");
-              }}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               aria-required="true"
               aria-describedby="title-error"
@@ -200,7 +198,7 @@ const EditVastuEntrance: React.FC = () => {
               </button>
             </label>
             <div
-              className="h-[200px] p-2 border border-gray-300 rounded-md bg-gray-50"
+              className="h-[200px] p-2 border border-gray-300 rounded-md bg-gray-50 overflow-y-scroll"
               dangerouslySetInnerHTML={{ __html: title }}
             />
             {formErrors.title && (
@@ -259,7 +257,7 @@ const EditVastuEntrance: React.FC = () => {
               </button>
             </label>
             <div
-              className="h-[200px]  p-2 border border-gray-300 rounded-md bg-gray-50"
+              className="h-[200px]  p-2 border border-gray-300 rounded-md bg-gray-50 overflow-y-scroll"
               dangerouslySetInnerHTML={{ __html: titleHi }}
             />
             {/* Title Hi Edit Modal Popup with Tiptap */}
@@ -301,9 +299,9 @@ const EditVastuEntrance: React.FC = () => {
             type="submit"
             className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-lg"
             aria-label="Add entrance"
-            disabled={loading}
+            disabled={updateLoading}
           >
-            {loading ? "updating..." : "Update"}
+            {updateLoading ? "updating..." : "Update"}
           </button>
           <button
             type="button"

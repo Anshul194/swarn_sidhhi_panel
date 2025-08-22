@@ -183,69 +183,6 @@ const EditRashi: React.FC = () => {
     }
   };
 
-  const markdownButtons = [
-    {
-      icon: Bold,
-      label: "Bold",
-      action: () => insertMarkdown("**", "**", "bold text"),
-    },
-    {
-      icon: Italic,
-      label: "Italic",
-      action: () => insertMarkdown("_", "_", "italic text"),
-    },
-    {
-      icon: List,
-      label: "Bullet List",
-      action: () => insertMarkdown("- ", "", "list item"),
-    },
-    {
-      icon: ListOrdered,
-      label: "Numbered List",
-      action: () => insertMarkdown("1. ", "", "list item"),
-    },
-    {
-      icon: Link2,
-      label: "Link",
-      action: () => insertMarkdown("[", "](url)", "link text"),
-    },
-    {
-      icon: Image,
-      label: "Image",
-      action: () => insertMarkdown("![", "](image-url)", "alt text"),
-    },
-    {
-      icon: Code,
-      label: "Code",
-      action: () => insertMarkdown("`", "`", "code"),
-    },
-    {
-      icon: Quote,
-      label: "Quote",
-      action: () => insertMarkdown("> ", "", "quote text"),
-    },
-  ];
-
-  // Render markdown as HTML (simple implementation)
-  const renderMarkdown = (text: string) => {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/_(.*?)_/g, "<em>$1</em>")
-      .replace(/`(.*?)`/g, "<code>$1</code>")
-      .replace(/^> (.*$)/gim, "<blockquote>$1</blockquote>")
-      .replace(/^- (.*$)/gim, "<li>$1</li>")
-      .replace(/^(\d+)\. (.*$)/gim, "<li>$1. $2</li>")
-      .replace(
-        /\[([^\]]+)\]\(([^\)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-      )
-      .replace(
-        /!\[([^\]]*)\]\(([^\)]+)\)/g,
-        '<img src="$2" alt="$1" style="max-width: 100%; height: auto;" />'
-      )
-      .replace(/\n/g, "<br>");
-  };
-
   // Validate form
   const validateForm = () => {
     const errors: { [key: string]: string } = {};

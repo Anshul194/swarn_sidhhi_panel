@@ -165,42 +165,13 @@ const EditMissingNumber: React.FC = () => {
 
       <form onSubmit={handleSubmit}>
         {/* Edit Modal Popups for each text field */}
-        {/* General Text Edit Modal */}
-        {showTextEditModal && (
-          <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-              <h2 className="text-lg font-semibold mb-4">Edit Personality</h2>
-              <TiptapEditor
-                value={modalTextValue}
-                onChange={setModalTextValue}
-                height="300px"
-              />
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-                  onClick={() => setShowTextEditModal(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-                  onClick={() => {
-                    setText(modalTextValue);
-                    setShowTextEditModal(false);
-                  }}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+
         {/* English Text Edit Modal */}
         {showTextEnEditModal && (
           <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
               <h2 className="text-lg font-semibold mb-4">
-                Edit Personality (English)
+                Edit Positive (English)
               </h2>
               <TiptapEditor
                 value={modalTextEnValue}
@@ -232,7 +203,7 @@ const EditMissingNumber: React.FC = () => {
           <div className="fixed inset-0 left-0 top-0 w-screen h-screen flex items-center justify-center bg-opacity-30 backdrop-blur z-[100]">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
               <h2 className="text-lg font-semibold mb-4">
-                Edit Personality (Hindi)
+                Edit Positive (Hindi)
               </h2>
               <TiptapEditor
                 value={modalTextHiValue}
@@ -261,6 +232,7 @@ const EditMissingNumber: React.FC = () => {
         )}
 
         {/* Text Fields */}
+        <h2 className="text-lg font-semibold mb-2">Personality</h2>
         <div className="space-y-6 mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Text (English) Field */}
           <div>
@@ -268,7 +240,7 @@ const EditMissingNumber: React.FC = () => {
               htmlFor="text_en_field"
               className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
             >
-              Personality (English) *
+              Positive (English) *
               <button
                 type="button"
                 className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
@@ -294,7 +266,7 @@ const EditMissingNumber: React.FC = () => {
               htmlFor="text_hi_field"
               className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
             >
-              Personality (Hindi) *
+              Positive (Hindi) *
               <button
                 type="button"
                 className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 border border-blue-300"
@@ -321,7 +293,7 @@ const EditMissingNumber: React.FC = () => {
               htmlFor="text_en_field"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Personality (English) *{" "}
+              Negative (English) *{" "}
             </label>
             {false ? (
               <div
@@ -351,7 +323,7 @@ const EditMissingNumber: React.FC = () => {
               htmlFor="text_hi_field"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Personality (Hindi) *{" "}
+              Negative (Hindi) *{" "}
             </label>
             {false ? (
               <div

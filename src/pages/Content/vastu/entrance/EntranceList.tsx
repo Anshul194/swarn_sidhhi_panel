@@ -7,6 +7,8 @@ import {
   Trash,
   ChevronLeft,
   ChevronRight,
+  LayoutGrid,
+  List,
 } from "lucide-react";
 // import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -16,6 +18,8 @@ import {
 } from "../../../../store/slices/entranceChoiceSlice";
 
 const EntranceList: React.FC = () => {
+  // View mode: 'table' or 'grid'
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const dispatch = useDispatch();
   // const navigate = useNavigate();
   const { entrances, loading, error, pagination } = useSelector(
@@ -122,9 +126,36 @@ const EntranceList: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
           Vastu Entrance List
         </h1>
-        <span className="text-gray-500 text-sm dark:text-gray-400">
-          Total: {pagination?.totalCount}
-        </span>
+        <div className="flex items-center gap-4">
+          {/* View toggle buttons */}
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => setViewMode("table")}
+              className={`p-2 rounded-md border border-gray-300 dark:border-gray-600 ${
+                viewMode === "table"
+                  ? "bg-gray-200 dark:bg-gray-700"
+                  : "bg-white dark:bg-gray-900"
+              } hover:bg-gray-100 dark:hover:bg-gray-800`}
+              title="Table View"
+            >
+              <List className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-2 rounded-md border border-gray-300 dark:border-gray-600 ${
+                viewMode === "grid"
+                  ? "bg-gray-200 dark:bg-gray-700"
+                  : "bg-white dark:bg-gray-900"
+              } hover:bg-gray-100 dark:hover:bg-gray-800`}
+              title="Grid View"
+            >
+              <LayoutGrid className="h-5 w-5" />
+            </button>
+          </div>
+          <span className="text-gray-500 text-sm dark:text-gray-400">
+            Total: {pagination?.totalCount}
+          </span>
+        </div>
       </div>
 
       {/* Search & Filter */}
@@ -175,61 +206,65 @@ const EntranceList: React.FC = () => {
       {/* Error State */}
       {error && <div className="text-red-500 text-center py-4">{error}</div>}
 
-      {/* Table */}
-      <div className="bg-white shadow rounded-lg overflow-x-auto dark:bg-gray-900">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                #
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                Choice
-              </th>
-
-              {/* <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                Actions
-              </th> */}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
-            {entrances?.map((entrance: any, idx: number) => (
-              <tr
-                key={entrance?._id || idx}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                  {(page - 1) * limit + idx + 1}
-                </td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                  {entrance?.choice || "-"}
-                </td>
-
-                {/* <td className="px-6 py-4 text-right space-x-2">
-                  <button
-                    className="text-blue-500 hover:text-blue-700 transition-colors"
-                    onClick={() =>
-                      navigate("/vastu/entrance/edit", {
-                        state: { entranceId: entrance?.id },
-                      })
-                    }
-                    title="Edit Article"
-                  >
-                    <Pencil className="h-5 w-5" />
-                  </button>
-                  <button
-                    className="text-red-500 hover:text-red-700 transition-colors"
-                    onClick={() => handleDeleteClick(entrance)}
-                    title="Delete Article"
-                  >
-                    <Trash className="h-5 w-5" />
-                  </button>
-                </td> */}
+      {/* Table or Grid View */}
+      {viewMode === "table" ? (
+        <div className="bg-white shadow rounded-lg overflow-x-auto dark:bg-gray-900">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                  #
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                  Choice
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
+              {entrances && entrances.length > 0 ? (
+                entrances.map((entrance: any, idx: number) => (
+                  <tr
+                    key={entrance?._id || idx}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                  >
+                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                      {(page - 1) * limit + idx + 1}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                      {entrance?.choice || "-"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={2} className="text-center py-6 text-gray-400">
+                    No entrances found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 py-4">
+          {entrances && entrances.length > 0 ? (
+            entrances.map((entrance: any, idx: number) => (
+              <div
+                key={entrance?._id || idx}
+                className="border border-gray-400 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition"
+              >
+                <div className="text-xl font-semibold text-gray-800 text-center mb-1">
+                  {entrance?.choice || "-"}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-6 text-gray-400">
+              No entrances found.
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="flex justify-end gap-2 mt-4">

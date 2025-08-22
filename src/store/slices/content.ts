@@ -76,15 +76,16 @@ export const fetchArticles = createAsyncThunk<
             if (sortOrder) params.append('sort_order', sortOrder);
 
             const response = await axiosInstance.get(
-                `/content/articles/?${params.toString()}`,
+                `/articles/?${params.toString()}`,
                 {
                     headers: {
                         Accept: 'application/json',
                     },
                 }
             );
-
-            const data = response.data.data;
+console.log("Fetched Articles56:", response.data);
+            const data = response.data;
+            console?.log("data article", data);
             const articles = data?.results || [];
             const pagination: Pagination = {
                 totalPages: data?.pagination?.total_pages ?? 1,
@@ -110,7 +111,7 @@ export const fetchArticleById = createAsyncThunk<
     async ({ articleId }, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get(
-                `/content/articles/${articleId}/`,
+                `/articles/${articleId}/`,
                 {
                     headers: {
                         Accept: 'application/json',
@@ -138,7 +139,7 @@ export const deleteArticle = createAsyncThunk<
     async ({ token, articleId }, { rejectWithValue }) => {
         try {
             await axiosInstance.delete(
-                `/content/articles/${articleId}/`,
+                `/articles/${articleId}/`,
                 {
                     headers: {
                         Accept: 'application/json',
@@ -167,7 +168,7 @@ export const updateArticle = createAsyncThunk<
     async ({ articleId, formData }, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.put(
-                `/content/articles/${articleId}/`,
+                `/articles/${articleId}/`,
                 formData,
                 {
                     headers: {
@@ -197,7 +198,7 @@ export const createArticle = createAsyncThunk<
     async ({ token, formData }, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.post(
-                `/content/articles/`,
+                `/articles/`,
                 formData,
                 {
                     headers: {

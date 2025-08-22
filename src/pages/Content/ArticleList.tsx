@@ -154,7 +154,7 @@ const ArticleList: React.FC = () => {
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
-                #
+                ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
                 Title
@@ -179,13 +179,19 @@ const ArticleList: React.FC = () => {
                 }
               >
                 <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                  {(page - 1) * limit + idx + 1}
+                  {article?.id}
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                  {article?.title || "-"}
+                  {article?.title_en || "-"}
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                  {article?.state || "-"}
+                  {" "}
+                  {article?.stats?.view_count ?? 0}{" "}
+                  <Eye className="h-4 w-4 inline mr-2" />{" "}
+                  {article?.stats?.comments_count ?? 0}{" "}
+                  <MessageSquareText className="h-4 w-4 inline mr-2" />{" "}
+                  {article?.stats?.share_count ?? 0}{" "}
+                  <Share2 className="h-4 w-4 inline" />
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                   {article?.status || "-"}

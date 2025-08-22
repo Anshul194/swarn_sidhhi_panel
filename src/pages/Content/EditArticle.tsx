@@ -265,9 +265,9 @@ const EditArticle: React.FC = () => {
   // Populate form fields when selectedArticle changes
   useEffect(() => {
     if (selectedArticle) {
-      setTitle(selectedArticle.title || "");
+      setTitle(selectedArticle.title_en || "");
       setTitleHi(selectedArticle.title_hi || "");
-      setContent(selectedArticle.content || "");
+      setContent(selectedArticle.content_en || "");
       setContentHi(selectedArticle.content_hi || "");
       setCategory(selectedArticle.category || "");
       setTags(
@@ -453,12 +453,13 @@ const EditArticle: React.FC = () => {
 
     try {
       const formData = new FormData();
-      formData.append("title", title);
+      formData.append("title_en", title);
       formData.append("title_hi", titleHi);
-      formData.append("content", content);
+      formData.append("content_en", content);
       formData.append("content_hi", contentHi);
       formData.append("category", category);
-      formData.append("tags", tags.join(","));
+      // tags: send as array of IDs
+      tags.forEach((tagId) => formData.append("tags[]", tagId));
       if (thumbnail) formData.append("thumbnail", thumbnail);
       if (image) formData.append("image", image);
 
@@ -474,9 +475,7 @@ const EditArticle: React.FC = () => {
         setUpdateSuccess(true);
         toast.success("Article updated successfully!", {
           position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
+          duration: 3000,
           pauseOnHover: true,
           draggable: true,
         });
@@ -486,26 +485,26 @@ const EditArticle: React.FC = () => {
           navigate("/content/all");
         }, 2000);
       } else {
-        toast.error(
-          resultAction.payload?.message ||
-            "Failed to update article. Please try again.",
-          {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
+        // Try to get error message from resultAction
+        let errorMsg = "Failed to update article. Please try again.";
+        if (resultAction && typeof resultAction === "object") {
+          if ("payload" in resultAction && resultAction.payload) {
+            const payload = resultAction.payload as { message?: string };
+            errorMsg = payload.message || errorMsg;
           }
-        );
+        }
+        toast.error(errorMsg, {
+          position: "top-right",
+          duration: 5000,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     } catch (err) {
       console.error("Update error:", err);
       toast.error("An unexpected error occurred. Please try again.", {
         position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
+        duration: 5000,
         pauseOnHover: true,
         draggable: true,
       });
@@ -757,7 +756,7 @@ const EditArticle: React.FC = () => {
           <div>
             <label
               htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
+              className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
             >
               Title (English)
               <button
@@ -823,7 +822,7 @@ const EditArticle: React.FC = () => {
           <div>
             <label
               htmlFor="title_hi"
-              className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
+              className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
             >
               Title (Hindi)
               <button
@@ -886,7 +885,7 @@ const EditArticle: React.FC = () => {
               <div>
                 <label
                   htmlFor="content"
-                  className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
+                  className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
                 >
                   Content (English)
                   <button
@@ -955,7 +954,7 @@ const EditArticle: React.FC = () => {
               <div>
                 <label
                   htmlFor="content_hi"
-                  className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
+                  className="flex text-sm font-medium text-gray-700 mb-2 items-center gap-2"
                 >
                   Content (Hindi) {/* No activeEditor logic, always show */}
                   <button
@@ -1266,6 +1265,53 @@ const EditArticle: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+        {/* Stats Section */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4">Stats</h3>
+          <div className="flex gap-8 mb-6">
+            <div className="border rounded-lg px-8 py-6 flex flex-col items-center min-w-[150px]">
+              <span className="text-3xl font-bold">
+                {selectedArticle?.view_count ?? 0}
+              </span>
+              <span className="text-sm text-gray-500 mt-1">Views</span>
+            </div>
+            <div className="border rounded-lg px-8 py-6 flex flex-col items-center min-w-[150px]">
+              <span className="text-2xl font-bold">
+                {selectedArticle?.comment_count ?? 0}
+              </span>
+              <span className="text-sm text-gray-500 mt-1">Comments</span>
+            </div>
+            <div className="border rounded-lg px-8 py-6 flex flex-col items-center min-w-[150px]">
+              <span className="text-2xl font-bold">
+                {selectedArticle?.share_count ?? 0}
+              </span>
+              <span className="text-sm text-gray-500 mt-1">Shares</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Comments Section */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4">Comments</h3>
+          {/* Render comments if available, else show placeholder */}
+          {selectedArticle?.comments && selectedArticle.comments.length > 0 ? (
+            <div className="grid gap-4">
+              {selectedArticle.comments.map((comment: any, idx: number) => (
+                <div key={idx} className="border rounded-lg p-4">
+                  <div className="font-semibold text-gray-800 mb-1">
+                    {comment.user?.name || "Anonymous"}
+                  </div>
+                  <div className="text-gray-700 text-sm">{comment.text}</div>
+                  <div className="text-xs text-gray-400 mt-2">
+                    {comment.created_at}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-500">No comments yet.</div>
+          )}
         </div>
         <div className="flex flex-col md:flex-row gap-4">
           <button

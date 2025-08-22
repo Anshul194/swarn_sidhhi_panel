@@ -35,7 +35,7 @@ export const fetchTags = createAsyncThunk<
       if (searchInput) params.append("search", searchInput);
 
       const res = await axiosInstance.get(
-        `/content/tags/?${params.toString()}`
+        `/articles/tags/?${params.toString()}`
       );
       const data = res.data;
       const tags = data?.results || [];
@@ -61,7 +61,7 @@ export const createTag = createAsyncThunk<
   { rejectValue: string }
 >("tags/create", async (tagData, { rejectWithValue }) => {
   try {
-    const res = await axiosInstance.post(`/content/tags/`, tagData);
+    const res = await axiosInstance.post(`/articles/tags/`, tagData);
     return res.data.data;
   } catch (err: any) {
     console.log("Error creating tag:", err);
@@ -75,7 +75,7 @@ export const updateTag = createAsyncThunk<
   { rejectValue: string }
 >("tags/update", async ({ id, data }, { rejectWithValue }) => {
   try {
-    const res = await axiosInstance.put(`/content/tags/${id}/`, data);
+    const res = await axiosInstance.put(`/articles/tags/${id}/`, data);
     return res.data.data;
   } catch (err: any) {
     return rejectWithValue(err.message || "Failed to update tag");
@@ -88,7 +88,7 @@ export const deleteTag = createAsyncThunk<
   { rejectValue: string }
 >("tags/delete", async (id, { rejectWithValue }) => {
   try {
-    await axiosInstance.delete(`/content/tags/${id}/`);
+    await axiosInstance.delete(`/articles/tags/${id}/`);
     return id;
   } catch (err: any) {
     return rejectWithValue(err.message || "Failed to delete tag");
