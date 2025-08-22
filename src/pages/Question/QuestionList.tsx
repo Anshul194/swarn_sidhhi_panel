@@ -23,42 +23,43 @@ const QuestionList = () => {
   };
 
   return (
-    <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12 mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Questionnaire</h1>
+   <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12 mx-auto">
+  <h1 className="text-2xl font-bold mb-6">Questionnaire</h1>
 
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+  {loading && <p>Loading...</p>}
+  {error && <p className="text-red-500">{error}</p>}
 
-      <div className="space-y-4">
-        {questions.map((q, index) => (
-          <div
-            key={q.id}
-            className="border-b pb-4 flex flex-col md:flex-row md:justify-between md:items-center"
-          >
-            <div className="mb-2 md:mb-0">
-              <span className="font-medium">{index + 1}. </span>
-              {showHindi === q.id ? q.question_hi : q.question_en}
-            </div>
-            <button
-              className="border px-3 py-1 rounded text-sm text-gray-700"
-              onClick={() => handleToggle(q.id)}
-            >
-              {q.type}
-            </button>
-          </div>
-        ))}
+  {/* Add Question Button - aligned right */}
+  <div className="flex justify-end mb-8">
+    <button
+      className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+      onClick={() => navigate("/questions/add")}
+    >
+      + Add Question
+    </button>
+  </div>
+
+  <div className="space-y-4">
+    {questions.map((q, index) => (
+      <div
+        key={q.id}
+        className="border-b pb-4 flex flex-col md:flex-row md:justify-between md:items-center"
+      >
+        <div className="mb-2 md:mb-0">
+          <span className="font-medium">{index + 1}. </span>
+          {showHindi === q.id ? q.question_hi : q.question_en}
+        </div>
+        <button
+          className="border px-3 py-1 rounded text-sm text-gray-700"
+          onClick={() => handleToggle(q.id)}
+        >
+          {q.type}
+        </button>
       </div>
-
-      <div className="flex justify-end">
-  <button
-    className="mt-6 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-    onClick={() => navigate("/questions/add")}
-  >
-    + Add Question
-  </button>
+    ))}
+  </div>
 </div>
 
-    </div>
   );
 };
 
