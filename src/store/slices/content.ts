@@ -5,47 +5,28 @@ interface Article {
     title: string;
 }
 
-interface Pagination {
-    totalPages: number;
-    totalCount: number;
-    currentPage: number;
-    pageSize: number;
-}
-
 interface ContentState {
     articles: Article[];
     loading: boolean;
     error: string | null;
     selectedArticle?: Article | null;
-    pagination?: Pagination;
 }
 const initialState: ContentState = {
     articles: [],
     loading: false,
     error: null,
     selectedArticle: null,
-    pagination: {
-        totalPages: 1,
-        totalCount: 0,
-        currentPage: 1,
-        pageSize: 20,
-    },
 };
 
 
 export const fetchArticles = createAsyncThunk<
-    { articles: Article[]; pagination: Pagination },
+    { articles: Article[] },
     {
         token: string;
         baseUrl: string;
         searchInput?: string;
         categoryFilter?: string;
         expertId?: string | number;
-        sortBy?: string;
-        sortOrder?: 'asc' | 'desc';
-        page?: number;
-        pageSize?: number;
-        limit?: number;
     },
     { rejectValue: string }
 >(
@@ -57,24 +38,14 @@ export const fetchArticles = createAsyncThunk<
             searchInput = '',
             categoryFilter = '',
             expertId = '',
-            sortBy = 'published_at',
-            sortOrder = 'desc',
-            page = 1,
-            pageSize,
-            limit,
         },
         { rejectWithValue }
     ) => {
         try {
             const params = new URLSearchParams();
-            params.append('page', page.toString());
-            params.append('page_size', (pageSize ?? limit ?? 20).toString());
             if (searchInput) params.append('search', searchInput);
             if (categoryFilter) params.append('category', categoryFilter);
             if (expertId) params.append('expert_id', expertId.toString());
-            if (sortBy) params.append('sort_by', sortBy);
-            if (sortOrder) params.append('sort_order', sortOrder);
-
             const response = await axiosInstance.get(
                 `/articles/?${params.toString()}`,
                 {
@@ -83,18 +54,10 @@ export const fetchArticles = createAsyncThunk<
                     },
                 }
             );
-console.log("Fetched Articles56:", response.data);
             const data = response.data;
-            console?.log("data article", data);
             const articles = data?.results || [];
-            const pagination: Pagination = {
-                totalPages: data?.pagination?.total_pages ?? 1,
-                totalCount: data?.pagination?.total_count ?? articles.length,
-                currentPage: data?.pagination?.current_page ?? page,
-                pageSize: data?.pagination?.page_size ?? (pageSize ?? limit ?? 20),
-            };
 
-            return { articles, pagination };
+            return { articles };
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch articles');
         }
@@ -227,7 +190,6 @@ const contentSlice = createSlice({
             .addCase(fetchArticles.fulfilled, (state, action) => {
                 state.loading = false;
                 state.articles = action.payload.articles;
-                state.pagination = action.payload.pagination;
             })
             .addCase(fetchArticles.rejected, (state, action) => {
                 state.loading = false;

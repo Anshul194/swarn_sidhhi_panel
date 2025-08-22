@@ -155,6 +155,15 @@ const TagList: React.FC = () => {
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
               />
             </div>
+            <div className="flex flex-col lg:flex-row gap-4">
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </button>
+          </div>
             {/* <div className="flex items-center gap-2">
             <span className="text-sm">Category:</span>
             <select
@@ -169,15 +178,7 @@ const TagList: React.FC = () => {
             </select>
           </div> */}
           </div>
-          <div className="flex flex-col lg:flex-row gap-4 mt-4">
-            <button
-              onClick={handleReset}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Reset
-            </button>
-          </div>
+          
         </div>
 
         {/* Loading State */}
