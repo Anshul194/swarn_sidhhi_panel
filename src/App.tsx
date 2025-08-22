@@ -46,6 +46,8 @@ import QuestionList from "./pages/Question/QuestionList";
 import AddQustion from "./pages/Question/AddQustion";
 import ZoneList from "./pages/Zone/ZoneList";
 import ZoneDetails from "./pages/Zone/ZoneDetails";
+import YogsList from "./pages/Yog/YogsList";
+import PersonalYears from "./pages/PersonalYears/PersonalYears";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -245,6 +247,15 @@ export default function App() {
               <Route
                 path="/numerology/numbers/list"
                 element={<NumbersList />}
+              />
+
+              <Route
+                path="/yogs/list"
+                element={<YogsList />}
+              />
+              <Route
+                path="/personal-years/list"
+                element={<PersonalYears />}
               />
               <Route
                 path="/numerology/numbers/edit"

@@ -149,6 +149,16 @@ const navItems: NavItem[] = [
   },
   {
     icon: <ListIcon />,
+    name: "Yogs",
+    path: "/yogs/list",
+  },
+  {
+    icon: <ListIcon />,
+    name: "Personal Years",
+    path: "/personal-years/list",
+  },
+  {
+    icon: <ListIcon />,
     name: "Loshu Rajyogs",
     path: "/numerology/rajyogs/list",
   },
