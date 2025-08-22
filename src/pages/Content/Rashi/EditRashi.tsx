@@ -1,22 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import TiptapEditor from "../../../components/TiptapEditor";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  Link2,
-  Image,
-  Code,
-  Quote,
-  Eye,
-  Edit3,
-  FileText,
-  Languages,
-  Pencil,
-} from "lucide-react";
+import { Edit3, FileText, Languages, Pencil } from "lucide-react";
 import {
   createRashi,
   fetchRashiById,

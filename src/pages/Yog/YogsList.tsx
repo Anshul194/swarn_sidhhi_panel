@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronRight, LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const yogs = [
@@ -18,7 +18,9 @@ const YogsList: React.FC = () => {
   const navigate = useNavigate();
   const handleNavigate = (yog: { name: string; value: string }) => {
     // Example navigation, adjust as needed
-    navigate("/yog/edit", { state: { yogName: yog.name, yogValue: yog.value } });
+    navigate("/yogs/edit", {
+      state: { yogName: yog.name, yogValue: yog.value },
+    });
   };
 
   return (
@@ -64,7 +66,6 @@ const YogsList: React.FC = () => {
                 <span className="text-base font-medium text-gray-900 dark:text-white">
                   {yog.name} - {yog.value}
                 </span>
-               
               </li>
             ))}
           </ul>

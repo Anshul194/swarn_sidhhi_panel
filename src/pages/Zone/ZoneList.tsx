@@ -3,8 +3,20 @@ import { List, LayoutGrid, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const zones = [
-  "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S",
-  "SSW", "SW", "WNW", "NW", "NNW"
+  "N",
+  "NNE",
+  "NE",
+  "ENE",
+  "E",
+  "ESE",
+  "SE",
+  "SSE",
+  "S",
+  "SSW",
+  "SW",
+  "WNW",
+  "NW",
+  "NNW",
 ];
 
 const ZoneList = () => {
@@ -18,7 +30,6 @@ const ZoneList = () => {
           Zone
         </h1>
         <div className="flex items-center gap-4">
-          
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setView("list")}
@@ -43,25 +54,22 @@ const ZoneList = () => {
               <LayoutGrid className="h-5 w-5" />
             </button>
           </div>
-         
         </div>
       </div>
 
       {view === "list" ? (
         <div className="bg-white  overflow-x-auto">
-        <div className="space-y-4">
-        {zones.map((zone, idx) => (
-          <div
-            key={idx}
-            className="border-b pb-4 flex flex-col md:flex-row md:justify-between md:items-center cursor-pointer"
-            onClick={() => navigate(`/zone/${zone.toLowerCase()}`)}
-          >
-            <div className="mb-2 md:mb-0 text-xl">
-              {zone}
-            </div>
+          <div className="space-y-4">
+            {zones.map((zone, idx) => (
+              <div
+                key={idx}
+                className="border-b pb-4 flex flex-col md:flex-row md:justify-between md:items-center cursor-pointer"
+                onClick={() => navigate(`/zone/${zone.toLowerCase()}`)}
+              >
+                <div className="mb-2 md:mb-0 text-xl">{zone}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 py-4">

@@ -47,6 +47,7 @@ import AddQustion from "./pages/Question/AddQustion";
 import ZoneList from "./pages/Zone/ZoneList";
 import ZoneDetails from "./pages/Zone/ZoneDetails";
 import YogsList from "./pages/Yog/YogsList";
+import YogsDetails from "./pages/Yog/YogDetails";
 import PersonalYears from "./pages/PersonalYears/PersonalYears";
 
 // Lazy load pages
@@ -163,8 +164,6 @@ export default function App() {
 
               <Route path="/analytics/user" element={<UserAnalytics />} />
 
-
-
               {/* zone */}
               <Route path="/zone/list" element={<ZoneList />} />
               <Route path="/zone/:zoneId" element={<ZoneDetails />} />
@@ -249,14 +248,9 @@ export default function App() {
                 element={<NumbersList />}
               />
 
-              <Route
-                path="/yogs/list"
-                element={<YogsList />}
-              />
-              <Route
-                path="/personal-years/list"
-                element={<PersonalYears />}
-              />
+              <Route path="/yogs/edit" element={<YogsDetails />} />
+              <Route path="/yogs/list" element={<YogsList />} />
+              <Route path="/personal-years/list" element={<PersonalYears />} />
               <Route
                 path="/numerology/numbers/edit"
                 element={<EditNumbers />}
