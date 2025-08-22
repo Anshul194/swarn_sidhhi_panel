@@ -1,34 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchArticles } from "../../store/slices/content";
-import {
-  Search,
-  RotateCcw,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  Eye,
-  Share2,
-  MessageSquareText,
-} from "lucide-react";
+import { Search, RotateCcw, Plus, Eye, Share2, MessageSquareText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const ArticleList: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { articles, loading, error, pagination } = useSelector(
-    (state: any) => state?.content
-  );
-  console.log("Articles fetched:", articles);
-  console.log("Pagination data:", pagination);
+  const { articles, loading, error } = useSelector((state: any) => state?.content);
 
   // Local UI states
   const [searchInput, setSearchInput] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-
-  // Pagination states
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -40,63 +23,34 @@ const ArticleList: React.FC = () => {
           baseUrl,
           searchInput,
           categoryFilter,
-          page,
-          limit,
         })
       );
     }, 400);
     return () => clearTimeout(timer);
-  }, [dispatch, searchInput, categoryFilter, page, limit]);
+  }, [dispatch, searchInput, categoryFilter]);
 
   const handleReset = () => {
     setSearchInput("");
     setCategoryFilter("");
-    setPage(1);
-    setLimit(10);
     const token = localStorage.getItem("token") || "";
     const baseUrl = import.meta.env.VITE_BASE_URL || "";
-    dispatch(
-      fetchArticles({
-        token,
-        baseUrl,
-        page: 1,
-        limit: 10,
-      })
-    );
-  };
-
-  // Pagination numbers
-  const generatePageNumbers = () => {
-    console.log("Generating page numbers for pagination", pagination);
-    const totalPages = pagination?.totalPages || 1;
-    const current = page;
-    const maxPages = 5;
-    const pages = [];
-    const start = Math.max(1, current - Math.floor(maxPages / 2));
-    const end = Math.min(totalPages, start + maxPages - 1);
-    if (start > 1) pages.push(1, "...");
-    for (let i = start; i <= end; i++) pages.push(i);
-    if (end < totalPages) pages.push("...", totalPages);
-    return pages;
+    dispatch(fetchArticles({ token, baseUrl }));
   };
 
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-          Article List
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">Article List</h1>
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/content/add")}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md bg-blue-600 text-white  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <Plus className="h-4 w-4" />
             Add Articles
           </button>
-          <span className="text-gray-500 text-sm dark:text-gray-400">
-            Total: {articles?.length}
-          </span>
+          <span className="text-gray-500 text-sm dark:text-gray-400">Total: {articles?.length}</span>
         </div>
       </div>
 
@@ -113,21 +67,6 @@ const ArticleList: React.FC = () => {
               className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             />
           </div>
-          {/* <div className="flex items-center gap-2">
-            <span className="text-sm">Category:</span>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2"
-            >
-              <option value="">All</option>
-              <option value="astrology">Astrology</option>
-              <option value="science">Science</option>
-              <option value="technology">Technology</option>
-            </select>
-          </div> */}
-        </div>
-        <div className="flex flex-col lg:flex-row gap-4 mt-4">
           <button
             onClick={handleReset}
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
@@ -173,84 +112,21 @@ const ArticleList: React.FC = () => {
                 key={article?.id || idx}
                 className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                 onClick={() =>
-                  navigate("/articles/edit", {
-                    state: { articleId: article?.id },
-                  })
+                  navigate("/articles/edit", { state: { articleId: article?.id } })
                 }
               >
-                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                  {article?.id}
-                </td>
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{article?.id}</td>
+                <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{article?.title_en || "-"}</td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                  {article?.title_en || "-"}
+                  {article?.stats?.view_count ?? 0} <Eye className="h-4 w-4 inline mr-2" />
+                  {article?.stats?.comments_count ?? 0} <MessageSquareText className="h-4 w-4 inline mr-2" />
+                  {article?.stats?.share_count ?? 0} <Share2 className="h-4 w-4 inline" />
                 </td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                  {" "}
-                  {article?.stats?.view_count ?? 0}{" "}
-                  <Eye className="h-4 w-4 inline mr-2" />{" "}
-                  {article?.stats?.comments_count ?? 0}{" "}
-                  <MessageSquareText className="h-4 w-4 inline mr-2" />{" "}
-                  {article?.stats?.share_count ?? 0}{" "}
-                  <Share2 className="h-4 w-4 inline" />
-                </td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                  {article?.status || "-"}
-                </td>
+                <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{article?.status || "-"}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-end gap-2 mt-4">
-        <button
-          onClick={() => setPage(page - 1)}
-          disabled={page === 1}
-          className="p-2 rounded-md border border-gray-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        {generatePageNumbers().map((p, idx) =>
-          typeof p === "number" ? (
-            <button
-              key={idx}
-              onClick={() => setPage(p)}
-              className={`px-3 py-1 rounded ${
-                page === p
-                  ? "bg-indigo-500 text-white"
-                  : "bg-gray-100 dark:bg-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
-              }`}
-            >
-              {p}
-            </button>
-          ) : (
-            <span key={idx} className="px-2 text-gray-400 dark:text-gray-500">
-              {p}
-            </span>
-          )
-        )}
-        <button
-          onClick={() => setPage(page + 1)}
-          disabled={page === (pagination?.totalPages || 1)}
-          className="p-2 rounded-md border border-gray-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-        <select
-          value={limit}
-          onChange={(e) => {
-            setLimit(Number(e.target.value));
-            setPage(1);
-          }}
-          className="ml-2 px-2 py-1 border border-gray-300 rounded dark:border-gray-700"
-        >
-          {[10, 20, 50, 100].map((sz) => (
-            <option key={sz} value={sz}>
-              {sz} / page
-            </option>
-          ))}
-        </select>
       </div>
     </div>
   );
