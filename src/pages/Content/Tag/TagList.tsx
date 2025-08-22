@@ -130,7 +130,7 @@ const TagList: React.FC = () => {
           </h1>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate("/articles/tags/add")}
+              onClick={() => navigate("/content/tags/add")}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md bg-blue-600 text-white  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <Plus className="h-4 w-4" />
