@@ -75,6 +75,11 @@ const navItems: NavItem[] = [
     name: "Rashi",
     path: "/kundli/rashi/list",
   },
+  {
+    icon: <ListIcon />,
+    name: "Houses",
+    path: "/houses",
+  },
   // {
   //   icon: <PageIcon />,
   //   name: "Add Planet",
@@ -116,16 +121,12 @@ const navItems: NavItem[] = [
     name: "Personality",
     path: "/numerology/personality/list",
   },
+  
   // {
-  //   icon: <PageIcon />,
-  //   name: "Add Year Prediction",
-  //   path: "/numerology/year-prediction/add"
+  //   icon: <ListIcon />,
+  //   name: "Year Prediction",
+  //   path: "/numerology/year-prediction/list",
   // },
-  {
-    icon: <ListIcon />,
-    name: "Year Prediction",
-    path: "/numerology/year-prediction/list",
-  },
   // {
   //   icon: <PageIcon />,
   //   name: "Add Missing Number Remedy",
@@ -166,6 +167,11 @@ const navItems: NavItem[] = [
     icon: <ListIcon />,
     name: "Questions",
     path: "/questions",
+  },
+  {
+    icon: <ListIcon />,
+    name: "Analytics",
+    path: "/analytics",
   },
   {
     icon: <ListIcon />,

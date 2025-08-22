@@ -1,24 +1,27 @@
 import React, { useState } from "react";
 import { List, LayoutGrid } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
-const entrances = [
-  "E1","E2","E3","E4","E5","E6","E7","E8",
-  "S1","S2","S3","S4","S5","S6","S7","S8",
-  "N1","N2","N3","N4","N5","N6","N7","N8",
-  "W1","W2","W3","W4","W5","W6","W7","W8"
+const mbtiTypes = [
+  "ISTJ", "ISFJ", "INFJ", "INTJ",
+  "ISTP", "ISFP", "INFP", "INTP",
+  "ESTP", "ESFP", "ENFP", "ENTP",
+  "ESTJ", "ESFJ", "ENFJ", "ENTJ"
 ];
 
-
-const EntranceList: React.FC = () => {
+const Analytics = () => {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const navigate = useNavigate();
+
+  const handleTypeClick = (type: string) => {
+    navigate("/analytics/details", { state: { mbtiType: type } });
+  };
 
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-          Entrance
+          {viewMode === "table" ? "Personalities" : "Karmas"}
         </h1>
         <div className="flex items-center gap-4">
           <div className="flex justify-end gap-2">
@@ -46,7 +49,7 @@ const EntranceList: React.FC = () => {
             </button>
           </div>
           <span className="text-gray-500 text-sm dark:text-gray-400">
-            Total: {entrances.length}
+            Total: {mbtiTypes.length}
           </span>
         </div>
       </div>
@@ -55,14 +58,14 @@ const EntranceList: React.FC = () => {
       {viewMode === "table" ? (
         <div className="bg-white overflow-x-auto dark:bg-gray-900">
           <ul className="divide-y divide-gray-200">
-            {entrances.map((choice, idx) => (
+            {mbtiTypes.map((type, idx) => (
               <li
                 key={idx}
                 className="flex items-center justify-between px-4 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                onClick={() => navigate("/vastu/entrance/edit", { state: { entranceId: choice } })}
+                onClick={() => handleTypeClick(type)}
               >
                 <span className="text-base font-medium text-gray-900 dark:text-white">
-                  {choice}
+                  {type}
                 </span>
               </li>
             ))}
@@ -70,14 +73,14 @@ const EntranceList: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 py-4">
-          {entrances.map((choice, idx) => (
+          {mbtiTypes.map((type, idx) => (
             <div
               key={idx}
               className="border border-gray-400 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition"
-              onClick={() => navigate("/vastu/entrance/edit", { state: { entranceId: choice } })}
+              onClick={() => handleTypeClick(type)}
             >
               <div className="text-xl font-semibold text-gray-800 text-center mb-1">
-                {choice}
+                {type}
               </div>
             </div>
           ))}
@@ -87,4 +90,4 @@ const EntranceList: React.FC = () => {
   );
 };
 
-export default EntranceList;
+export default Analytics;
