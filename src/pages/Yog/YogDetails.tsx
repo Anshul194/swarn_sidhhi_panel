@@ -9,7 +9,7 @@ const YogDetails = () => {
   const dispatch = useDispatch();
   const yogId = location.state?.yogId || 123;
   const token = localStorage.getItem("token") || "";
-  const yog = useSelector((state: any) => state.yog?.details);
+  const yog = useSelector((state: any) => state.yog?.data);
   const loading = useSelector((state: any) => state.yog?.loading);
   const error = useSelector((state: any) => state.yog?.error);
 
@@ -22,64 +22,60 @@ const YogDetails = () => {
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-center">
-        Yog Details - {yogId}
+        Adhyatmik Yoga - {yogId}
       </h2>
 
       {/* Details Section */}
-      {yog && (
-        <div className="mb-8">
-          <div className="grid grid-cols-2 gap-6 mr-10 ">
-            <div className="flex items-center space-x-2">
-              <label className="font-medium w-32">Title English:</label>
-              <div className="flex-1 border rounded p-2 text-gray-700">
-                {yog.title_en}
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="font-medium w-32">Title Hindi:</label>
-              <div className="flex-1 border rounded p-2 text-gray-700">
-                {yog.title_hi}
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="font-medium w-32">Tags:</label>
-              <div className="flex-1 border rounded p-2 text-gray-700">
-                {Array.isArray(yog.tags) ? yog.tags.join(", ") : yog.tags}
-              </div>
-            </div>
+      <div className="mb-8  mx-auto">
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center gap-4">
+            <label className="font-medium w-40">Title English:</label>
+            <input
+              type="text"
+              value={yog?.title_en || ""}
+              readOnly
+              className="flex-1 border rounded px-3 py-2 bg-gray-100"
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="font-medium w-40">Title Hindi:</label>
+            <input
+              type="text"
+              value={yog?.title_hi || ""}
+              readOnly
+              className="flex-1 border rounded px-3 py-2 bg-gray-100"
+            />
           </div>
         </div>
-      )}
+      </div>
 
       {/* Meanings Section */}
-      {yog && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          <div className="border rounded-lg p-6">
-            <h3 className="font-bold mb-2">Present Meaning (English)</h3>
-            <div className="text-sm whitespace-pre-line">
-              {yog.present_meaning_en || "No data available."}
-            </div>
-          </div>
-          <div className="border rounded-lg p-6">
-            <h3 className="font-bold mb-2">Present Meaning (Hindi)</h3>
-            <div className="text-sm whitespace-pre-line">
-              {yog.present_meaning_hi || "No data available."}
-            </div>
-          </div>
-          <div className="border rounded-lg p-6">
-            <h3 className="font-bold mb-2">Missing Meaning (English)</h3>
-            <div className="text-sm whitespace-pre-line">
-              {yog.missing_meaning_en || "No data available."}
-            </div>
-          </div>
-          <div className="border rounded-lg p-6">
-            <h3 className="font-bold mb-2">Missing Meaning (Hindi)</h3>
-            <div className="text-sm whitespace-pre-line">
-              {yog.missing_meaning_hi || "No data available."}
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8  mx-auto">
+        <div className="border rounded-lg p-6">
+          <h3 className="font-bold mb-2">Present Meaning (English)</h3>
+          <div className="text-sm whitespace-pre-line">
+            {yog?.present_meaning_en || "No data available."}
           </div>
         </div>
-      )}
+        <div className="border rounded-lg p-6">
+          <h3 className="font-bold mb-2">Present Meaning (Hindi)</h3>
+          <div className="text-sm whitespace-pre-line">
+            {yog?.present_meaning_hi || "No data available."}
+          </div>
+        </div>
+        <div className="border rounded-lg p-6">
+          <h3 className="font-bold mb-2">Missing Meaning (English)</h3>
+          <div className="text-sm whitespace-pre-line">
+            {yog?.missing_meaning_en || "No data available."}
+          </div>
+        </div>
+        <div className="border rounded-lg p-6">
+          <h3 className="font-bold mb-2">Missing Meaning (Hindi)</h3>
+          <div className="text-sm whitespace-pre-line">
+            {yog?.missing_meaning_hi || "No data available."}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

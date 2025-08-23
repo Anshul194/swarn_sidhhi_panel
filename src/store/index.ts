@@ -14,6 +14,8 @@ import rajyogSlice from "./slices/rajyogSlice";
 import tagSLice from "./slices/tag";
 import questionReducer from "./slices/questionSlice";
 import zoneReducer from "./slices/Zone";
+import houseReducer from "./slices/house";
+import personalYearReducer from "./slices/personalYear";
 
 export const store = configureStore({
   reducer: {
@@ -32,6 +34,8 @@ export const store = configureStore({
     tag: tagSLice,
     question: questionReducer,
     zone: zoneReducer,
+    house: houseReducer,
+    personalYear: personalYearReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

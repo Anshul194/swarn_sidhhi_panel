@@ -1,11 +1,34 @@
-import React from 'react'
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPersonalYear } from "../../store/slices/personalYear";
+import type { RootState } from "../../store";
+
+const EditIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    fill="currentColor"
+    className="inline ml-2 text-gray-500 cursor-pointer"
+    viewBox="0 0 20 20"
+  >
+    <path d="M17.414 2.586a2 2 0 0 1 0 2.828l-1.586 1.586-2.828-2.828 1.586-1.586a2 2 0 0 1 2.828 0zm-3.121 3.535l-8.486 8.486a1 1 0 0 0-.263.465l-1 4a1 1 0 0 0 1.213 1.213l4-1a1 1 0 0 0 .465-.263l8.486-8.486-4.415-4.415z" />
+  </svg>
+);
 
 const PersonalDetails = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { data, loading, error } = useSelector(
+    (state: RootState) => state.personalYear
+  );
+
+  useEffect(() => {
+    dispatch(fetchPersonalYear());
+  }, [dispatch]);
 
   return (
-    <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto">
+    <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-4 py-8 xl:px-10 xl:py-12 mx-auto">
       {/* Back Button */}
       <button
         className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
@@ -19,79 +42,76 @@ const PersonalDetails = () => {
         Personal Year Details
       </h1>
 
-      {/* Details Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-semibold mb-4">Details</h3>
-        <div>
-          <div className="flex items-center space-x-2 mb-5">
-            <label className="font-medium w-32">Title English:</label>
-            <input
-              type="text"
-              placeholder="Enter Title in English"
-              className="flex-1 border rounded px-3 py-2"
-            />
+      {/* Numerology Year Data Section */}
+      <div className="mt-8">
+        <h2 className="text-lg font-bold mb-4">Numerology Year Data</h2>
+        {loading && <p>Loading...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+        {!loading && !error && data.length > 0 && (
+          <div className="space-y-10">
+            {data.map((item: any) => (
+              <div key={item.lifestyle}>
+                <h3 className="text-xl font-bold mb-4 capitalize">
+                  {item.lifestyle.replace("_", " ")}
+                </h3>
+                <div className="flex  gap-6 overflow-y-scroll no-scrollbar">
+                  {[...Array(9)].map((_, i) => {
+                    const num = String(i + 1);
+                    const pred = item.predictions[num];
+                    return (
+                      <React.Fragment key={num}>
+                        <div className="flex flex-col gap-6">
+                          {/* Prediction EN Card */}
+                          <div className="border rounded-lg p-4 shadow-sm bg-white w-2xs h-56">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="font-semibold">
+                                Number {num}: Prediction En
+                              </span>
+                              {/* <EditIcon /> */}
+                            </div>
+                            <div>
+                              <span className="">
+                                {pred?.prediction_en
+                                  ? pred.prediction_en
+                                  : "No prediction available."}
+                              </span>
+                            </div>
+                          </div>
+                          {/* Prediction HI Card */}
+                          <div className="border rounded-lg p-4 shadow-sm bg-white w-2xs h-56">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="font-semibold">
+                                Number {num}: Prediction Hi
+                              </span>
+                              {/* <EditIcon /> */}
+                            </div>
+                            <div>
+                              <span className="">
+                                {pred?.prediction_hi
+                                  ? pred.prediction_hi
+                                  : "No prediction available."}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex items-center space-x-2">
-            <label className="font-medium w-32">Title Hindi:</label>
-            <input
-              type="text"
-              placeholder="Enter Title in Hindi"
-              className="flex-1 border rounded px-3 py-2"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Meaning Sections */}
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        {/* Present Meaning (English) */}
-        <div className="border rounded-lg p-5">
-          <h2 className="font-semibold mb-2">Present Meaning (English)</h2>
-          <textarea
-            rows={6}
-            placeholder="Enter present meaning in English"
-            className="w-full border rounded px-3 py-2"
-          ></textarea>
-        </div>
-        {/* Present Meaning (Hindi) */}
-        <div className="border rounded-lg p-5">
-          <h2 className="font-semibold mb-2">Present Meaning (Hindi)</h2>
-          <textarea
-            rows={6}
-            placeholder="Enter present meaning in Hindi"
-            className="w-full border rounded px-3 py-2"
-          ></textarea>
-        </div>
-        {/* Missing Meaning (English) */}
-        <div className="border rounded-lg p-5">
-          <h2 className="font-semibold mb-2">Missing Meaning (English)</h2>
-          <textarea
-            rows={6}
-            placeholder="Enter missing meaning in English"
-            className="w-full border rounded px-3 py-2"
-          ></textarea>
-        </div>
-        {/* Missing Meaning (Hindi) */}
-        <div className="border rounded-lg p-5">
-          <h2 className="font-semibold mb-2">Missing Meaning (Hindi)</h2>
-          <textarea
-            rows={6}
-            placeholder="Enter missing meaning in Hindi"
-            className="w-full border rounded px-3 py-2"
-          ></textarea>
-        </div>
+        )}
       </div>
 
       {/* Save Button */}
       <div className="mt-8 text-right">
-        <button
-          className="py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
-        >
+        <button className="py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold">
           Save
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PersonalDetails
+export default PersonalDetails;

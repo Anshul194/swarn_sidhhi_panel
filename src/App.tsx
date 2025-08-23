@@ -257,7 +257,7 @@ export default function App() {
               />
 
               <Route path="/yogs/list" element={<YogsList />} />
-              <Route path="/yog/edit" element={<EditYog />} />
+              <Route path="/yogs/edit" element={<YogsDetails />} />
               <Route path="/personal-years/list" element={<PersonalYears />} />
               <Route
                 path="/personal-years/details"

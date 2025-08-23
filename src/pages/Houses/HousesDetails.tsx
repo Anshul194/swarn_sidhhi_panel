@@ -1,78 +1,95 @@
-import React from 'react'
-import { useLocation } from 'react-router-dom'
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchHouseById } from "../../store/slices/house";
 
 const HousesDetails = () => {
-  const location = useLocation()
-  const houseLabel = location.state?.houseLabel || 'House Details'
+  const location = useLocation();
+  const houseLabel = location.state?.houseLabel || "House: 1st";
+  const houseId = location.state?.houseId || 1;
+  const dispatch = useDispatch();
+  const houseData = useSelector((state: any) => state.house?.details);
+  const loading = useSelector((state: any) => state.house?.loading);
+  const error = useSelector((state: any) => state.house?.error);
+
+  useEffect(() => {
+    if (houseId) {
+      dispatch(fetchHouseById({ id: houseId }));
+    }
+  }, [dispatch, houseId]);
+
+  const details = houseData?.details;
+  const planets = houseData?.planets || [];
 
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto">
       {/* Page Title */}
-      <h1 className="text-2xl font-bold text-center mb-8">{houseLabel}</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">{houseLabel}</h1>
 
-      {/* House Section */}
-      <h2 className="text-xl font-semibold mb-4">House</h2>
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        {/* House Details (English) */}
-        <div className="border rounded-lg p-5">
-          <h3 className="font-semibold mb-2">House Details (English)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
+      {loading && <div>Loading...</div>}
+      {error && <div className="text-red-500">{error}</div>}
+
+      {/* House Details Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+        <div className="border rounded-lg p-6">
+          <h3 className="font-bold mb-2">Meaning (English)</h3>
+          <div className="text-sm whitespace-pre-line">
+            {details?.description_en || "No data available."}
+          </div>
         </div>
-        {/* House Details (Hindi) */}
-        <div className="border rounded-lg p-5">
-          <h3 className="font-semibold mb-2">House Details (Hindi)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
+        <div className="border rounded-lg p-6">
+          <h3 className="font-bold mb-2">Meaning (Hindi)</h3>
+          <div className="text-sm whitespace-pre-line">
+            {details?.description_hi || "No data available."}
+          </div>
         </div>
       </div>
 
-      {/* Additional Section */}
-      <h2 className="text-xl font-semibold mb-4">Other Details</h2>
-      {/* Empty space for future content */}
+      {/* Planets Section */}
 
-      {/* Save Button */}
-      <div className="mt-8 text-right">
-        <button className="py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold">
-          Add
-        </button>
-      </div>
+      <>
+        {planets.map((planet: any) => (
+          <div key={planet.name} className="mb-10">
+            <h2 className="text-xl font-bold mb-4 capitalize">
+              {planet.name === "sun"
+                ? "Sun"
+                : planet.name === "moon"
+                ? "Moon House"
+                : planet.name.charAt(0).toUpperCase() +
+                  planet.name.slice(1) +
+                  " House"}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="border rounded-lg p-6">
+                <h3 className="font-bold mb-2">
+                  {planet.name.charAt(0).toUpperCase() + planet.name.slice(1)}{" "}
+                  in House {houseId} Meaning (English)
+                </h3>
+                <div className="text-sm whitespace-pre-line">
+                  {planet.pros_en || "No data available."}
+                </div>
+                <div className="mt-2 text-sm whitespace-pre-line font-semibold">
+                  {planet.cons_en || ""}
+                </div>
+              </div>
+              <div className="border rounded-lg p-6">
+                <h3 className="font-bold mb-2">
+                  {planet.name.charAt(0).toUpperCase() + planet.name.slice(1)}{" "}
+                  in House {houseId} Meaning (Hindi)
+                </h3>
+                <div className="text-sm whitespace-pre-line">
+                  {planet.pros_hi || "No data available."}
+                </div>
+                <div className="mt-2 text-sm whitespace-pre-line font-semibold">
+                  {planet.cons_hi || ""}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </>
     </div>
-  )
-}
+  );
+};
 
-export default HousesDetails
+export default HousesDetails;
