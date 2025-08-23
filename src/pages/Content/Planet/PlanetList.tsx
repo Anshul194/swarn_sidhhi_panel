@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { List, LayoutGrid } from "lucide-react";
 
 const planets = [
@@ -16,6 +17,7 @@ const planets = [
 ];
 
 const PlanetList: React.FC = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
   return (
@@ -64,6 +66,11 @@ const PlanetList: React.FC = () => {
               <li
                 key={idx}
                 className="flex items-center justify-between px-4 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                onClick={() =>
+                  navigate("/kundli/planet/edit", {
+                    state: { planetName: planet.toLowerCase() },
+                  })
+                }
               >
                 <span className="text-base font-medium text-gray-900 dark:text-white">
                   {planet}
@@ -78,6 +85,11 @@ const PlanetList: React.FC = () => {
             <div
               key={idx}
               className="border border-gray-400 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition"
+              onClick={() =>
+                navigate("/kundli/planet/edit", {
+                  state: { planetName: planet.toLowerCase() },
+                })
+              }
             >
               <div className="text-xl font-semibold text-gray-800 text-center mb-1">
                 {planet}

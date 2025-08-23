@@ -1,78 +1,120 @@
-// src/features/planet/planetSlice.ts
 
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from '../../services/axiosConfig';
 
-interface PlanetPayload {
-  name: string;
-  description: string;
-  description_en: string;
-  description_hi: string;
+export interface PlanetDetails {
+  meaning_en: string;
+  meaning_hi: string;
+  remedy_en: string;
+  remedy_hi: string;
 }
 
-interface PlanetState {
+export interface HouseDetails {
+  name: string;
+  pros_en: string;
+  pros_hi: string;
+  cons_en: string;
+  cons_hi: string;
+}
+
+export interface PlanetData {
+  details: PlanetDetails;
+  houses: HouseDetails[];
+}
+
+export interface PlanetState {
+  data: PlanetData | null;
   loading: boolean;
-  success: boolean;
   error: string | null;
 }
 
 const initialState: PlanetState = {
+  data: null,
   loading: false,
-  success: false,
   error: null,
 };
 
-// Async thunk
-export const createPlanet = createAsyncThunk(
-  'planet/create',
-  async (planet: PlanetPayload, { rejectWithValue }) => {
+export const fetchPlanetDetails = createAsyncThunk(
+  "planet/fetchDetails",
+  async (
+    { name }: { name: string },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await axiosInstance.post(
-        `/content/kundli/planets/`,
-        planet,
+      const response = await axiosInstance.get(
+        `/kundli/planets/${name}/`,
         {
           headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
+            Accept: "application/json",
           },
         }
       );
-      return response.data;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to create planet');
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch planet details");
+    }
+  }
+);
+
+export const updatePlanetDetails = createAsyncThunk(
+  "planet/updateDetails",
+  async (
+    { name, details, houses }: { name: string; details: PlanetDetails; houses: HouseDetails[] },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axiosInstance.patch(
+        `/kundli/planets/${name}/`,
+        { details, houses },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error: unknown) {
+      if (typeof error === "object" && error !== null && "response" in error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to update planet details");
+      }
+      return rejectWithValue("Failed to update planet details");
     }
   }
 );
 
 const planetSlice = createSlice({
-  name: 'planet',
+  name: "planet",
   initialState,
-  reducers: {
-    resetPlanetState: (state) => {
-      state.loading = false;
-      state.success = false;
-      state.error = null;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createPlanet.pending, (state) => {
+      .addCase(fetchPlanetDetails.pending, (state) => {
         state.loading = true;
-        state.success = false;
         state.error = null;
       })
-      .addCase(createPlanet.fulfilled, (state) => {
+      .addCase(fetchPlanetDetails.fulfilled, (state, action) => {
         state.loading = false;
-        state.success = true;
+        state.data = action.payload;
       })
-      .addCase(createPlanet.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(fetchPlanetDetails.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload as string;
+      });
+    builder
+      .addCase(updatePlanetDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatePlanetDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(updatePlanetDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });
-
-export const { resetPlanetState } = planetSlice.actions;
 
 export default planetSlice.reducer;

@@ -17,6 +17,7 @@ import zoneReducer from "./slices/Zone";
 import houseReducer from "./slices/house";
 import personalYearReducer from "./slices/personalYear";
 import newAnalyticsReducer from "./slices/newAnalytics";
+import numerologyNumbersReducer from "./slices/numerologyNumbers";
 
 export const store = configureStore({
   reducer: {
@@ -38,6 +39,7 @@ export const store = configureStore({
     house: houseReducer,
     personalYear: personalYearReducer,
     newAnalytics: newAnalyticsReducer,
+    numerologyNumbers: numerologyNumbersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
