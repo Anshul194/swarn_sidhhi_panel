@@ -55,34 +55,7 @@ const initialState: HouseState = {
 
 // ----------------- Async Thunks -----------------
 
-// Fetch houses list
-export const fetchHousesList = createAsyncThunk<
-  { houses: House[]; pagination: Pagination },
-  void,
-  { rejectValue: string }
->("houses/fetchList", async (_, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.get(`/kundli/houses/`, {
-      headers: {
-        "Content-Type": "text/plain",
-        Accept: "application/json",
-      },
-    });
 
-    const data = response.data.data || {};
-    const houses: House[] = data.results || [];
-    const pagination: Pagination = {
-      totalPages: data?.pagination?.total_pages ?? 1,
-      totalCount: data?.pagination?.total_count ?? houses.length,
-      currentPage: data?.pagination?.current_page ?? 1,
-      pageSize: data?.pagination?.page_size ?? 20,
-    };
-
-    return { houses, pagination };
-  } catch (error: any) {
-    return rejectWithValue(error.message || "Failed to fetch houses");
-  }
-});
 
 // Fetch a House by ID
 export const fetchHouseById = createAsyncThunk<
@@ -105,27 +78,24 @@ export const fetchHouseById = createAsyncThunk<
 });
 
 // Update a House by ID
+// Update a House by ID
 export const updateHouseById = createAsyncThunk<
   House,
-  { id: number; payload: Partial<House>; token: string },
+  { id: number; payload: Partial<House> },
   { rejectValue: string }
->("houses/updateById", async ({ id, payload, token }, { rejectWithValue }) => {
+>("houses/updateById", async ({ id, payload }, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.patch(
-      `/kundli/houses/${id}/`,
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axiosInstance.patch(`/kundli/houses/${id}/`, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return response.data.data as House;
   } catch (error: any) {
     return rejectWithValue(error.message || "Failed to update house");
   }
 });
+
 
 // ----------------- Slice -----------------
 const houseSlice = createSlice({
@@ -134,20 +104,7 @@ const houseSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Houses List
-      .addCase(fetchHousesList.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchHousesList.fulfilled, (state, action) => {
-        state.loading = false;
-        state.houses = action.payload.houses;
-        state.pagination = action.payload.pagination;
-      })
-      .addCase(fetchHousesList.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
+     
       // Fetch House Details
       .addCase(fetchHouseById.pending, (state) => {
         state.loading = true;

@@ -16,6 +16,7 @@ import questionReducer from "./slices/questionSlice";
 import zoneReducer from "./slices/Zone";
 import housesReducer from "./slices/houses";
 import personalYearReducer from "./slices/personalYear";
+import yogReducer from "./slices/yog";
 
 export const store = configureStore({
   reducer: {
@@ -31,6 +32,7 @@ export const store = configureStore({
     planet: planetReducer,
     missingNumber: missingNumberRemedySlice,
     rajyog: rajyogSlice,
+    yog: yogReducer,
     tag: tagSLice,
     question: questionReducer,
     zone: zoneReducer,
