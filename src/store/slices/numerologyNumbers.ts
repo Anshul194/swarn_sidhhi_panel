@@ -1,8 +1,26 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from '../../services/axiosConfig';
+
+export interface Personality {
+  positive_en: string;
+  positive_hi: string;
+  negative_en: string;
+  negative_hi: string;
+}
+
+export interface Remedy {
+  missing_meaning_in_loshu_en: string;
+  missing_meaning_in_loshu_hi: string;
+}
+
+export interface NumerologyNumberData {
+  personality: Personality;
+  remedy: Remedy;
+  products: any[];
+}
 
 export interface NumerologyNumberState {
-  data: any;
+  data: NumerologyNumberData | null;
   loading: boolean;
   error: string | null;
 }
@@ -17,20 +35,17 @@ const initialState: NumerologyNumberState = {
 export const fetchNumerologyNumberById = createAsyncThunk(
   "numerologyNumbers/fetchById",
   async (
-    { id, token }: { id: string | number; token: string },
+    { id }: { id: string | number },
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.get(
-        `https://test.swarnsiddhi.com/admin/api/v1/numerology/numbers/${id}`,
+      const response = await axiosInstance.get(
+        `/numerology/numbers/${id}/`,
         {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          
         }
       );
-      return response.data;
+      return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch numerology number");
     }

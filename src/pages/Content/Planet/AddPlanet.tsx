@@ -15,7 +15,7 @@ import {
   FileText,
   Languages,
 } from "lucide-react";
-import { createPlanet } from "../../../store/slices/planet";
+// import { createPlanet } from "../../../store/slices/planet";
 
 import type { RootState } from "../../../store";
 import type { AppDispatch } from "../../../store";
