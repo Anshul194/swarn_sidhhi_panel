@@ -586,7 +586,8 @@ const navGroups: NavGroup[] = [
       {
         icon: <GridIcon />,
         name: "Dashboard",
-        path: "/",
+        // path: "/",
+        path: "/analytics/user",
       },
       {
         icon: <PageIcon   />,
@@ -634,6 +635,11 @@ const navGroups: NavGroup[] = [
         name: "Rashis",
         path: "/kundli/rashi/list",
       },
+      {
+        // icon: <ListIcon />,
+        name: "Houses",
+        path: "/houses",
+      },
       
       
     ],
@@ -666,7 +672,7 @@ const navGroups: NavGroup[] = [
       {
         // icon: <ListIcon />,
         name: "Analysis",
-        path: "/vastu/entrance/analysis/list",
+        path: "/analytics",
       },
       {
         // icon: <ListIcon />,

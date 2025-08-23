@@ -62,6 +62,7 @@ const Houses = () => {
         house,
         houseIndex: idx,
         houseLabel: formatHouseTable(house, idx),
+        houseId: idx + 1, // Pass correct house ID (1-based)
       },
     });
   };

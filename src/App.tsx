@@ -22,7 +22,7 @@ import EditRashi from "./pages/Content/Rashi/EditRashi";
 import AddVastuEntrance from "./pages/Content/vastu/entranceAnalysis/AddEntrance";
 import EntranceAnalysisList from "./pages/Content/vastu/entranceAnalysis/EntranceList";
 import EntranceList from "./pages/Content/vastu/entrance/EntranceList";
-import EditVastuEntrance from "./pages/Content/vastu/entranceAnalysis/EditEntrance";
+// import EditVastuEntrance from "./pages/Content/vastu/entranceAnalysis/EditEntrance";
 import AddPersonality from "./pages/Content/numerology/personality/AddPersonality";
 import PersonalityList from "./pages/Content/numerology/personality/PersonalityList";
 import EditPersonality from "./pages/Content/numerology/personality/EditPersonality";
@@ -56,6 +56,8 @@ import EditYog from "./pages/Yog/EditYog";
 import EditEntrance from "./pages/Content/vastu/entrance/EditEntrance";
 import HousesDetails from "./pages/Houses/HousesDetails";
 import PersonalDetails from "./pages/PersonalYears/PersonalDetails";
+import YogDetails from "./pages/Yog/YogDetails";
+import EntranceDetails from "./pages/Content/vastu/entrance/EntranceDetails";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -208,13 +210,11 @@ export default function App() {
                 path="/vastu/entrance/analysis/list"
                 element={<EntranceAnalysisList />}
               />
-              <Route
-                path="/vastu/entrance/analysis/edit"
-                element={<EditVastuEntrance />}
-              />
+              
 
               <Route path="/vastu/entrance/list" element={<EntranceList />} />
-              <Route path="/vastu/entrance/edit" element={<EditEntrance />} />
+              <Route path="/vastu/entrance/details" element={<EntranceDetails />} />
+              {/* <Route path="/vastu/entrance/edit" element={<EditEntrance />} /> */}
               <Route
                 path="/numerology/personality/add"
                 element={<AddPersonality />}
@@ -257,7 +257,7 @@ export default function App() {
               />
 
               <Route path="/yogs/list" element={<YogsList />} />
-              <Route path="/yogs/edit" element={<YogsDetails />} />
+              <Route path="/yogs/details" element={<YogDetails />} />
               <Route path="/personal-years/list" element={<PersonalYears />} />
               <Route
                 path="/personal-years/details"

@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom"; // added useNavigate
 import { useDispatch, useSelector } from "react-redux";
-import { fetchHouseById } from "../../store/slices/house";
+import { fetchHouseById } from "../../store/slices/houses";
 
 const HousesDetails = () => {
   const location = useLocation();
+  const navigate = useNavigate(); // added
   const houseLabel = location.state?.houseLabel || "House: 1st";
   const houseId = location.state?.houseId || 1;
   const dispatch = useDispatch();
-  const houseData = useSelector((state: any) => state.house?.details);
+  const houseDetails = useSelector((state: any) => state.house?.houseDetails); // updated selector
   const loading = useSelector((state: any) => state.house?.loading);
   const error = useSelector((state: any) => state.house?.error);
 
@@ -18,11 +19,18 @@ const HousesDetails = () => {
     }
   }, [dispatch, houseId]);
 
-  const details = houseData?.details;
-  const planets = houseData?.planets || [];
+  const details = houseDetails?.details;
+  const planets = houseDetails?.planets || [];
 
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto">
+      {/* Back Button */}
+      <button
+        className="mb-6 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+        onClick={() => navigate(-1)}
+      >
+        &larr; Back
+      </button>
       {/* Page Title */}
       <h1 className="text-3xl font-bold text-center mb-8">{houseLabel}</h1>
 

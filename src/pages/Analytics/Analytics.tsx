@@ -2,19 +2,24 @@ import React, { useState } from "react";
 import { List, LayoutGrid } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const mbtiTypes = [
+// Accept mbtiTypes as a prop for dynamic usage
+interface AnalyticsProps {
+  mbtiTypes?: string[];
+}
+
+const defaultMbtiTypes = [
   "ISTJ", "ISFJ", "INFJ", "INTJ",
   "ISTP", "ISFP", "INFP", "INTP",
   "ESTP", "ESFP", "ENFP", "ENTP",
   "ESTJ", "ESFJ", "ENFJ", "ENTJ"
 ];
 
-const Analytics = () => {
+const Analytics: React.FC<AnalyticsProps> = ({ mbtiTypes = defaultMbtiTypes }) => {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const navigate = useNavigate();
 
   const handleTypeClick = (type: string) => {
-    navigate("/analytics/details", { state: { mbtiType: type } });
+    navigate("/analytics/details", { state: { mbtiType: type.toLowerCase() } });
   };
 
   return (
