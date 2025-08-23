@@ -17,6 +17,7 @@ import zoneReducer from "./slices/Zone";
 import housesReducer from "./slices/houses";
 import personalYearReducer from "./slices/personalYear";
 import yogReducer from "./slices/yog";
+import entranceReducer from "./slices/entrance";
 
 export const store = configureStore({
   reducer: {
@@ -38,6 +39,7 @@ export const store = configureStore({
     zone: zoneReducer,
     house: housesReducer,
     personalYear: personalYearReducer,
+    entrance: entranceReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
