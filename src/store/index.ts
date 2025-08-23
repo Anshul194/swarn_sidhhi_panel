@@ -16,6 +16,7 @@ import questionReducer from "./slices/questionSlice";
 import zoneReducer from "./slices/Zone";
 import houseReducer from "./slices/house";
 import personalYearReducer from "./slices/personalYear";
+import newAnalyticsReducer from "./slices/newAnalytics";
 
 export const store = configureStore({
   reducer: {
@@ -36,6 +37,7 @@ export const store = configureStore({
     zone: zoneReducer,
     house: houseReducer,
     personalYear: personalYearReducer,
+    newAnalytics: newAnalyticsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

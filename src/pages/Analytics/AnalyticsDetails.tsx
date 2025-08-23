@@ -1,119 +1,90 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchKarmaKundliAnalysis } from "../../store/slices/newAnalytics";
 
 const AnalyticsDetails = () => {
   const location = useLocation();
   const mbtiType = location.state?.mbtiType || "ISTJ";
+  const dispatch = useDispatch();
+  const { data, loading, error } = useSelector(
+    (state: any) => state.newAnalytics
+  );
+
+  useEffect(() => {
+    if (mbtiType) {
+      dispatch(fetchKarmaKundliAnalysis({ type: mbtiType }));
+    }
+  }, [dispatch, mbtiType]);
+
+  const getElement = (element: string) =>
+    data.find((item: any) => item.element === element) || {};
+  const career = getElement("career");
+  const health = getElement("health");
+  const relationship = getElement("relationship");
+
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto">
       {/* Page Title */}
       <h1 className="text-2xl font-bold text-center mb-8">Karma: {mbtiType}</h1>
 
+      {loading && <div>Loading...</div>}
+      {error && <div className="text-red-500">{error}</div>}
+
       {/* Career Section */}
       <h2 className="text-xl font-semibold mb-4">Career</h2>
       <div className="grid grid-cols-2 gap-6 mb-8">
-        {/* Career Prediction (English) */}
         <div className="border rounded-lg p-5">
           <h3 className="font-semibold mb-2">Career Prediction (English)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
+          <div className="text-sm whitespace-pre-line">
+            {career.description_en || "No data available."}
+          </div>
         </div>
-        {/* Career Prediction (Hindi) */}
         <div className="border rounded-lg p-5">
           <h3 className="font-semibold mb-2">Career Prediction (Hindi)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
+          <div className="text-sm whitespace-pre-line">
+            {career.description_hi || "No data available."}
+          </div>
         </div>
       </div>
 
       {/* Health Section */}
       <h2 className="text-xl font-semibold mb-4">Health</h2>
       <div className="grid grid-cols-2 gap-6 mb-8">
-        {/* Health Prediction (English) */}
         <div className="border rounded-lg p-5">
           <h3 className="font-semibold mb-2">Health Prediction (English)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
+          <div className="text-sm whitespace-pre-line">
+            {health.description_en || "No data available."}
+          </div>
         </div>
-        {/* Health Prediction (Hindi) */}
         <div className="border rounded-lg p-5">
           <h3 className="font-semibold mb-2">Health Prediction (Hindi)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
+          <div className="text-sm whitespace-pre-line">
+            {health.description_hi || "No data available."}
+          </div>
         </div>
       </div>
 
       {/* Relationship Section */}
-      <h2 className="text-xl font-semibold mb-4">Relationship, etc</h2>
-      {/* Empty space for future content */}
+      <h2 className="text-xl font-semibold mb-4">Relationship</h2>
+      <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="border rounded-lg p-5">
+          <h3 className="font-semibold mb-2">
+            Relationship Prediction (English)
+          </h3>
+          <div className="text-sm whitespace-pre-line">
+            {relationship.description_en || "No data available."}
+          </div>
+        </div>
+        <div className="border rounded-lg p-5">
+          <h3 className="font-semibold mb-2">
+            Relationship Prediction (Hindi)
+          </h3>
+          <div className="text-sm whitespace-pre-line">
+            {relationship.description_hi || "No data available."}
+          </div>
+        </div>
+      </div>
 
       {/* Save Button */}
       <div className="mt-8 text-right">
