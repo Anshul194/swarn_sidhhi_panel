@@ -58,6 +58,7 @@ import HousesDetails from "./pages/Houses/HousesDetails";
 import PersonalDetails from "./pages/PersonalYears/PersonalDetails";
 import YogDetails from "./pages/Yog/YogDetails";
 import EntranceDetails from "./pages/Content/vastu/entrance/EntranceDetails";
+import ZoneEdit from "./pages/Zone/ZoneEdit";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -176,6 +177,8 @@ export default function App() {
               {/* zone */}
               <Route path="/zone/list" element={<ZoneList />} />
               <Route path="/zone/:zoneId" element={<ZoneDetails />} />
+             
+              <Route path="/vastu/zones/:zoneId/edit" element={<ZoneEdit />} />
 
               {/* Kundli */}
 

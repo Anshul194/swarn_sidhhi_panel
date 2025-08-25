@@ -85,6 +85,36 @@ export const fetchZonesDetails = createAsyncThunk<
   }
 });
 
+// PATCH zone details and items
+export const updateZoneDetails = createAsyncThunk<
+  { details: ZoneDetails; items: ZoneItem[] },
+  { letter: string; details: ZoneDetails; items: ZoneItem[]; token: string },
+  { rejectValue: string }
+>(
+  "zone/updateZoneDetails",
+  async ({ letter, details, items, token }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.patch(
+        `/vastu/zones/${letter}/`,
+        { details, items },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = response.data.data || {};
+      return {
+        details: data.details,
+        items: data.items,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to update zone details");
+    }
+  }
+);
+
 const zoneSlice = createSlice({
   name: "zone",
   initialState,
@@ -103,6 +133,19 @@ const zoneSlice = createSlice({
         state.items = action.payload.items;
       })
       .addCase(fetchZonesDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateZoneDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateZoneDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.details = action.payload.details;
+        state.items = action.payload.items;
+      })
+      .addCase(updateZoneDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
