@@ -59,6 +59,7 @@ import PersonalDetails from "./pages/PersonalYears/PersonalDetails";
 import YogDetails from "./pages/Yog/YogDetails";
 import EntranceDetails from "./pages/Content/vastu/entrance/EntranceDetails";
 import ZoneEdit from "./pages/Zone/ZoneEdit";
+import QuestionEdit from "./pages/Question/QuestionEdit";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -205,6 +206,7 @@ export default function App() {
               {/* Questions */}
               <Route path="/questions" element={<QuestionList />} />
               <Route path="/questions/add" element={<AddQustion />} />
+              <Route path="/questions/:id" element={<QuestionEdit />} />
               <Route
                 path="/vastu/entrance/analysis/add"
                 element={<AddVastuEntrance />}

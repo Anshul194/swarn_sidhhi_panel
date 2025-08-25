@@ -105,7 +105,7 @@ const HousesDetails = () => {
             />
             <button
               onClick={() => openEditModal(field, formData.details[field])}
-              className="absolute top-4 right-4 text-gray-600 hover:text-black"
+              className="absolute top-4 right-4 text-blue-600"
             >
               <Pencil size={18} />
             </button>
@@ -135,7 +135,7 @@ const HousesDetails = () => {
                 />
                 <button
                   onClick={() => openEditModal("", planet[key], idx, key)}
-                  className="absolute top-4 right-4 text-gray-600 hover:text-black"
+                  className="absolute top-4 right-4 text-blue-600"
                 >
                   <Pencil size={18} />
                 </button>
