@@ -81,7 +81,7 @@ const AddQuestion = () => {
         </div>
         <button
           type="submit"
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           disabled={loading}
         >
           {loading ? "Adding..." : "Add Question"}

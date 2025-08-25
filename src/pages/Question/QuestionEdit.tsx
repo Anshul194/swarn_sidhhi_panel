@@ -35,6 +35,8 @@ const QuestionEdit = () => {
     type: "",
   });
 
+  const [success, setSuccess] = useState(false);
+
   useEffect(() => {
     if (id) dispatch(fetchQuestionById(Number(id)));
   }, [dispatch, id]);
@@ -47,9 +49,13 @@ const QuestionEdit = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
+    setSuccess(false);
     if (id) {
-      dispatch(updateQuestion({ id: Number(id), data: formData }));
+      const result = await dispatch(updateQuestion({ id: Number(id), data: formData }));
+      if (result.type.endsWith("fulfilled")) {
+        setSuccess(true);
+      }
     }
   };
 
@@ -61,12 +67,9 @@ const QuestionEdit = () => {
   };
 
   return (
-    <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto max-w-xl">
-      <h2 className="text-2xl font-bold mb-6">Edit Question</h2>
-
+    <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12 mx-auto">
+      <h2 className="text-xl font-bold mb-4">Edit Question</h2>
       {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-
       <form className="space-y-4">
         <div>
           <label className="block font-medium mb-1">Question (English)</label>
@@ -79,7 +82,6 @@ const QuestionEdit = () => {
             required
           />
         </div>
-
         <div>
           <label className="block font-medium mb-1">Question (Hindi)</label>
           <input
@@ -90,7 +92,6 @@ const QuestionEdit = () => {
             className="border rounded px-3 py-2 w-full"
           />
         </div>
-
         <div>
           <label className="block font-medium mb-1">Type</label>
           <select
@@ -110,30 +111,34 @@ const QuestionEdit = () => {
             ))}
           </select>
         </div>
-
         <div className="flex gap-4 mt-4">
           <button
             type="button"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             onClick={handleUpdate}
+            disabled={loading}
           >
-            Update
+            {loading ? "Updating..." : "Update"}
           </button>
           <button
             type="button"
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
             onClick={handleDelete}
           >
             Delete
           </button>
           <button
             type="button"
-            className="px-4 py-2 border rounded hover:bg-gray-100"
+            className="border px-4 py-2 rounded hover:bg-gray-100"
             onClick={() => navigate("/questions")}
           >
             Cancel
           </button>
         </div>
+        {error && <p className="text-red-500">{error}</p>}
+        {success && (
+          <p className="text-green-600">Question updated successfully!</p>
+        )}
       </form>
     </div>
   );
