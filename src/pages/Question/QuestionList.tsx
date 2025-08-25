@@ -32,7 +32,7 @@ const QuestionList = () => {
   {/* Add Question Button - aligned right */}
   <div className="flex justify-end mb-8">
     <button
-      className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
       onClick={() => navigate("/questions/add")}
     >
       + Add Question
