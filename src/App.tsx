@@ -62,6 +62,8 @@ import ZoneEdit from "./pages/Zone/ZoneEdit";
 import QuestionEdit from "./pages/Question/QuestionEdit";
 import RemediesList from "./pages/Remedies/RemediesList";
 import RemediesDetails from "./pages/Remedies/RemediesDetails";
+import AdvancedList from "./pages/Advanced/AdvancedList";
+import AdvanceDetails from "./pages/Advanced/AdvanceDetails";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -283,7 +285,10 @@ export default function App() {
               {/* Houses */}
               <Route path="/houses" element={<Houses />} />
               <Route path="/houses/details" element={<HousesDetails />} />
-
+            {/* advanced */}
+              <Route path="/advanced" element={<AdvancedList />} />
+              <Route path="/advanced/details" element={<AdvanceDetails />} />
+              {/* <Route path="/vastu/entrance/edit" element={<EditEntrance />} /> */}
               <Route
                 path="/numerology/numbers/edit"
                 element={<EditNumbers />}

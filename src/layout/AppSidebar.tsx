@@ -682,7 +682,7 @@ const navGroups: NavGroup[] = [
       {
         // icon: <ListIcon />,
         name: "Advanced",
-        // path: "/vastu/entrance/analysis/list",
+        path: "/advanced",
       },
       
       

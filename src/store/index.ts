@@ -22,6 +22,7 @@ import numerologyNumbersReducer from "./slices/numerologyNumbers";
 import yogReducer from "./slices/yog";
 import entranceReducer from "./slices/entrance"; 
 import analysisReducer from "./slices/analysis";
+import advanceReducer from "./slices/advance";
 
 export const store = configureStore({
   reducer: {
@@ -47,6 +48,7 @@ export const store = configureStore({
     newAnalytics: newAnalyticsReducer,
     numerologyNumbers: numerologyNumbersReducer,
     entrance: entranceReducer,
+    advance: advanceReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
