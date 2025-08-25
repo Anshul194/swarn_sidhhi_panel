@@ -677,7 +677,7 @@ const navGroups: NavGroup[] = [
       {
         // icon: <ListIcon />,
         name: "Remedies",
-        // path: "/vastu/entrance/analysis/list",
+        path: "/remedies",
       },
       {
         // icon: <ListIcon />,

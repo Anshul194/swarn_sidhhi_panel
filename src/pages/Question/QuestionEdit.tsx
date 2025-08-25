@@ -36,6 +36,7 @@ const QuestionEdit = () => {
   });
 
   const [success, setSuccess] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   useEffect(() => {
     if (id) dispatch(fetchQuestionById(Number(id)));
@@ -55,13 +56,17 @@ const QuestionEdit = () => {
       const result = await dispatch(updateQuestion({ id: Number(id), data: formData }));
       if (result.type.endsWith("fulfilled")) {
         setSuccess(true);
+        setTimeout(() => {
+          navigate("/questions");
+        }, 1200);
       }
     }
   };
 
-  const handleDelete = () => {
-    if (id && window.confirm("Are you sure you want to delete this question?")) {
-      dispatch(deleteQuestion(Number(id)));
+  const handleDelete = async () => {
+    if (id) {
+      await dispatch(deleteQuestion(Number(id)));
+      setShowDeletePopup(false);
       navigate("/questions");
     }
   };
@@ -123,7 +128,7 @@ const QuestionEdit = () => {
           <button
             type="button"
             className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-            onClick={handleDelete}
+            onClick={() => setShowDeletePopup(true)}
           >
             Delete
           </button>
@@ -137,9 +142,51 @@ const QuestionEdit = () => {
         </div>
         {error && <p className="text-red-500">{error}</p>}
         {success && (
-          <p className="text-green-600">Question updated successfully!</p>
+          <p className="text-green-600">Question updated successfully! Redirecting...</p>
         )}
       </form>
+
+      {showDeletePopup && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-white/30 backdrop-blur-sm z-40"
+            onClick={() => setShowDeletePopup(false)}
+          ></div>
+
+          {/* Modal */}
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm relative">
+              {/* Close Icon */}
+              <button
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                onClick={() => setShowDeletePopup(false)}
+                aria-label="Close"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h3 className="text-lg font-bold mb-4">Confirm Delete</h3>
+              <p className="mb-6">Are you sure you want to delete this question?</p>
+              <div className="flex justify-end gap-3">
+                <button
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  onClick={() => setShowDeletePopup(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

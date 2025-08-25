@@ -19,7 +19,7 @@ const initialState: AnalysisState = {
   error: null,
 };
 
-// --------------------------- Fetch Analysis --------------------------- //
+// Fetch analysis by MBTI type
 export const fetchAnalysisByType = createAsyncThunk<
   Analysis[],
   { type: string; token: string },
@@ -28,54 +28,35 @@ export const fetchAnalysisByType = createAsyncThunk<
   try {
     const response = await axiosInstance.get(`/karma-kundli/analysis/${type}/`, {
       headers: {
-        "Content-Type": "text/plain",
-        Accept: "application/json",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      maxRedirects: 0,
     });
-
+    console.log("Fetched analysis:", response.data?.data);
     return response.data?.data || [];
   } catch (error: any) {
-    if (error.response?.status === 301) {
-      return rejectWithValue(
-        "The requested resource was moved. Please contact support."
-      );
-    }
-    if (error.response?.status >= 400) {
-      return rejectWithValue(
-        error.response.data?.message || "Failed to fetch analysis"
-      );
-    }
-    return rejectWithValue(error.message || "Failed to fetch analysis");
+    return rejectWithValue(error.response?.data?.message || error.message || "Failed to fetch analysis");
   }
 });
 
-// --------------------------- Update Analysis --------------------------- //
+// Update analysis by MBTI type
 export const updateAnalysisByType = createAsyncThunk<
   Analysis[],
   { type: string; payload: Analysis[]; token: string },
   { rejectValue: string }
->(
-  "analysis/updateByType",
-  async ({ type, payload, token }, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.patch(
-        `/karma-kundli/analysis/${type}/`, // ensure trailing slash
-        { data: payload }, // wrap payload in 'data'
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return response.data?.data || [];
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to update analysis");
-    }
+>("analysis/updateByType", async ({ type, payload, token }, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.patch(`/karma-kundli/analysis/${type}/`, payload, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data?.data || [];
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || error.message || "Failed to update analysis");
   }
-);
+});
 
 const analysisSlice = createSlice({
   name: "analysis",
@@ -83,31 +64,34 @@ const analysisSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch
       .addCase(fetchAnalysisByType.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAnalysisByType.fulfilled, (state, action) => {
+      .addCase(fetchAnalysisByType.fulfilled, (state, action: PayloadAction<Analysis[]>) => {
         state.loading = false;
-        state.data = action.payload;
+        state.data = action.payload.map((item) => ({
+          ...item,
+          description_en: item.description_en || "",
+          description_hi: item.description_hi || "",
+        }));
       })
       .addCase(fetchAnalysisByType.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Update
       .addCase(updateAnalysisByType.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        updateAnalysisByType.fulfilled,
-        (state, action: PayloadAction<Analysis[]>) => {
-          state.loading = false;
-          state.data = action.payload;
-        }
-      )
+      .addCase(updateAnalysisByType.fulfilled, (state, action: PayloadAction<Analysis[]>) => {
+        state.loading = false;
+        state.data = action.payload.map((item) => ({
+          ...item,
+          description_en: item.description_en || "",
+          description_hi: item.description_hi || "",
+        }));
+      })
       .addCase(updateAnalysisByType.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;

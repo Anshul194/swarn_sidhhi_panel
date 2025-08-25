@@ -60,6 +60,8 @@ import YogDetails from "./pages/Yog/YogDetails";
 import EntranceDetails from "./pages/Content/vastu/entrance/EntranceDetails";
 import ZoneEdit from "./pages/Zone/ZoneEdit";
 import QuestionEdit from "./pages/Question/QuestionEdit";
+import RemediesList from "./pages/Remedies/RemediesList";
+import RemediesDetails from "./pages/Remedies/RemediesDetails";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -207,6 +209,13 @@ export default function App() {
               <Route path="/questions" element={<QuestionList />} />
               <Route path="/questions/add" element={<AddQustion />} />
               <Route path="/questions/:id" element={<QuestionEdit />} />
+
+
+
+              {/* Remedies */}
+              <Route path="/remedies" element={<RemediesList />} />
+              <Route path="/remedies/details" element={<RemediesDetails />} />
+
               <Route
                 path="/vastu/entrance/analysis/add"
                 element={<AddVastuEntrance />}
@@ -216,6 +225,7 @@ export default function App() {
                 element={<EntranceAnalysisList />}
               />
               
+
 
               <Route path="/vastu/entrance/list" element={<EntranceList />} />
               <Route path="/vastu/entrance/details" element={<EntranceDetails />} />

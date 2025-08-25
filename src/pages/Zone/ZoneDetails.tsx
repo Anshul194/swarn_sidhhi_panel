@@ -139,12 +139,12 @@ const ZoneDetails = () => {
       {details && (
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-4">Details</h3>
-          <div className="grid grid-cols-2 gap-6 mr-10 ">
-            {/* Colors */}
+          <div className="grid grid-cols-2 gap-6 mr-10">
+            {/** Colors **/}
             <div className="flex items-center space-x-2 relative">
               <label className="font-medium w-20">Colors:</label>
               <div className="flex-1 border rounded p-2 text-gray-700">
-                {zoneDetails.color_en}
+                <p dangerouslySetInnerHTML={{ __html: zoneDetails.color_en || "" }} />
               </div>
               <button
                 className="absolute top-3 right-5 text-blue-600"
@@ -155,7 +155,7 @@ const ZoneDetails = () => {
             </div>
             <div className="flex items-center space-x-2 relative">
               <div className="flex-1 border rounded p-2 text-gray-700">
-                {zoneDetails.color_hi}
+                <p dangerouslySetInnerHTML={{ __html: zoneDetails.color_hi || "" }} />
               </div>
               <button
                 className="absolute top-3 right-5 text-blue-600"
@@ -164,12 +164,12 @@ const ZoneDetails = () => {
                 <Pencil className="h-4 w-4" />
               </button>
             </div>
-      
-            {/* Shapes */}
+
+            {/** Shapes **/}
             <div className="flex items-center space-x-2 relative">
               <label className="font-medium w-20">Shapes:</label>
               <div className="flex-1 border rounded p-2 text-gray-700">
-                {zoneDetails.shape_en}
+                <p dangerouslySetInnerHTML={{ __html: zoneDetails.shape_en || "" }} />
               </div>
               <button
                 className="absolute top-3 right-5 text-blue-600"
@@ -180,7 +180,7 @@ const ZoneDetails = () => {
             </div>
             <div className="flex items-center space-x-2 relative">
               <div className="flex-1 border rounded p-2 text-gray-700">
-                {zoneDetails.shape_hi}
+                <p dangerouslySetInnerHTML={{ __html: zoneDetails.shape_hi || "" }} />
               </div>
               <button
                 className="absolute top-3 right-5 text-blue-600"
@@ -189,12 +189,12 @@ const ZoneDetails = () => {
                 <Pencil className="h-4 w-4" />
               </button>
             </div>
-      
-            {/* Elements */}
+
+            {/** Elements **/}
             <div className="flex items-center space-x-2 relative">
               <label className="font-medium w-20">Elements:</label>
               <div className="flex-1 border rounded p-2 text-gray-700">
-                {zoneDetails.element_en}
+                <p dangerouslySetInnerHTML={{ __html: zoneDetails.element_en || "" }} />
               </div>
               <button
                 className="absolute top-3 right-5 text-blue-600"
@@ -205,7 +205,7 @@ const ZoneDetails = () => {
             </div>
             <div className="flex items-center space-x-2 relative">
               <div className="flex-1 border rounded p-2 text-gray-700">
-                {zoneDetails.element_hi}
+                <p dangerouslySetInnerHTML={{ __html: zoneDetails.element_hi || "" }} />
               </div>
               <button
                 className="absolute top-3 right-5 text-blue-600"
@@ -253,7 +253,7 @@ const ZoneDetails = () => {
       )}
 
       {/* Update Button */}
-      <div className="flex justify-center mt-8">
+      <div className="flex justify-end mt-8">
         <button
           className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 shadow disabled:opacity-50"
           onClick={handleUpdate}
@@ -262,6 +262,7 @@ const ZoneDetails = () => {
           {loading ? "Updating..." : "Update Zone"}
         </button>
       </div>
+
       {/* Success Message */}
       {success && (
         <div className="mt-4 text-green-700 text-center font-semibold">
@@ -271,9 +272,8 @@ const ZoneDetails = () => {
 
       {/* Edit Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30  backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto relative">
-            {/* Cross Icon for closing */}
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
               onClick={closeModal}
@@ -284,7 +284,6 @@ const ZoneDetails = () => {
             <h3 className="text-lg font-bold mb-4">
               Edit {modalField.replace(/_/g, ' ').toUpperCase()}
             </h3>
-            {/* Replace textarea with TiptapEditor for rich text editing */}
             <TiptapEditor
               value={modalValue}
               onChange={setModalValue}

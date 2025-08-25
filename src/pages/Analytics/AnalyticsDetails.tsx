@@ -1,119 +1,62 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAnalysisByType } from "../../store/slices/analysis";
+import { RootState } from "../../store"; // adjust import if needed
+
+const sections = ["career", "health", "relationship"]; // can be extended dynamically
 
 const AnalyticsDetails: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const mbtiType = location.state?.mbtiType || "ISTJ";
+  const dispatch = useDispatch();
+  const { data, loading, error } = useSelector((state: RootState) => state.analysis);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token") || "";
+    dispatch(fetchAnalysisByType({ type: mbtiType, token }));
+  }, [mbtiType, dispatch]);
+
+  // Helper to get analysis for a given element dynamically
+  const getAnalysis = (element: string) => data.find((item) => item.element === element);
+
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto">
+      {/* Back Button */}
+      <button
+        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
+        onClick={() => navigate(-1)}
+      >
+        &larr; Back
+      </button>
+
       {/* Page Title */}
       <h1 className="text-2xl font-bold text-center mb-8">Karma: {mbtiType}</h1>
 
-      {/* Career Section */}
-      <h2 className="text-xl font-semibold mb-4">Career</h2>
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        {/* Career Prediction (English) */}
-        <div className="border rounded-lg p-5">
-          <h3 className="font-semibold mb-2">Career Prediction (English)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
-        </div>
-        {/* Career Prediction (Hindi) */}
-        <div className="border rounded-lg p-5">
-          <h3 className="font-semibold mb-2">Career Prediction (Hindi)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
-        </div>
-      </div>
+      {loading && <div className="text-center text-gray-500">Loading...</div>}
+      {error && <div className="text-center text-red-500">{error}</div>}
 
-      {/* Health Section */}
-      <h2 className="text-xl font-semibold mb-4">Health</h2>
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        {/* Health Prediction (English) */}
-        <div className="border rounded-lg p-5">
-          <h3 className="font-semibold mb-2">Health Prediction (English)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
-        </div>
-        {/* Health Prediction (Hindi) */}
-        <div className="border rounded-lg p-5">
-          <h3 className="font-semibold mb-2">Health Prediction (Hindi)</h3>
-          <p>
-            <span className="font-bold">Lorem Ipsum</span> is simply dummy text
-            of the printing and typesetting industry.
-          </p>
-          <ul className="list-disc ml-6 my-2">
-            <li>
-              Lorem Ipsum has been the industry's standard dummy text ever since
-              the 1500s, when an unknown printer took a galley
-            </li>
-            <li>
-              of type and scrambled it to make a type specimen book. It has
-              survived <br />
-              <span className="italic">
-                not only five centuries, but also the leap into electronic
-              </span>
-            </li>
-          </ul>
-          <p className="font-bold">Lorem Ipsum</p> is simply dummy text of
-          the printing
-        </div>
-      </div>
+      {/* Render each section dynamically */}
+      {sections.map((section) => {
+        const analysis = getAnalysis(section);
 
-      {/* Relationship Section */}
-      <h2 className="text-xl font-semibold mb-4">Relationship, etc</h2>
-      {/* Empty space for future content */}
+        return (
+          <div key={section} className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">{section.charAt(0).toUpperCase() + section.slice(1)}</h2>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="border rounded-lg p-5">
+                <h3 className="font-semibold mb-2">{section.charAt(0).toUpperCase() + section.slice(1)} Prediction (English)</h3>
+                <p>{analysis?.description_en || "No data available."}</p>
+              </div>
+              <div className="border rounded-lg p-5">
+                <h3 className="font-semibold mb-2">{section.charAt(0).toUpperCase() + section.slice(1)} Prediction (Hindi)</h3>
+                <p>{analysis?.description_hi || "No data available."}</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
 
       {/* Save / Add Button */}
       <div className="mt-8 text-right">
