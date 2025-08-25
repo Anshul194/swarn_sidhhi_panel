@@ -83,7 +83,7 @@ const YogDetails = () => {
       </button>
 
       <h2 className="text-2xl font-bold mb-6 text-center">
-         {yogData.title_en || "Untitled"} - {yogData.id}
+         {yogData.title_en || "Untitled"} 
       </h2>
 
       {/* Titles */}

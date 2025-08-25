@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHouseById, updateHouseById } from "../../store/slices/houses";
-import { Pencil, Check, X } from "lucide-react";
+import { Pencil, X } from "lucide-react";
+import TiptapEditor from "../../components/TiptapEditor";
 
 const HousesDetails = () => {
   const location = useLocation();
@@ -13,9 +14,15 @@ const HousesDetails = () => {
 
   const { houseDetails, loading, error } = useSelector((state: any) => state.house);
 
-  // Local editable state
-  const [editing, setEditing] = useState<{ [key: string]: boolean }>({});
+  // Local state
   const [formData, setFormData] = useState<any>({ details: {}, planets: [] });
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalField, setModalField] = useState("");
+  const [modalValue, setModalValue] = useState("");
+  const [modalPlanetIdx, setModalPlanetIdx] = useState<number | null>(null);
+  const [modalPlanetKey, setModalPlanetKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (houseId) dispatch(fetchHouseById({ id: houseId }));
@@ -33,32 +40,47 @@ const HousesDetails = () => {
     }
   }, [houseDetails]);
 
-  const handleChange = (field: string, value: string, planetIdx?: number, key?: string) => {
-    if (planetIdx !== undefined && key) {
-      // Updating planet pros/cons
+  const openEditModal = (field: string, value: string, planetIdx?: number, key?: string) => {
+    setModalField(field);
+    setModalValue(value || "");
+    setModalPlanetIdx(planetIdx ?? null);
+    setModalPlanetKey(key ?? null);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalField("");
+    setModalValue("");
+    setModalPlanetIdx(null);
+    setModalPlanetKey(null);
+  };
+
+  const handleModalSave = () => {
+    if (modalPlanetIdx !== null && modalPlanetKey) {
+      // Update planet field
       setFormData((prev: any) => {
         const updatedPlanets = [...prev.planets];
-        updatedPlanets[planetIdx] = { ...updatedPlanets[planetIdx], [key]: value };
+        updatedPlanets[modalPlanetIdx] = { ...updatedPlanets[modalPlanetIdx], [modalPlanetKey]: modalValue };
         return { ...prev, planets: updatedPlanets };
       });
     } else {
-      // Updating details
+      // Update house details
       setFormData((prev: any) => ({
         ...prev,
-        details: { ...prev.details, [field]: value },
+        details: { ...prev.details, [modalField]: modalValue },
       }));
     }
-  };
-
-  const toggleEdit = (key: string) => {
-    setEditing((prev) => ({ ...prev, [key]: !prev[key] }));
+    closeModal();
   };
 
   const handleSave = () => {
     if (!houseId) return;
     dispatch(updateHouseById({ id: houseId, payload: formData }));
-    setEditing({});
   };
+
+  if (loading) return <div className="p-8 text-blue-500">Loading...</div>;
+  if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto">
@@ -70,60 +92,28 @@ const HousesDetails = () => {
         &larr; Back
       </button>
 
-      {/* Page Title */}
       <h1 className="text-3xl font-bold text-center mb-8">{houseLabel}</h1>
 
-      {loading && <div>Loading...</div>}
-      {error && <div className="text-red-500">{error}</div>}
-
-      {/* House Details Section */}
+      {/* House Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-        {/* English Meaning */}
-        <div className="border rounded-lg p-6 relative">
-          <h3 className="font-bold mb-2">Meaning (English)</h3>
-          {editing["desc_en"] ? (
-            <textarea
-              value={formData.details.description_en}
-              onChange={(e) => handleChange("description_en", e.target.value)}
-              className="w-full border rounded p-2 text-sm"
+        {["description_en", "description_hi"].map((field) => (
+          <div key={field} className="border rounded-lg p-6 relative">
+            <h3 className="font-bold mb-2">{field === "description_en" ? "Meaning (English)" : "Meaning (Hindi)"}</h3>
+            <div
+              className="text-sm whitespace-pre-line"
+              dangerouslySetInnerHTML={{ __html: formData.details[field] || "No data available." }}
             />
-          ) : (
-            <div className="text-sm whitespace-pre-line">
-              {formData.details.description_en || "No data available."}
-            </div>
-          )}
-          <button
-            onClick={() => toggleEdit("desc_en")}
-            className="absolute top-4 right-4 text-gray-600 hover:text-black"
-          >
-            {editing["desc_en"] ? <X size={18} /> : <Pencil size={18} />}
-          </button>
-        </div>
-
-        {/* Hindi Meaning */}
-        <div className="border rounded-lg p-6 relative">
-          <h3 className="font-bold mb-2">Meaning (Hindi)</h3>
-          {editing["desc_hi"] ? (
-            <textarea
-              value={formData.details.description_hi}
-              onChange={(e) => handleChange("description_hi", e.target.value)}
-              className="w-full border rounded p-2 text-sm"
-            />
-          ) : (
-            <div className="text-sm whitespace-pre-line">
-              {formData.details.description_hi || "No data available."}
-            </div>
-          )}
-          <button
-            onClick={() => toggleEdit("desc_hi")}
-            className="absolute top-4 right-4 text-gray-600 hover:text-black"
-          >
-            {editing["desc_hi"] ? <X size={18} /> : <Pencil size={18} />}
-          </button>
-        </div>
+            <button
+              onClick={() => openEditModal(field, formData.details[field])}
+              className="absolute top-4 right-4 text-gray-600 hover:text-black"
+            >
+              <Pencil size={18} />
+            </button>
+          </div>
+        ))}
       </div>
 
-      {/* Planets Section */}
+      {/* Planets */}
       {formData.planets.map((planet: any, idx: number) => (
         <div key={planet.name} className="mb-10">
           <h2 className="text-xl font-bold mb-4 capitalize">
@@ -134,45 +124,23 @@ const HousesDetails = () => {
               : planet.name.charAt(0).toUpperCase() + planet.name.slice(1) + " House"}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* English */}
-            <div className="border rounded-lg p-6 relative">
-              <h3 className="font-bold mb-2">{planet.name} in House {houseId} (English)</h3>
-              {editing[`planet_${idx}_en`] ? (
-                <textarea
-                  value={planet.pros_en}
-                  onChange={(e) => handleChange("", e.target.value, idx, "pros_en")}
-                  className="w-full border rounded p-2 text-sm"
+            {["pros_en", "pros_hi"].map((key) => (
+              <div key={key} className="border rounded-lg p-6 relative">
+                <h3 className="font-bold mb-2">
+                  {planet.name} in House {houseId} ({key === "pros_en" ? "English" : "Hindi"})
+                </h3>
+                <div
+                  className="text-sm whitespace-pre-line"
+                  dangerouslySetInnerHTML={{ __html: planet[key] || "No data available." }}
                 />
-              ) : (
-                <div className="text-sm whitespace-pre-line">{planet.pros_en || "No data available."}</div>
-              )}
-              <button
-                onClick={() => toggleEdit(`planet_${idx}_en`)}
-                className="absolute top-4 right-4 text-gray-600 hover:text-black"
-              >
-                {editing[`planet_${idx}_en`] ? <X size={18} /> : <Pencil size={18} />}
-              </button>
-            </div>
-
-            {/* Hindi */}
-            <div className="border rounded-lg p-6 relative">
-              <h3 className="font-bold mb-2">{planet.name} in House {houseId} (Hindi)</h3>
-              {editing[`planet_${idx}_hi`] ? (
-                <textarea
-                  value={planet.pros_hi}
-                  onChange={(e) => handleChange("", e.target.value, idx, "pros_hi")}
-                  className="w-full border rounded p-2 text-sm"
-                />
-              ) : (
-                <div className="text-sm whitespace-pre-line">{planet.pros_hi || "No data available."}</div>
-              )}
-              <button
-                onClick={() => toggleEdit(`planet_${idx}_hi`)}
-                className="absolute top-4 right-4 text-gray-600 hover:text-black"
-              >
-                {editing[`planet_${idx}_hi`] ? <X size={18} /> : <Pencil size={18} />}
-              </button>
-            </div>
+                <button
+                  onClick={() => openEditModal("", planet[key], idx, key)}
+                  className="absolute top-4 right-4 text-gray-600 hover:text-black"
+                >
+                  <Pencil size={18} />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       ))}
@@ -186,6 +154,38 @@ const HousesDetails = () => {
           Save Changes
         </button>
       </div>
+
+      {/* Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl relative">
+            <button
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              onClick={closeModal}
+            >
+              <X className="h-6 w-6" />
+            </button>
+            <h3 className="text-lg font-bold mb-4">
+              Edit {modalField || modalPlanetKey}
+            </h3>
+            <TiptapEditor value={modalValue} onChange={setModalValue} height="300px" />
+            <div className="flex justify-end gap-4 mt-6">
+              <button
+                className="px-6 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                onClick={handleModalSave}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
