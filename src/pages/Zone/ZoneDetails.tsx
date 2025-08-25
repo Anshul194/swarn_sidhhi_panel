@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchZonesDetails, updateZoneDetails } from '../../store/slices/Zone'
 import { RootState } from '../../store'
 import { Pencil, X } from "lucide-react";
+import TiptapEditor from "../../components/TiptapEditor";
 
 const ZoneDetails = () => {
   const { zoneId } = useParams<{ zoneId: string }>()
@@ -283,10 +284,11 @@ const ZoneDetails = () => {
             <h3 className="text-lg font-bold mb-4">
               Edit {modalField.replace(/_/g, ' ').toUpperCase()}
             </h3>
-            <textarea
-              className="w-full border rounded p-2 min-h-[200px]"
+            {/* Replace textarea with TiptapEditor for rich text editing */}
+            <TiptapEditor
               value={modalValue}
-              onChange={e => setModalValue(e.target.value)}
+              onChange={setModalValue}
+              height="300px"
             />
             <div className="flex justify-end gap-4 mt-6">
               <button
