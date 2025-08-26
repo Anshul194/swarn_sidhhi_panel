@@ -299,6 +299,9 @@ export default function App() {
                 element={<RajyogsList />}
               />
               <Route path="/numerology/rajyogs/edit" element={<EditRajyog />} />
+
+              {/* UserProfile */}
+              <Route path="/user-profile" element={<UserProfiles />} />
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />
 
