@@ -1,32 +1,33 @@
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { Pencil, X } from "lucide-react";
 import { fetchYogById, updateYogById } from "../../store/slices/yog";
 import { RootState } from "../../store";
-import { Pencil, X } from "lucide-react";
 import TiptapEditor from "../../components/TiptapEditor";
 
-// Helper to remove HTML tags
-const stripHTML = (str: string) => str.replace(/<[^>]+>/g, "");
-
-const YogDetails = () => {
+const YogEdit: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const yogId = location.state?.yogId;
 
-  const { yogDetails: yog, loading, error } = useSelector(
-    (state: RootState) => state.yog
-  );
+  const { yogDetails: yog, loading, error } = useSelector((state: RootState) => state.yog);
   const token = useSelector((state: RootState) => state.auth.token);
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalField, setModalField] = useState("");
-  const [modalValue, setModalValue] = useState("");
+  const [modalField, setModalField] = useState<string>("");
+  const [modalValue, setModalValue] = useState<string>("");
+  const [success, setSuccess] = useState(false);
 
-  // Local editable yog state
-  const [yogData, setYogData] = useState<any>({});
+  // Local editable state
+  const [yogData, setYogData] = useState({
+    title_en: "",
+    title_hi: "",
+    present_meaning_en: "",
+    present_meaning_hi: "",
+  });
 
   useEffect(() => {
     if (yogId) dispatch(fetchYogById({ id: yogId }));
@@ -35,18 +36,15 @@ const YogDetails = () => {
   useEffect(() => {
     if (yog) {
       setYogData({
-        
-        title_en: stripHTML(yog.title_en || ""),
-        title_hi: stripHTML(yog.title_hi || ""),
-        present_meaning_en: stripHTML(yog.present_meaning_en || ""),
-        present_meaning_hi: stripHTML(yog.present_meaning_hi || ""),
-        missing_meaning_en: stripHTML(yog.missing_meaning_en || ""),
-        missing_meaning_hi: stripHTML(yog.missing_meaning_hi || ""),
+        title_en: yog.title_en || "",
+        title_hi: yog.title_hi || "",
+        present_meaning_en: yog.present_meaning_en || "",
+        present_meaning_hi: yog.present_meaning_hi || "",
       });
     }
   }, [yog]);
 
-  const openModal = (field: string, value: string) => {
+  const openEditModal = (field: string, value: string) => {
     setModalField(field);
     setModalValue(value || "");
     setModalOpen(true);
@@ -59,13 +57,30 @@ const YogDetails = () => {
   };
 
   const handleModalSave = () => {
-    setYogData((prev: any) => ({ ...prev, [modalField]: modalValue }));
+    setYogData((prev) => ({ ...prev, [modalField]: modalValue }));
     closeModal();
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (!yogId || !token) return;
-    dispatch(updateYogById({ id: yogId, payload: yogData, token }));
+    try {
+      const result = await dispatch(
+        updateYogById({
+          id: yogId,
+          payload: yogData,
+          token,
+        })
+      );
+      if (result.type.endsWith("/fulfilled")) {
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+          navigate("/yogs/details", { state: { yogId } }); // Navigate to details after update
+        }, 1200);
+      }
+    } catch (err) {
+      console.error("Update failed:", err);
+    }
   };
 
   if (!yogId) return <div className="p-8 text-gray-500">No Yog selected.</div>;
@@ -83,98 +98,58 @@ const YogDetails = () => {
       </button>
 
       <h2 className="text-2xl font-bold mb-6 text-center">
-         {yogData.title_en || "Untitled"} 
+        Edit Yog: {yogData.title_en || "Untitled"}
       </h2>
 
       {/* Titles */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="border p-4 rounded relative">
+          <h4 className="font-semibold mb-2">Title (English)</h4>
+          <div className="text-gray-700">{yogData.title_en}</div>
+          <button
+            onClick={() => openEditModal("title_en", yogData.title_en)}
+            className="absolute top-4 right-4 text-blue-600"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+        </div>
 
-          <div className="mb-8 space-y-4">
-            {/* Title English */}
-            <div className="flex items-center gap-4 relative">
-              <h4 className="font-semibold w-36">Title English:</h4>
-              <div className="border p-2 rounded text-gray-700 flex-1">{yogData.title_en || "-"}</div>
-              <button
-                onClick={() => openModal("title_en", yogData.title_en)}
-                className="text-blue-600 ml-2"
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-            </div>
-          
-            {/* Title Hindi */}
-            <div className="flex items-center gap-4 relative">
-              <h4 className="font-semibold w-36">Title Hindi:</h4>
-              <div className="border p-2 rounded text-gray-700 flex-1">{yogData.title_hi || "-"}</div>
-              <button
-                onClick={() => openModal("title_hi", yogData.title_hi)}
-                className="text-blue-600 ml-2"
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
+        <div className="border p-4 rounded relative">
+          <h4 className="font-semibold mb-2">Title (Hindi)</h4>
+          <div className="text-gray-700">{yogData.title_hi}</div>
+          <button
+            onClick={() => openEditModal("title_hi", yogData.title_hi)}
+            className="absolute top-4 right-4 text-blue-600"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
       {/* Meanings */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Present Meaning English */}
         <div className="border p-4 rounded relative">
           <h4 className="font-semibold mb-2">Present Meaning (English)</h4>
-          <div className="text-gray-700 text-sm whitespace-pre-wrap break-words">
-            {yogData.present_meaning_en || "-"}
-          </div>
+          <div
+            className="text-gray-700 text-sm"
+            dangerouslySetInnerHTML={{ __html: yogData.present_meaning_en }}
+          />
           <button
-            onClick={() =>
-              openModal("present_meaning_en", yogData.present_meaning_en)
-            }
+            onClick={() => openEditModal("present_meaning_en", yogData.present_meaning_en)}
             className="absolute top-4 right-4 text-blue-600"
           >
             <Pencil className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Present Meaning Hindi */}
         <div className="border p-4 rounded relative">
           <h4 className="font-semibold mb-2">Present Meaning (Hindi)</h4>
-          <div className="text-gray-700 text-sm whitespace-pre-wrap break-words">
-            {yogData.present_meaning_hi || "-"}
-          </div>
+          <div
+            className="text-gray-700 text-sm"
+            dangerouslySetInnerHTML={{ __html: yogData.present_meaning_hi }}
+          />
           <button
-            onClick={() =>
-              openModal("present_meaning_hi", yogData.present_meaning_hi)
-            }
-            className="absolute top-4 right-4 text-blue-600"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-        </div>
-
-        {/* Missing Meaning English */}
-        <div className="border p-4 rounded relative">
-          <h4 className="font-semibold mb-2">Missing Meaning (English)</h4>
-          <div className="text-gray-700 text-sm whitespace-pre-wrap break-words">
-            {yogData.missing_meaning_en || "-"}
-          </div>
-          <button
-            onClick={() =>
-              openModal("missing_meaning_en", yogData.missing_meaning_en)
-            }
-            className="absolute top-4 right-4 text-blue-600"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-        </div>
-
-        {/* Missing Meaning Hindi */}
-        <div className="border p-4 rounded relative">
-          <h4 className="font-semibold mb-2">Missing Meaning (Hindi)</h4>
-          <div className="text-gray-700 text-sm whitespace-pre-wrap break-words">
-            {yogData.missing_meaning_hi || "-"}
-          </div>
-          <button
-            onClick={() =>
-              openModal("missing_meaning_hi", yogData.missing_meaning_hi)
-            }
+            onClick={() => openEditModal("present_meaning_hi", yogData.present_meaning_hi)}
             className="absolute top-4 right-4 text-blue-600"
           >
             <Pencil className="h-4 w-4" />
@@ -183,7 +158,7 @@ const YogDetails = () => {
       </div>
 
       {/* Update Button */}
-      <div className="flex justify-end mt-8">
+      <div className="flex justify-center mt-8">
         <button
           className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow disabled:opacity-50"
           onClick={handleUpdate}
@@ -192,6 +167,12 @@ const YogDetails = () => {
           {loading ? "Updating..." : "Update Yog"}
         </button>
       </div>
+
+      {success && (
+        <div className="mt-4 text-green-600 text-center font-semibold">
+          Yog updated successfully!
+        </div>
+      )}
 
       {/* Modal */}
       {modalOpen && (
@@ -228,4 +209,4 @@ const YogDetails = () => {
   );
 };
 
-export default YogDetails;
+export default YogEdit;

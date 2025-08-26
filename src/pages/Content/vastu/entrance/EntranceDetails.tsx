@@ -10,9 +10,14 @@ const EntranceDetails: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const entranceId = location.state?.entranceId;
 
-  const entranceDetails = useSelector((state: RootState) => state.entrance.entranceDetails);
-  const loading = useSelector((state: RootState) => state.entrance.loading);
-  const error = useSelector((state: RootState) => state.entrance.error);
+  const {
+    entranceDetails,
+    loading,
+    error
+  } = useSelector(
+    (state: RootState) =>
+      state.entrance ?? { entranceDetails: null, loading: false, error: null }
+  );
   const token = useSelector((state: RootState) => state.auth.token);
 
   const [meaningEn, setMeaningEn] = useState("");

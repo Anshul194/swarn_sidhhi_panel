@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createQuestion } from "../../store/slices/questionSlice";
 import { AppDispatch, RootState } from "../../store";
+import { useNavigate } from "react-router-dom";
 
 // Define your available types
 const questionTypes = [
@@ -17,6 +18,7 @@ const questionTypes = [
 
 const AddQuestion = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.question);
 
   const [question_en, setQuestionEn] = useState("");
@@ -35,6 +37,9 @@ const AddQuestion = () => {
       setQuestionEn("");
       setQuestionHi("");
       setType("");
+      setTimeout(() => {
+        navigate("/questions");
+      }, 1200);
     }
   };
 
@@ -81,14 +86,16 @@ const AddQuestion = () => {
         </div>
         <button
           type="submit"
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           disabled={loading}
         >
           {loading ? "Adding..." : "Add Question"}
         </button>
         {error && <p className="text-red-500">{error}</p>}
         {success && (
-          <p className="text-green-600">Question added successfully!</p>
+          <p className="text-green-600">
+            Question added successfully! Redirecting...
+          </p>
         )}
       </form>
     </div>

@@ -58,6 +58,12 @@ import HousesDetails from "./pages/Houses/HousesDetails";
 import PersonalDetails from "./pages/PersonalYears/PersonalDetails";
 import YogDetails from "./pages/Yog/YogDetails";
 import EntranceDetails from "./pages/Content/vastu/entrance/EntranceDetails";
+import ZoneEdit from "./pages/Zone/ZoneEdit";
+import QuestionEdit from "./pages/Question/QuestionEdit";
+import RemediesList from "./pages/Remedies/RemediesList";
+import RemediesDetails from "./pages/Remedies/RemediesDetails";
+import AdvancedList from "./pages/Advanced/AdvancedList";
+import AdvanceDetails from "./pages/Advanced/AdvanceDetails";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -176,6 +182,8 @@ export default function App() {
               {/* zone */}
               <Route path="/zone/list" element={<ZoneList />} />
               <Route path="/zone/:zoneId" element={<ZoneDetails />} />
+             
+              <Route path="/vastu/zones/:zoneId/edit" element={<ZoneEdit />} />
 
               {/* Kundli */}
 
@@ -202,6 +210,14 @@ export default function App() {
               {/* Questions */}
               <Route path="/questions" element={<QuestionList />} />
               <Route path="/questions/add" element={<AddQustion />} />
+              <Route path="/questions/:id" element={<QuestionEdit />} />
+
+
+
+              {/* Remedies */}
+              <Route path="/remedies" element={<RemediesList />} />
+              <Route path="/remedies/details" element={<RemediesDetails />} />
+
               <Route
                 path="/vastu/entrance/analysis/add"
                 element={<AddVastuEntrance />}
@@ -211,6 +227,7 @@ export default function App() {
                 element={<EntranceAnalysisList />}
               />
               
+
 
               <Route path="/vastu/entrance/list" element={<EntranceList />} />
               <Route path="/vastu/entrance/details" element={<EntranceDetails />} />
@@ -268,7 +285,10 @@ export default function App() {
               {/* Houses */}
               <Route path="/houses" element={<Houses />} />
               <Route path="/houses/details" element={<HousesDetails />} />
-
+            {/* advanced */}
+              <Route path="/advanced" element={<AdvancedList />} />
+              <Route path="/advanced/details" element={<AdvanceDetails />} />
+              {/* <Route path="/vastu/entrance/edit" element={<EditEntrance />} /> */}
               <Route
                 path="/numerology/numbers/edit"
                 element={<EditNumbers />}
@@ -279,6 +299,9 @@ export default function App() {
                 element={<RajyogsList />}
               />
               <Route path="/numerology/rajyogs/edit" element={<EditRajyog />} />
+
+              {/* UserProfile */}
+              <Route path="/user-profile" element={<UserProfiles />} />
               {/* Forms */}
               <Route path="/form-elements" element={<FormElements />} />
 

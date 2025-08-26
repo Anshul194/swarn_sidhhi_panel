@@ -32,7 +32,7 @@ const QuestionList = () => {
   {/* Add Question Button - aligned right */}
   <div className="flex justify-end mb-8">
     <button
-      className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
       onClick={() => navigate("/questions/add")}
     >
       + Add Question
@@ -40,24 +40,29 @@ const QuestionList = () => {
   </div>
 
   <div className="space-y-4">
-    {questions.map((q, index) => (
-      <div
-        key={q.id}
-        className="border-b pb-4 flex flex-col md:flex-row md:justify-between md:items-center"
-      >
-        <div className="mb-2 md:mb-0">
-          <span className="font-medium">{index + 1}. </span>
-          {showHindi === q.id ? q.question_hi : q.question_en}
-        </div>
-        <button
-          className="border px-3 py-1 rounded text-sm text-gray-700"
-          onClick={() => handleToggle(q.id)}
-        >
-          {q.type}
-        </button>
+  {questions.map((q, index) => (
+    <div
+      key={q.id}
+      className="border-b pb-4 flex flex-col md:flex-row md:justify-between md:items-center cursor-pointer hover:bg-gray-50"
+      onClick={() => navigate(`/questions/${q.id}`)}
+    >
+      <div className="mb-2 md:mb-0">
+        <span className="font-medium">{index + 1}. </span>
+        {showHindi === q.id ? q.question_hi : q.question_en}
       </div>
-    ))}
-  </div>
+      <button
+        className="border px-3 py-1 rounded text-sm text-gray-700"
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent navigating when clicking the type button
+          handleToggle(q.id);
+        }}
+      >
+        {q.type}
+      </button>
+    </div>
+  ))}
+</div>
+
 </div>
 
   );

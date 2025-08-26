@@ -27,6 +27,7 @@ export const store = configureStore({
     users: user,
     content: content,
     analytics: anayltics,
+    analysis: analysisReducer,
     rashi: rashi,
     vastuEntrance: vastuEntranceSlice,
     entranceChoice: entranceChoiceSlice,
