@@ -19,7 +19,7 @@ const NumbersList: React.FC = () => {
   const navigate = useNavigate();
   const handleNavigate = (number: number) => {
     navigate("/numerology/numbers/edit", {
-      state: { missingNumberId: number },
+      state: { numberId: number },
     });
   };
   return (
@@ -54,7 +54,7 @@ const NumbersList: React.FC = () => {
         </div>
       </div>
       {viewMode === "table" ? (
-        <div className="bg-white shadow rounded-lg overflow-x-auto dark:bg-gray-900">
+        <div className="bg-white  overflow-x-auto dark:bg-gray-900">
           <ul className="divide-y divide-gray-200 dark:divide-gray-700">
             {staticNumbers.map((item) => (
               <li

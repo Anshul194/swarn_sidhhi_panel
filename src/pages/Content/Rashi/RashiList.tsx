@@ -47,7 +47,7 @@ const RashiList: React.FC = () => {
         </div>
       </div>
       {viewMode === "table" ? (
-        <div className="bg-white shadow rounded-lg overflow-x-auto">
+        <div className="bg-white  overflow-x-auto">
           <ul className="divide-y divide-gray-300">
             {staticRashis.map((item, idx) => (
               <li

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import { fetchPlanetDetails } from "../../../store/slices/planet";
 import { updatePlanetDetails } from "../../../store/slices/planet";
@@ -43,11 +44,19 @@ const EditPlanet: React.FC = () => {
   const location = useLocation();
   const planetName = location.state?.planetName || "sun";
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const {
     data: planetData,
     loading,
     error,
   } = useAppSelector((state) => state.planet);
+  // Render HTML from editor (preserve formatting)
+  const renderHtml = (html: string) => (
+    <div
+      className="text-gray-700 whitespace-pre-line"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
 
   // Local state for editing
   const [details, setDetails] = React.useState({
@@ -97,6 +106,13 @@ const EditPlanet: React.FC = () => {
       })
     );
     if (updatePlanetDetails.fulfilled.match(result)) {
+      toast.success("Planet updated successfully!", {
+        duration: 4000,
+        position: "top-right",
+      });
+      setTimeout(() => {
+        navigate("/kundli/planet/list");
+      }, 1000);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 2000);
     }
@@ -117,12 +133,12 @@ const EditPlanet: React.FC = () => {
               onClick={() => openEditModal("meaning_en", details.meaning_en)}
               className="ml-2 text-blue-600"
             >
-              <Pencil className="h-5 w-5" />
+              <Pencil className="h-4 w-4" />
             </button>
           </div>
-          <div className="text-gray-700 whitespace-pre-line">
-            {details.meaning_en}
-          </div>
+          <p className="overflow-y-scroll text-sm">
+            {renderHtml(details.meaning_en)}
+          </p>
         </div>
         <div className="border rounded-lg p-4 pb-0 max-h-72 flex flex-col">
           <div className="flex justify-between items-center mb-2">
@@ -131,12 +147,12 @@ const EditPlanet: React.FC = () => {
               onClick={() => openEditModal("meaning_hi", details.meaning_hi)}
               className="ml-2 text-blue-600"
             >
-              <Pencil className="h-5 w-5" />
+              <Pencil className="h-4 w-4" />
             </button>
           </div>
-          <div className="text-gray-700 whitespace-pre-line">
-            {details.meaning_hi}
-          </div>
+          <p className="overflow-y-scroll text-sm">
+            {renderHtml(details.meaning_hi)}
+          </p>
         </div>
         <div className="border rounded-lg p-4 pb-0 max-h-72 flex flex-col">
           <div className="flex justify-between items-center mb-2">
@@ -145,12 +161,12 @@ const EditPlanet: React.FC = () => {
               onClick={() => openEditModal("remedy_en", details.remedy_en)}
               className="ml-2 text-blue-600"
             >
-              <Pencil className="h-5 w-5" />
+              <Pencil className="h-4 w-4" />
             </button>
           </div>
-          <div className="text-gray-700 whitespace-pre-line">
-            {details.remedy_en}
-          </div>
+          <p className="overflow-y-scroll text-sm">
+            {renderHtml(details.remedy_en)}
+          </p>
         </div>
         <div className="border rounded-lg p-4 pb-0 max-h-72 flex flex-col">
           <div className="flex justify-between items-center mb-2">
@@ -159,12 +175,12 @@ const EditPlanet: React.FC = () => {
               onClick={() => openEditModal("remedy_hi", details.remedy_hi)}
               className="ml-2 text-blue-600"
             >
-              <Pencil className="h-5 w-5" />
+              <Pencil className="h-4 w-4" />
             </button>
           </div>
-          <div className="text-gray-700 whitespace-pre-line">
-            {details.remedy_hi}
-          </div>
+          <p className="overflow-y-scroll text-sm">
+            {renderHtml(details.remedy_hi)}
+          </p>
         </div>
       </div>
       {/* House Wise Details */}
@@ -173,60 +189,62 @@ const EditPlanet: React.FC = () => {
           <h3 className="text-lg font-bold mb-2">{`${idx + 1}st House`}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="border rounded-lg p-4 pb-0 max-h-72 flex flex-col">
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="font-semibold">
-                  Sun in House {idx + 1} Meaning (English)
-                </h4>
+              <h4 className="font-semibold">
+                Sun in House {idx + 1} Meaning (English)
+              </h4>
+              <div className="flex justify-between items-center ">
+                <h4 className="font-semibold">Pros (English)</h4>
                 <button
                   onClick={() => openEditModal("pros_en", house.pros_en, idx)}
                   className="ml-2 text-blue-600"
                 >
-                  <Pencil className="h-5 w-5" />
+                  <Pencil className="h-4 w-4" />
                 </button>
               </div>
-              <div className="text-gray-700 whitespace-pre-line">
-                {house.pros_en}
-              </div>
+              <p className="overflow-y-scroll text-sm">
+                {renderHtml(house.pros_en)}
+              </p>
               <div className="flex justify-between items-center mt-2">
-                <h4 className="font-semibold">Cons (English)</h4>
+                <h5 className="font-semibold">Cons (English)</h5>
                 <button
                   onClick={() => openEditModal("cons_en", house.cons_en, idx)}
                   className="ml-2 text-blue-600"
                 >
-                  <Pencil className="h-5 w-5" />
+                  <Pencil className="h-4 w-4" />
                 </button>
               </div>
-              <div className="text-gray-700 whitespace-pre-line">
-                {house.cons_en}
-              </div>
+              <p className="overflow-y-scroll text-sm">
+                {renderHtml(house.cons_en)}
+              </p>
             </div>
             <div className="border rounded-lg p-4 pb-0 max-h-72 flex flex-col">
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="font-semibold">
-                  Sun in House {idx + 1} Meaning (Hindi)
-                </h4>
+              <h4 className="font-semibold">
+                Sun in House {idx + 1} Meaning (Hindi)
+              </h4>
+              <div className="flex justify-between items-center ">
+                <h4 className="font-semibold">Pros (Hindi)</h4>
                 <button
                   onClick={() => openEditModal("pros_hi", house.pros_hi, idx)}
                   className="ml-2 text-blue-600"
                 >
-                  <Pencil className="h-5 w-5" />
+                  <Pencil className="h-4 w-4" />
                 </button>
               </div>
-              <div className="text-gray-700 whitespace-pre-line">
-                {house.pros_hi}
-              </div>
+              <p className="overflow-y-scroll text-sm">
+                {renderHtml(house.pros_hi)}
+              </p>
               <div className="flex justify-between items-center mt-2">
                 <h4 className="font-semibold">Cons (Hindi)</h4>
                 <button
                   onClick={() => openEditModal("cons_hi", house.cons_hi, idx)}
                   className="ml-2 text-blue-600"
                 >
-                  <Pencil className="h-5 w-5" />
+                  <Pencil className="h-4 w-4" />
                 </button>
               </div>
-              <div className="text-gray-700 whitespace-pre-line">
-                {house.cons_hi}
-              </div>
+              <p className="overflow-y-scroll text-sm">
+                {renderHtml(house.cons_hi)}
+              </p>
             </div>
           </div>
         </div>

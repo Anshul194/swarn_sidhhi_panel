@@ -29,7 +29,7 @@ export const fetchPersonalYear = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        'https://test.swarnsiddhi.com/admin/api/v1/numerology/year/1/',
+        '/numerology/year/1/',
         {
           headers: {
             'Content-Type': 'text/plain',
@@ -40,6 +40,26 @@ export const fetchPersonalYear = createAsyncThunk(
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch data');
+    }
+  }
+);
+
+export const updatePersonalYear = createAsyncThunk(
+  'personalYear/updatePersonalYear',
+  async (editData: LifestylePredictions[], { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.patch(
+        '/numerology/year/1/',
+        editData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update data');
     }
   }
 );
@@ -59,6 +79,18 @@ const personalYearSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(fetchPersonalYear.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updatePersonalYear.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatePersonalYear.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(updatePersonalYear.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
