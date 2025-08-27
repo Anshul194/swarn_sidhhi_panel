@@ -41,7 +41,8 @@ export const fetchProfile = createAsyncThunk<
         },
       }
     );
-    return response.data.data as Profile;
+    console.log("Full profile response:", response.data);
+    return response.data as Profile;
   } catch (error: any) {
     return rejectWithValue(error.message || "Failed to fetch profile");
   }

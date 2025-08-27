@@ -1,5 +1,3 @@
-zone update
-Analysis both API error
-Entrance update API
-Questions update error
-Questions delete error
+get all user
+numerology ma update number
+House details
