@@ -151,7 +151,7 @@ const AdvanceDetails = () => {
 
       {/* Analysis Section */}
      <div>
-         <h2 className="text-xl font-semibold">Analysis</h2>
+         <h2 className="text-xl font-semibold mb-5">Analysis</h2>
          
 
      </div>

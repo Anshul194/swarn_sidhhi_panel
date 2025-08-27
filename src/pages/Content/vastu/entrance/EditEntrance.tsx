@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { Pencil, X } from "lucide-react";
 import { fetchEntranceById, updateEntranceById } from "../../../../store/slices/entrance";
 import { RootState, AppDispatch } from "../../../../store";
-import { Pencil, X } from "lucide-react";
 import TiptapEditor from "../../../../components/TiptapEditor";
 
-const EntranceDetails: React.FC = () => {
+const EntranceEdit: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const entranceId = location.state?.entranceId;
 
   const { entranceDetails, loading, error } = useSelector(
-    (state: RootState) => state.entrance ?? { entranceDetails: null, loading: false, error: null }
+    (state: RootState) => state.entrance
   );
   const token = useSelector((state: RootState) => state.auth.token);
 
@@ -25,18 +25,20 @@ const EntranceDetails: React.FC = () => {
 
   // Local editable state
   const [entranceData, setEntranceData] = useState({
-    // title_en: "",
-    // title_hi: "",
+    title_en: "",
+    title_hi: "",
     meaning_en: "",
     meaning_hi: "",
   });
 
+  // Fetch entrance
   useEffect(() => {
     if (entranceId && token) {
-      dispatch(fetchEntranceById({ id: entranceId.toLowerCase(), token }));
+      dispatch(fetchEntranceById({ id: entranceId, token }));
     }
-  }, [entranceId, token, dispatch]);
+  }, [dispatch, entranceId, token]);
 
+  // Set local data
   useEffect(() => {
     if (entranceDetails) {
       setEntranceData({
@@ -79,10 +81,11 @@ const EntranceDetails: React.FC = () => {
         setSuccess(true);
         setTimeout(() => {
           setSuccess(false);
+          navigate("/entrances/details", { state: { entranceId } });
         }, 1200);
       }
     } catch (err) {
-      // handle error
+      console.error("Update failed:", err);
     }
   };
 
@@ -91,7 +94,8 @@ const EntranceDetails: React.FC = () => {
   if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
-    <div className="min-h-screen max-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto overflow-y-auto">
+    <div className="max-w-6xl mx-auto p-6 bg-white shadow rounded-lg">
+      {/* Back Button */}
       <button
         className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
         onClick={() => navigate(-1)}
@@ -100,10 +104,33 @@ const EntranceDetails: React.FC = () => {
       </button>
 
       <h2 className="text-2xl font-bold mb-6 text-center">
-        Entrance {entranceData.title_en || entranceId?.toUpperCase() || "Not Found"}
+        Edit Entrance: {entranceData.title_en || entranceId?.toUpperCase()}
       </h2>
 
-     
+      {/* Titles */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="border p-4 rounded relative">
+          <h4 className="font-semibold mb-2">Title (English)</h4>
+          <div className="text-gray-700">{entranceData.title_en || "-"}</div>
+          <button
+            onClick={() => openEditModal("title_en", entranceData.title_en)}
+            className="absolute top-4 right-4 text-blue-600"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="border p-4 rounded relative">
+          <h4 className="font-semibold mb-2">Title (Hindi)</h4>
+          <div className="text-gray-700">{entranceData.title_hi || "-"}</div>
+          <button
+            onClick={() => openEditModal("title_hi", entranceData.title_hi)}
+            className="absolute top-4 right-4 text-blue-600"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
       {/* Meanings */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -120,6 +147,7 @@ const EntranceDetails: React.FC = () => {
             <Pencil className="h-4 w-4" />
           </button>
         </div>
+
         <div className="border p-4 rounded relative">
           <h4 className="font-semibold mb-2">Meaning (Hindi)</h4>
           <div
@@ -187,4 +215,4 @@ const EntranceDetails: React.FC = () => {
   );
 };
 
-export default EntranceDetails;
+export default EntranceEdit;
