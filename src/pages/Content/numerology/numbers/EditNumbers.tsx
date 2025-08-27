@@ -532,7 +532,7 @@ const EditNumbers = () => {
       {/* Update Number Button */}
       <div className="mt-8 text-right">
         <button
-          className="py-2 px-6 bg-green-600 text-white rounded hover:bg-green-700 font-semibold"
+          className="py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
           onClick={async () => {
             if (!numberId) return;
             const result = await dispatch(

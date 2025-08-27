@@ -37,6 +37,19 @@ const PersonalDetails = () => {
     }
   }, [data]);
 
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    if (modalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto"; // cleanup on unmount
+    };
+  }, [modalOpen]);
+
   const openEditModal = (
     type: "en" | "hi",
     value: string,
@@ -60,7 +73,6 @@ const PersonalDetails = () => {
   const handleModalSave = () => {
     const updatedData = editData.map((item: any) => {
       if (item.lifestyle === modalLifestyle) {
-        // Deep clone predictions and its nested objects
         const predictions = Object.keys(item.predictions).reduce(
           (acc: any, key: string) => {
             acc[key] = { ...item.predictions[key] };
@@ -83,22 +95,11 @@ const PersonalDetails = () => {
 
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-4 py-8 xl:px-10 xl:py-12 mx-auto">
-      {/* Back Button */}
-      {/* <button
-        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
-        onClick={() => navigate(-1)}
-      >
-        &larr; Back
-      </button> */}
-
-      {/* Page Title */}
       <h1 className="text-2xl font-bold text-center mb-6">
         Personal Year Details
       </h1>
 
-      {/* Numerology Year Data Section */}
       <div className="mt-8">
-        {/* <h2 className="text-lg font-bold mb-4">Numerology Year Data</h2> */}
         {loading && <p>Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {!loading && !error && editData.length > 0 ? (
@@ -115,7 +116,6 @@ const PersonalDetails = () => {
                     return (
                       <React.Fragment key={num}>
                         <div className="flex flex-col gap-6">
-                          {/* Prediction EN Card */}
                           <div className="border rounded-lg p-4 shadow-sm bg-white w-2xs h-56">
                             <div className="flex justify-between items-center mb-2">
                               <span className="font-semibold">
@@ -135,20 +135,16 @@ const PersonalDetails = () => {
                                 <Pencil className="h-4 w-4" />
                               </button>
                             </div>
-                            <div>
-                              <span className="">
-                                <div
-                                  className="text-gray-700 whitespace-pre-line"
-                                  dangerouslySetInnerHTML={{
-                                    __html:
-                                      pred?.prediction_en ||
-                                      "No prediction available.",
-                                  }}
-                                />
-                              </span>
+                            <div className="text-gray-700 whitespace-pre-line">
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html:
+                                    pred?.prediction_en ||
+                                    "No prediction available.",
+                                }}
+                              />
                             </div>
                           </div>
-                          {/* Prediction HI Card */}
                           <div className="border rounded-lg p-4 shadow-sm bg-white w-2xs h-56">
                             <div className="flex justify-between items-center mb-2">
                               <span className="font-semibold">
@@ -168,17 +164,14 @@ const PersonalDetails = () => {
                                 <Pencil className="h-4 w-4" />
                               </button>
                             </div>
-                            <div>
-                              <span className="">
-                                <div
-                                  className="text-gray-700 whitespace-pre-line"
-                                  dangerouslySetInnerHTML={{
-                                    __html:
-                                      pred?.prediction_hi ||
-                                      "No prediction available.",
-                                  }}
-                                />
-                              </span>
+                            <div className="text-gray-700 whitespace-pre-line">
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html:
+                                    pred?.prediction_hi ||
+                                    "No prediction available.",
+                                }}
+                              />
                             </div>
                           </div>
                         </div>
@@ -196,7 +189,6 @@ const PersonalDetails = () => {
         )}
       </div>
 
-      {/* Update Button */}
       <div className="mt-8 text-right">
         <button
           className="py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
@@ -221,13 +213,13 @@ const PersonalDetails = () => {
           Update
         </button>
       </div>
+
       {success && (
         <div className="mt-4 text-green-700 text-center font-semibold">
           Personal year updated successfully!
         </div>
       )}
 
-      {/* Edit Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">

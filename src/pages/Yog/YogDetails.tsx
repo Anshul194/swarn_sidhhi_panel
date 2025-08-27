@@ -6,9 +6,6 @@ import { RootState } from "../../store";
 import { Pencil, X } from "lucide-react";
 import TiptapEditor from "../../components/TiptapEditor";
 
-// Helper to remove HTML tags
-const stripHTML = (str: string) => str.replace(/<[^>]+>/g, "");
-
 const YogDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -35,13 +32,12 @@ const YogDetails = () => {
   useEffect(() => {
     if (yog) {
       setYogData({
-        
-        title_en: stripHTML(yog.title_en || ""),
-        title_hi: stripHTML(yog.title_hi || ""),
-        present_meaning_en: stripHTML(yog.present_meaning_en || ""),
-        present_meaning_hi: stripHTML(yog.present_meaning_hi || ""),
-        missing_meaning_en: stripHTML(yog.missing_meaning_en || ""),
-        missing_meaning_hi: stripHTML(yog.missing_meaning_hi || ""),
+        title_en: yog.title_en || "",
+        title_hi: yog.title_hi || "",
+        present_meaning_en: yog.present_meaning_en || "",
+        present_meaning_hi: yog.present_meaning_hi || "",
+        missing_meaning_en: yog.missing_meaning_en || "",
+        missing_meaning_hi: yog.missing_meaning_hi || "",
       });
     }
   }, [yog]);
@@ -83,37 +79,38 @@ const YogDetails = () => {
       </button>
 
       <h2 className="text-2xl font-bold mb-6 text-center">
-         {yogData.title_en || "Untitled"} 
+         <span dangerouslySetInnerHTML={{ __html: yogData.title_en || "Untitled" }} />
       </h2>
 
       {/* Titles */}
-
-          <div className="mb-8 space-y-4">
-            {/* Title English */}
-            <div className="flex items-center gap-4 relative">
-              <h4 className="font-semibold w-36">Title English:</h4>
-              <div className="border p-2 rounded text-gray-700 flex-1">{yogData.title_en || "-"}</div>
-              <button
-                onClick={() => openModal("title_en", yogData.title_en)}
-                className="text-blue-600 ml-2"
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-            </div>
-          
-            {/* Title Hindi */}
-            <div className="flex items-center gap-4 relative">
-              <h4 className="font-semibold w-36">Title Hindi:</h4>
-              <div className="border p-2 rounded text-gray-700 flex-1">{yogData.title_hi || "-"}</div>
-              <button
-                onClick={() => openModal("title_hi", yogData.title_hi)}
-                className="text-blue-600 ml-2"
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-            </div>
+      <div className="mb-8 space-y-4">
+        {/* Title English */}
+        <div className="flex items-center gap-4 relative">
+          <h4 className="font-semibold w-36">Title English:</h4>
+          <div className="border p-2 rounded text-gray-700 flex-1">
+            <span dangerouslySetInnerHTML={{ __html: yogData.title_en || "-" }} />
           </div>
-
+          <button
+            onClick={() => openModal("title_en", yogData.title_en)}
+            className="text-blue-600 ml-2"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+        </div>
+        {/* Title Hindi */}
+        <div className="flex items-center gap-4 relative">
+          <h4 className="font-semibold w-36">Title Hindi:</h4>
+          <div className="border p-2 rounded text-gray-700 flex-1">
+            <span dangerouslySetInnerHTML={{ __html: yogData.title_hi || "-" }} />
+          </div>
+          <button
+            onClick={() => openModal("title_hi", yogData.title_hi)}
+            className="text-blue-600 ml-2"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
       {/* Meanings */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -121,7 +118,7 @@ const YogDetails = () => {
         <div className="border p-4 rounded relative">
           <h4 className="font-semibold mb-2">Present Meaning (English)</h4>
           <div className="text-gray-700 text-sm whitespace-pre-wrap break-words">
-            {yogData.present_meaning_en || "-"}
+            <span dangerouslySetInnerHTML={{ __html: yogData.present_meaning_en || "-" }} />
           </div>
           <button
             onClick={() =>
@@ -137,7 +134,7 @@ const YogDetails = () => {
         <div className="border p-4 rounded relative">
           <h4 className="font-semibold mb-2">Present Meaning (Hindi)</h4>
           <div className="text-gray-700 text-sm whitespace-pre-wrap break-words">
-            {yogData.present_meaning_hi || "-"}
+            <span dangerouslySetInnerHTML={{ __html: yogData.present_meaning_hi || "-" }} />
           </div>
           <button
             onClick={() =>
@@ -153,7 +150,7 @@ const YogDetails = () => {
         <div className="border p-4 rounded relative">
           <h4 className="font-semibold mb-2">Missing Meaning (English)</h4>
           <div className="text-gray-700 text-sm whitespace-pre-wrap break-words">
-            {yogData.missing_meaning_en || "-"}
+            <span dangerouslySetInnerHTML={{ __html: yogData.missing_meaning_en || "-" }} />
           </div>
           <button
             onClick={() =>
@@ -169,7 +166,7 @@ const YogDetails = () => {
         <div className="border p-4 rounded relative">
           <h4 className="font-semibold mb-2">Missing Meaning (Hindi)</h4>
           <div className="text-gray-700 text-sm whitespace-pre-wrap break-words">
-            {yogData.missing_meaning_hi || "-"}
+            <span dangerouslySetInnerHTML={{ __html: yogData.missing_meaning_hi || "-" }} />
           </div>
           <button
             onClick={() =>
@@ -227,5 +224,7 @@ const YogDetails = () => {
     </div>
   );
 };
+
+
 
 export default YogDetails;
