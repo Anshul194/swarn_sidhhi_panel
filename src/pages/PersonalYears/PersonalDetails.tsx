@@ -58,32 +58,38 @@ const PersonalDetails = () => {
   };
 
   const handleModalSave = () => {
-    setEditData((prev: any[]) =>
-      prev.map((item: any) => {
-        if (item.lifestyle === modalLifestyle) {
-          const predictions = { ...item.predictions };
-          if (modalType === "en") {
-            predictions[modalNum].prediction_en = modalValue;
-          } else {
-            predictions[modalNum].prediction_hi = modalValue;
-          }
-          return { ...item, predictions };
+    const updatedData = editData.map((item: any) => {
+      if (item.lifestyle === modalLifestyle) {
+        // Deep clone predictions and its nested objects
+        const predictions = Object.keys(item.predictions).reduce(
+          (acc: any, key: string) => {
+            acc[key] = { ...item.predictions[key] };
+            return acc;
+          },
+          {}
+        );
+        if (modalType === "en") {
+          predictions[modalNum].prediction_en = modalValue;
+        } else {
+          predictions[modalNum].prediction_hi = modalValue;
         }
-        return item;
-      })
-    );
+        return { ...item, predictions };
+      }
+      return item;
+    });
+    setEditData(updatedData);
     closeModal();
   };
 
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-4 py-8 xl:px-10 xl:py-12 mx-auto">
       {/* Back Button */}
-      <button
+      {/* <button
         className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
         onClick={() => navigate(-1)}
       >
         &larr; Back
-      </button>
+      </button> */}
 
       {/* Page Title */}
       <h1 className="text-2xl font-bold text-center mb-6">

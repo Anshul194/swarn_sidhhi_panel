@@ -27,13 +27,12 @@ const initialState: EntranceState = {
 // Fetch Entrance by ID
 export const fetchEntranceById = createAsyncThunk<
   EntranceAnalysis,
-  { id: string; token: string },
+  { id: string },
   { rejectValue: string }
->("entrance/fetchEntranceById", async ({ id, token }, { rejectWithValue }) => {
+>("entrance/fetchEntranceById", async ({ id }, { rejectWithValue }) => {
   try {
     if (!id) throw new Error("Entrance ID is required");
     const response = await axiosInstance.get(`/vastu/entrances/${id.toLowerCase()}/`, {
-      headers: { Authorization: `Bearer ${token}` },
     });
     return response.data.data;
   } catch (error: any) {
@@ -44,13 +43,12 @@ export const fetchEntranceById = createAsyncThunk<
 // Update Entrance by ID
 export const updateEntranceById = createAsyncThunk<
   EntranceAnalysis,
-  { id: string; payload: Partial<EntranceAnalysis>; token: string },
+  { id: string; payload: Partial<EntranceAnalysis> },
   { rejectValue: string }
->("entrance/updateEntranceById", async ({ id, payload, token }, { rejectWithValue }) => {
+>("entrance/updateEntranceById", async ({ id, payload }, { rejectWithValue }) => {
   try {
     if (!id) throw new Error("Entrance ID is required");
     const response = await axiosInstance.patch(`/vastu/entrances/${id.toLowerCase()}/`, payload, {
-      headers: { Authorization: `Bearer ${token}` },
     });
     return response.data.data;
   } catch (error: any) {

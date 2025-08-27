@@ -3,7 +3,11 @@ import TiptapEditor from "../../../components/TiptapEditor";
 import { Pencil } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
-import { fetchRashiDetails } from "../../../store/slices/rashi";
+import {
+  fetchRashiDetails,
+  updateRashiDetails,
+} from "../../../store/slices/rashi";
+import { toastConfig } from "../../../utils/toastConfig";
 
 const EditRashi: React.FC = () => {
   const location = useLocation();
@@ -13,8 +17,29 @@ const EditRashi: React.FC = () => {
     data: rashiData,
     loading,
     error,
+    updateLoading,
+    updateError,
+    updateSuccess,
   } = useAppSelector((state) => state.rashi);
 
+  // Show toast on successful update
+  useEffect(() => {
+    if (updateSuccess) {
+      toastConfig.success("Rashi updated successfully!");
+    }
+  }, [updateSuccess]);
+
+  // Show toast on update failure
+  useEffect(() => {
+    if (updateError) {
+      toastConfig.error(updateError);
+    }
+  }, [updateError]);
+
+  // Local state for editing
+  const [localRashi, setLocalRashi] = React.useState<
+    import("../../../store/slices/rashi").RashiData | null
+  >(null);
   // Modal state
   const [modalOpen, setModalOpen] = React.useState(false);
   const [modalValue, setModalValue] = React.useState("");
@@ -26,6 +51,12 @@ const EditRashi: React.FC = () => {
       dispatch(fetchRashiDetails({ name: rashiName }));
     }
   }, [rashiName, dispatch]);
+
+  useEffect(() => {
+    if (rashiData) {
+      setLocalRashi(JSON.parse(JSON.stringify(rashiData)));
+    }
+  }, [rashiData]);
 
   const openEditModal = (field: string, value: string, houseIdx?: number) => {
     setModalField(field);
@@ -42,8 +73,40 @@ const EditRashi: React.FC = () => {
   };
 
   const handleModalSave = () => {
-    // Update logic here (connect to Redux/API as needed)
+    if (!localRashi) return;
+    if (modalHouseIdx !== null) {
+      // House field
+      if (modalField === "house_description_en") {
+        localRashi.houses[modalHouseIdx].description_en = modalValue;
+      } else if (modalField === "house_description_hi") {
+        localRashi.houses[modalHouseIdx].description_hi = modalValue;
+      }
+    } else {
+      // Details field
+      const allowedFields: (keyof typeof localRashi.details)[] = [
+        "meaning_en",
+        "meaning_hi",
+        "remedy_en",
+        "remedy_hi",
+        "short_description_en",
+        "short_description_hi",
+        "description_en",
+        "description_hi",
+      ];
+      if (
+        allowedFields.includes(modalField as keyof typeof localRashi.details)
+      ) {
+        localRashi.details[modalField as keyof typeof localRashi.details] =
+          modalValue;
+      }
+    }
+    setLocalRashi({ ...localRashi });
     closeModal();
+  };
+
+  const handleUpdateRashi = () => {
+    if (!localRashi) return;
+    dispatch(updateRashiDetails({ name: rashiName, payload: localRashi }));
   };
 
   return (
@@ -226,6 +289,27 @@ const EditRashi: React.FC = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Update Rashi Button */}
+      {localRashi && (
+        <div className="mt-8 flex justify-end">
+          <button
+            className="px-8 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded disabled:bg-gray-400"
+            onClick={handleUpdateRashi}
+            disabled={updateLoading}
+          >
+            {updateLoading ? "Updating..." : "Update Rashi"}
+          </button>
+        </div>
+      )}
+      {updateError && (
+        <div className="mt-4 text-red-600 text-right">{updateError}</div>
+      )}
+      {updateSuccess && (
+        <div className="mt-4 text-green-600 text-right">
+          Rashi updated successfully!
         </div>
       )}
     </div>
