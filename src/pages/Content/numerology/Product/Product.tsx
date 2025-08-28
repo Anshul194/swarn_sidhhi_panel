@@ -98,9 +98,8 @@
 
 // export default Product;
 
-
 import React from "react";
-import { LayoutGrid, List, Search, Filter } from "lucide-react";
+import { LayoutGrid, List, Search, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { fetchProducts } from "../../../../store/slices/products";
@@ -126,88 +125,82 @@ const Product: React.FC = () => {
     }
   };
 
-  // Filter products based on search term
   const filteredProducts = products.filter((product) => {
     const searchableText = (
-      product.name || 
-      product.title_en || 
-      product.title || 
-      ""
+      product.name || product.title_en || product.title || ""
     ).toLowerCase();
     return searchableText.includes(searchTerm.toLowerCase());
   });
 
-  const getProductImage = (product: any) => {
-    return product.image || "https://via.placeholder.com/150x150?text=No+Image";
-  };
+  const getProductImage = (product: any) =>
+    product.image || "https://via.placeholder.com/150x150?text=No+Image";
 
-  const getProductName = (product: any) => {
-    return product.name || product.title_en || product.title || "Unnamed Product";
-  };
+  const getProductName = (product: any) =>
+    product.name || product.title_en || product.title || "Unnamed Product";
 
-  const getProductPrice = (product: any) => {
-    if (product.price) {
-      return `${product.price} ${(product.price_unit || "").toUpperCase()}`;
-    }
-    return "Price not available";
-  };
+  const getProductPrice = (product: any) =>
+    product.price
+      ? `${product.price} ${(product.price_unit || "").toUpperCase()}`
+      : "Price not available";
 
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-          Products Catalog
-        </h1>
-        
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-            />
-          </div>
+      
+      {/* Row 1: Title */}
+      <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90 mb-6">
+        Products Catalog
+      </h1>
 
-          {/* View Toggle */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setViewMode("table")}
-              className={`p-2 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors ${
-                viewMode === "table"
-                  ? "bg-blue-100 border-blue-300 text-blue-600 dark:bg-blue-900/30"
-                  : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-              }`}
-              title="Table View"
-            >
-              <List className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors ${
-                viewMode === "grid"
-                  ? "bg-blue-100 border-blue-300 text-blue-600 dark:bg-blue-900/30"
-                  : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-              }`}
-              title="Grid View"
-            >
-              <LayoutGrid className="h-5 w-5" />
-            </button>
-          </div>
+      {/* Row 2: Create button + View toggle */}
+      <div className="flex justify-end items-center mb-6 gap-3">
+        {/* Create Button */}
+        <button
+          onClick={() => navigate("/products/add")}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+        >
+          <Plus className="h-4 w-4" /> Create
+        </button>
+
+        {/* View Toggle */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode("table")}
+            className={`p-2 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors ${
+              viewMode === "table"
+                ? "bg-blue-100 border-blue-300 text-blue-600 dark:bg-blue-900/30"
+                : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            }`}
+            title="Table View"
+          >
+            <List className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setViewMode("grid")}
+            className={`p-2 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors ${
+              viewMode === "grid"
+                ? "bg-blue-100 border-blue-300 text-blue-600 dark:bg-blue-900/30"
+                : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            }`}
+            title="Grid View"
+          >
+            <LayoutGrid className="h-5 w-5" />
+          </button>
         </div>
-        <span className="text-gray-500 text-sm dark:text-gray-400 sm:ml-4 mt-2 sm:mt-0">
-          Total: {products.length}
-        </span>
       </div>
 
-     
+      {/* Row 3: Search Bar */}
+      <div className="relative mb-8 max-w-md">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+        />
+      </div>
 
-      {/* Content */}
+      {/* Products Content */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <div className="text-center">
@@ -218,7 +211,9 @@ const Product: React.FC = () => {
       ) : error ? (
         <div className="text-center py-16">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-            <h3 className="text-red-800 font-semibold mb-2">Error Loading Products</h3>
+            <h3 className="text-red-800 font-semibold mb-2">
+              Error Loading Products
+            </h3>
             <p className="text-red-600 text-sm">{error}</p>
             <button
               onClick={() => dispatch(fetchProducts({ limit: 50, offset: 0 }))}
@@ -235,10 +230,9 @@ const Product: React.FC = () => {
               {searchTerm ? "No products found" : "No products available"}
             </h3>
             <p className="text-gray-500 text-sm">
-              {searchTerm 
+              {searchTerm
                 ? `No products match "${searchTerm}". Try adjusting your search.`
-                : "There are no products to display at this time."
-              }
+                : "There are no products to display at this time."}
             </p>
             {searchTerm && (
               <button
@@ -251,7 +245,7 @@ const Product: React.FC = () => {
           </div>
         </div>
       ) : viewMode === "table" ? (
-        // Table View
+        /* Table View */
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -307,10 +301,14 @@ const Product: React.FC = () => {
                           <span>⭐</span>
                           <span>{product.rating}</span>
                           {product.reviews_count && (
-                            <span className="text-gray-500">({product.reviews_count})</span>
+                            <span className="text-gray-500">
+                              ({product.reviews_count})
+                            </span>
                           )}
                         </div>
-                      ) : "No rating"}
+                      ) : (
+                        "No rating"
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -319,7 +317,7 @@ const Product: React.FC = () => {
           </div>
         </div>
       ) : (
-        // Grid View
+        /* Grid View */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
             <div
@@ -334,43 +332,53 @@ const Product: React.FC = () => {
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
                 />
               </div>
-              
+
               <div className="p-4">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
                   {getProductName(product)}
                 </h3>
-                
+
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600 dark:text-gray-400">Price:</span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Price:
+                    </span>
                     <span className="font-semibold text-gray-900 dark:text-white">
                       {getProductPrice(product)}
                     </span>
                   </div>
-                  
+
                   {product.left_in_stock !== undefined && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600 dark:text-gray-400">Stock:</span>
-                      <span className={`font-medium ${
-                        product.left_in_stock > 0 
-                          ? "text-green-600" 
-                          : "text-red-600"
-                      }`}>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Stock:
+                      </span>
+                      <span
+                        className={`font-medium ${
+                          product.left_in_stock > 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
                         {product.left_in_stock}
                       </span>
                     </div>
                   )}
-                  
+
                   {product.rating && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600 dark:text-gray-400">Rating:</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Rating:
+                      </span>
                       <div className="flex items-center space-x-1">
                         <span>⭐</span>
                         <span className="font-medium text-gray-900 dark:text-white">
                           {product.rating}
                         </span>
                         {product.reviews_count && (
-                          <span className="text-gray-500">({product.reviews_count})</span>
+                          <span className="text-gray-500">
+                            ({product.reviews_count})
+                          </span>
                         )}
                       </div>
                     </div>
