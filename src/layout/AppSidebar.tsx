@@ -609,7 +609,13 @@ const navGroups: NavGroup[] = [
         // icon: <ListIcon />,
         name: "Numbers",
         path: "/numerology/numbers/list",
-      }, {
+      },
+      {
+        // icon: <ListIcon />,
+        name: "Products",
+        path: "/products/list",
+      },
+       {
         // icon: <ListIcon />,
         name: "Yogs",
         path: "/yogs/list",

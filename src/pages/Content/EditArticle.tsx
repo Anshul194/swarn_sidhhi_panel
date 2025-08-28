@@ -13,7 +13,7 @@ import CodeBlock from "@tiptap/extension-code-block";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { fetchArticleById, updateArticle } from "../../store/slices/content";
+import { fetchArticleById, updateArticle, fetchArticleComments } from "../../store/slices/content";
 import { RootState } from "../../store/store";
 import {
   Bold,
@@ -124,7 +124,7 @@ const EditArticle: React.FC = () => {
   const navigate = useNavigate();
   const articleId = location.state?.articleId;
   const dispatch = useDispatch();
-  const { selectedArticle, loading, error } = useSelector(
+  const { selectedArticle, loading, error, comments } = useSelector(
     (state: RootState) => state.content
   );
   // Dropdown state for tags
@@ -255,6 +255,8 @@ const EditArticle: React.FC = () => {
       const token = localStorage.getItem("token") || "";
       const baseUrl = import.meta.env.VITE_BASE_URL || "";
       dispatch(fetchArticleById({ token, baseUrl, articleId }));
+      // Fetch comments for the article
+      dispatch(fetchArticleComments({ token, baseUrl, articleId }));
     } else {
       // If no articleId is provided, redirect to content/all
       toast.error("No article ID provided");
@@ -431,7 +433,7 @@ const EditArticle: React.FC = () => {
     const errors: { [key: string]: string } = {};
     if (!title.trim()) errors.title = "Title is required";
     if (!content.trim()) errors.content = "Content is required";
-    if (!category.trim()) errors.category = "Category is required";
+    // category is NOT required anymore
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -639,6 +641,13 @@ const EditArticle: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      {/* Back Button */}
+      <button
+        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
+        onClick={() => navigate(-1)}
+      >
+        &larr; Back
+      </button>
       <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
         <Edit3 className="h-8 w-8" />
         Edit Article - Markdown Editor
@@ -1029,14 +1038,14 @@ const EditArticle: React.FC = () => {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  aria-required="true"
                   aria-describedby="category-error"
                 />
-                {formErrors.category && (
+                {/* Remove category error display */}
+                {/* {formErrors.category && (
                   <p id="category-error" className="mt-1 text-sm text-red-600">
                     {formErrors.category}
                   </p>
-                )}
+                )} */}
               </div>
 
               <div>
@@ -1295,14 +1304,14 @@ const EditArticle: React.FC = () => {
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Comments</h3>
           {/* Render comments if available, else show placeholder */}
-          {selectedArticle?.comments && selectedArticle.comments.length > 0 ? (
+          {comments && comments.length > 0 ? (
             <div className="grid gap-4">
-              {selectedArticle.comments.map((comment: any, idx: number) => (
+              {comments.map((comment: any, idx: number) => (
                 <div key={idx} className="border rounded-lg p-4">
                   <div className="font-semibold text-gray-800 mb-1">
                     {comment.user?.name || "Anonymous"}
                   </div>
-                  <div className="text-gray-700 text-sm">{comment.text}</div>
+                  <div className="text-gray-700 text-sm">{comment.comment}</div>
                   <div className="text-xs text-gray-400 mt-2">
                     {comment.created_at}
                   </div>

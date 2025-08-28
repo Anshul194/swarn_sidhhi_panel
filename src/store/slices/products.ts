@@ -17,6 +17,7 @@ interface ProductsState {
   previous: string | null;
   loading: boolean;
   error: string | null;
+  productDetail?: Product | null; // Add productDetail for single product view/edit
 }
 
 const initialState: ProductsState = {
@@ -26,6 +27,7 @@ const initialState: ProductsState = {
   previous: null,
   loading: false,
   error: null,
+  productDetail: null, // Initialize productDetail
 };
 
 export const fetchProducts = createAsyncThunk(
@@ -43,6 +45,8 @@ export const fetchProducts = createAsyncThunk(
           },
         }
       );
+      console.log("Fetched products:", response.data);
+
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
@@ -128,7 +132,12 @@ export const updateProductDetail = createAsyncThunk(
 const productsSlice = createSlice({
   name: 'products',
   initialState,
-  reducers: {},
+  reducers: {
+    // Optionally, add a resetProductDetail reducer
+    resetProductDetail(state) {
+      state.productDetail = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProducts.pending, (state) => {
@@ -162,14 +171,16 @@ const productsSlice = createSlice({
       .addCase(fetchProductDetail.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.productDetail = null;
       })
       .addCase(fetchProductDetail.fulfilled, (state, action) => {
         state.loading = false;
-        // Handle product detail data, maybe store in a separate state slice
+        state.productDetail = action.payload; // Store fetched product detail
       })
       .addCase(fetchProductDetail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+        state.productDetail = null;
       })
       .addCase(updateProductDetail.pending, (state) => {
         state.loading = true;
@@ -177,7 +188,12 @@ const productsSlice = createSlice({
       })
       .addCase(updateProductDetail.fulfilled, (state, action) => {
         state.loading = false;
-        // Handle updated product detail, maybe update in the results array
+        state.productDetail = action.payload; // Update productDetail with new data
+        // Optionally update results array if needed
+        const idx = state.results.findIndex(p => p.id === action.payload.id);
+        if (idx !== -1) {
+          state.results[idx] = action.payload;
+        }
       })
       .addCase(updateProductDetail.rejected, (state, action) => {
         state.loading = false;
@@ -186,4 +202,5 @@ const productsSlice = createSlice({
   },
 });
 
+export const { resetProductDetail } = productsSlice.actions;
 export default productsSlice.reducer;
