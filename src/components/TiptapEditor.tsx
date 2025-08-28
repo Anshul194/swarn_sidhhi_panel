@@ -3,7 +3,6 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
-import Heading from "@tiptap/extension-heading";
 import Blockquote from "@tiptap/extension-blockquote";
 import CodeBlock from "@tiptap/extension-code-block";
 import BulletList from "@tiptap/extension-bullet-list";
@@ -35,19 +34,21 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
   height = "400px",
 }) => {
   const [, setSelectionUpdate] = React.useState(0);
+
   const editor = useEditor({
     extensions: [
-      Heading.configure({ levels: [1, 2, 3] }),
-      StarterKit,
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3], // only h1, h2, h3
+        },
+      }),
       Underline,
       Link,
       Blockquote,
       CodeBlock,
       BulletList,
       OrderedList,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     content: value,
     onUpdate: ({ editor }) => {
@@ -69,17 +70,18 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-4 p-2 bg-gray-100 rounded-lg">
+        {/* Bold */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleBold().run()}
           className={
-            editor?.isActive("bold")
-              ? "bg-blue-200 px-2 py-1 rounded"
-              : "px-2 py-1"
+            editor?.isActive("bold") ? "bg-blue-200 px-2 py-1 rounded" : "px-2 py-1"
           }
         >
           <Bold strokeWidth={3} className="h-5 w-5" />
         </button>
+
+        {/* Italic */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleItalic().run()}
@@ -91,6 +93,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           <Italic className="h-5 w-5" />
         </button>
+
+        {/* Underline */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleUnderline().run()}
@@ -102,6 +106,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           <UnderlineIcon className="h-5 w-5" />
         </button>
+
+        {/* Heading dropdown */}
         <div className="relative inline-block">
           <select
             className="px-2 py-1 rounded border border-gray-300 bg-white focus:outline-none"
@@ -116,13 +122,12 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (value === "h1")
-                editor?.chain().focus().toggleHeading({ level: 1 }).run();
-              else if (value === "h2")
-                editor?.chain().focus().toggleHeading({ level: 2 }).run();
-              else if (value === "h3")
-                editor?.chain().focus().toggleHeading({ level: 3 }).run();
-              else editor?.chain().focus().setParagraph().run();
+              editor?.chain().focus().run(({ commands }) => {
+                if (value === "h1") commands.setHeading({ level: 1 });
+                else if (value === "h2") commands.setHeading({ level: 2 });
+                else if (value === "h3") commands.setHeading({ level: 3 });
+                else commands.setParagraph();
+              });
             }}
           >
             <option value="paragraph">H</option>
@@ -131,6 +136,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             <option value="h3">H3</option>
           </select>
         </div>
+
+        {/* Lists */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleBulletList().run()}
@@ -142,6 +149,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           <List className="h-5 w-5" />
         </button>
+
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleOrderedList().run()}
@@ -153,6 +161,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           <ListOrdered className="h-5 w-5" />
         </button>
+
+        {/* Blockquote */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleBlockquote().run()}
@@ -164,6 +174,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           ❝ Quote
         </button>
+
+        {/* CodeBlock */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
@@ -175,6 +187,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           <CodeXml className="h-5 w-5" />
         </button>
+
+        {/* Link */}
         <button
           type="button"
           onClick={() => {
@@ -185,6 +199,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           <Link2 className="h-5 w-5" />
         </button>
+
+        {/* Text alignment */}
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign("left").run()}
@@ -196,6 +212,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           <AlignLeft className="h-5 w-5" />
         </button>
+
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign("center").run()}
@@ -207,6 +224,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           <AlignCenter className="h-5 w-5" />
         </button>
+
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign("right").run()}
@@ -218,6 +236,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         >
           <AlignRight className="h-5 w-5" />
         </button>
+
         <button
           type="button"
           onClick={() => editor?.chain().focus().setTextAlign("justify").run()}
@@ -230,6 +249,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
           <AlignJustify className="h-5 w-5" />
         </button>
       </div>
+
+      {/* Editor Content */}
       <div
         className="border border-gray-300 rounded mb-4"
         style={{ height, overflowY: "scroll" }}

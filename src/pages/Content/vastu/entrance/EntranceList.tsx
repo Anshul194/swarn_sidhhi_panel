@@ -48,7 +48,7 @@ const EntranceList: React.FC = () => {
                 navigate("/vastu/entrance/details", { state: { entranceId: choice.toLowerCase() } })
               }
             >
-              <span className="text-base font-medium text-gray-900">{choice.toLowerCase()}</span>
+              <span className="text-base font-medium text-gray-900">{choice}</span>
             </li>
           ))}
         </ul>
