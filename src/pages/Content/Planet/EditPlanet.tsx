@@ -120,6 +120,13 @@ const EditPlanet: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      {/* Back Button */}
+      <button
+        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
+        onClick={() => navigate(-1)}
+      >
+        &larr; Back
+      </button>
       {loading && <div className="text-blue-600">Loading...</div>}
       {error && <div className="text-red-600">{error}</div>}
       <h2 className="text-2xl font-bold mb-8 text-center">

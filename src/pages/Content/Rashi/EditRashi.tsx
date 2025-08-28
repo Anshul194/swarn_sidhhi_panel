@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import TiptapEditor from "../../../components/TiptapEditor";
 import { Pencil } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import {
   fetchRashiDetails,
@@ -11,6 +11,7 @@ import { toastConfig } from "../../../utils/toastConfig";
 
 const EditRashi: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const rashiName = location.state?.rashiName || "Aries";
   const dispatch = useAppDispatch();
   const {
@@ -104,13 +105,28 @@ const EditRashi: React.FC = () => {
     closeModal();
   };
 
-  const handleUpdateRashi = () => {
+  const handleUpdateRashi = async () => {
     if (!localRashi) return;
-    dispatch(updateRashiDetails({ name: rashiName, payload: localRashi }));
+    const result = await dispatch(
+      updateRashiDetails({ name: rashiName, payload: localRashi })
+    );
+    if (updateRashiDetails.fulfilled.match(result)) {
+      localStorage.setItem(
+        "rashiData_" + rashiName,
+        JSON.stringify(localRashi)
+      );
+    }
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      {/* Back Button */}
+      <button
+        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
+        onClick={() => navigate(-1)}
+      >
+        &larr; Back
+      </button>
       {loading && <div className="text-blue-600">Loading...</div>}
       {error && <div className="text-red-600">{error}</div>}
       {rashiData && (

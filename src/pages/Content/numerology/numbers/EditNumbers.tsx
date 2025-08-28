@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import TiptapEditor from "../../../../components/TiptapEditor";
 import { Pencil } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -17,6 +17,7 @@ import { toast } from "react-hot-toast";
 const EditNumbers = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   const numberId = location.state?.numberId || 1;
   const { data, loading, error } = useSelector(
     (state: any) => state.numerologyNumbers
@@ -112,6 +113,13 @@ const EditNumbers = () => {
 
   return (
     <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-8 py-8 xl:px-10 xl:py-12 mx-auto">
+      {/* Back Button */}
+      <button
+        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
+        onClick={() => navigate(-1)}
+      >
+        &larr; Back
+      </button>
       <h1 className="text-2xl font-bold text-center mb-8">
         Number: {numberId}
       </h1>
@@ -532,7 +540,7 @@ const EditNumbers = () => {
       {/* Update Number Button */}
       <div className="mt-8 text-right">
         <button
-          className="py-2 px-6 bg-green-600 text-white rounded hover:bg-green-700 font-semibold"
+          className="py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
           onClick={async () => {
             if (!numberId) return;
             const result = await dispatch(
