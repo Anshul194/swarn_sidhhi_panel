@@ -251,7 +251,7 @@ const ProductDetails: React.FC = () => {
           className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to Products</span>
+          <span>Back to</span>
         </button>
         
         <div className="flex items-center space-x-4">
@@ -287,9 +287,9 @@ const ProductDetails: React.FC = () => {
             </div>
           )}
           
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          {/* <div className="text-sm text-gray-500 dark:text-gray-400">
             Product ID: {productId}
-          </div>
+          </div> */}
         </div>
       </div>
 

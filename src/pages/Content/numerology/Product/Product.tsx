@@ -148,7 +148,7 @@ const Product: React.FC = () => {
       
       {/* Row 1: Title */}
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90 mb-6">
-        Products Catalog
+        Products 
       </h1>
 
       {/* Row 2: Create button + View toggle */}
