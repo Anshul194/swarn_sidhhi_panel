@@ -94,7 +94,16 @@ const PersonalDetails = () => {
   };
 
   return (
-    <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-4 py-8 xl:px-10 xl:py-12 mx-auto">
+    <div className="min-h-screen max-w-[1182.2px]  rounded-2xl border border-gray-200 bg-white px-4 py-8 xl:px-10 xl:py-12 mx-auto">
+      {/* Back Button */}
+      <button
+        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
+        onClick={() => navigate(-1)}
+      >
+        &larr; Back
+      </button>
+
+      {/* Page Title */}
       <h1 className="text-2xl font-bold text-center mb-6">
         Personal Year Details
       </h1>
@@ -116,7 +125,8 @@ const PersonalDetails = () => {
                     return (
                       <React.Fragment key={num}>
                         <div className="flex flex-col gap-6">
-                          <div className="border rounded-lg p-4 shadow-sm bg-white w-2xs h-56">
+                          {/* Prediction EN Card */}
+                          <div className="border rounded-lg p-4 shadow-sm bg-white w-[450px] h-56">
                             <div className="flex justify-between items-center mb-2">
                               <span className="font-semibold">
                                 Number {num}: Prediction En
@@ -145,7 +155,8 @@ const PersonalDetails = () => {
                               />
                             </div>
                           </div>
-                          <div className="border rounded-lg p-4 shadow-sm bg-white w-2xs h-56">
+                          {/* Prediction HI Card */}
+                          <div className="border rounded-lg p-4 shadow-sm bg-white w-[450px] h-56">
                             <div className="flex justify-between items-center mb-2">
                               <span className="font-semibold">
                                 Number {num}: Prediction Hi
