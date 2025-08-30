@@ -268,7 +268,7 @@ const ProductDetails: React.FC = () => {
               <button
                 onClick={handleUpdate}
                 disabled={updating}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
               >
                 {updating ? (
                   <RefreshCw className="h-4 w-4 animate-spin" />
