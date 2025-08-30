@@ -1,3 +1,5 @@
+import { fetchArticles } from "../../store/slices/content";
+import { List, LayoutGrid } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,16 +16,17 @@ import TiptapEditor from "../../components/TiptapEditor";
 // Helper to sanitize HTML content (optional - for security)
 const sanitizeHTML = (str: string) => {
   // Basic sanitization - you might want to use a library like DOMPurify for production
-  return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
 };
 
 // Helper to check if content is empty (ignoring HTML tags)
 const isContentEmpty = (str: string) => {
-  const textContent = str.replace(/<[^>]+>/g, '').trim();
-  return !textContent || textContent === '';
+  const textContent = str.replace(/<[^>]+>/g, "").trim();
+  return !textContent || textContent === "";
 };
 
 const AdvanceDetails = () => {
+  // ...existing code...
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,6 +54,21 @@ const AdvanceDetails = () => {
     remedy_en: "<p></p>",
     remedy_hi: "<p></p>",
   });
+
+  // Articles Suggestions UI
+  const [articleView, setArticleView] = useState<"grid" | "list">("grid");
+  const articles = useSelector((state: RootState) => state.content.articles);
+  const articlesLoading = useSelector(
+    (state: RootState) => state.content.loading
+  );
+  const articlesError = useSelector((state: RootState) => state.content.error);
+
+  useEffect(() => {
+    // Fetch articles for suggestions
+    const token = localStorage.getItem("token") || "";
+    const baseUrl = import.meta.env.VITE_BASE_URL || "";
+    dispatch(fetchArticles({ token, baseUrl }));
+  }, [dispatch]);
 
   // --- Fetch data ---
   useEffect(() => {
@@ -117,17 +135,17 @@ const AdvanceDetails = () => {
     if (isContentEmpty(content)) {
       return <span className="text-gray-400 italic">No content available</span>;
     }
-    
+
     return (
-      <div 
+      <div
         className="prose prose-sm max-w-none text-gray-700"
-        dangerouslySetInnerHTML={{ 
-          __html: sanitizeHTML(content) 
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHTML(content),
         }}
         style={{
           // Custom styles for better rendering
-          lineHeight: '1.6',
-          fontSize: '14px'
+          lineHeight: "1.6",
+          fontSize: "14px",
         }}
       />
     );
@@ -180,7 +198,9 @@ const AdvanceDetails = () => {
         {questions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <div className="text-lg mb-2">No questions found</div>
-            <div className="text-sm">Click "Add Question" to create your first question</div>
+            <div className="text-sm">
+              Click "Add Question" to create your first question
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -191,18 +211,21 @@ const AdvanceDetails = () => {
               >
                 {/* English Question (default view) */}
                 <div className="text-gray-700 text-sm whitespace-pre-wrap break-words group-hover:hidden">
-                  <span className="font-semibold text-black-600">{index + 1}.</span>{" "}
+                  <span className="font-semibold text-black-600">
+                    {index + 1}.
+                  </span>{" "}
                   {question.question_en || "-"}
                 </div>
-                
+
                 {/* Hindi Question (hover view) */}
                 <div className="text-gray-700 text-sm whitespace-pre-wrap break-words hidden group-hover:block">
-                  <span className="font-semibold text-black-600">{index + 1}.</span>{" "}
+                  <span className="font-semibold text-black-600">
+                    {index + 1}.
+                  </span>{" "}
                   {question.question_hi || "-"}
                 </div>
-                
+
                 {/* Language indicator */}
-               
               </div>
             ))}
           </div>
@@ -212,43 +235,45 @@ const AdvanceDetails = () => {
       {/* Analysis Section */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-5">Analysis </h2>
-        
+
         {/* Symptoms Row */}
-<div className="mb-6">
-  <h3 className="text-lg font-medium mb-3 text-gray-800">Symptoms</h3>
+        <div className="mb-6">
+          <h3 className="text-lg font-medium mb-3 text-gray-800">Symptoms</h3>
 
-  <div className="flex gap-6">
-    {/* Symptoms English */}
-    <div className="flex-1 border border-gray-200 p-4 rounded-lg relative hover:shadow-sm transition-shadow">
-      <button
-        onClick={() => openModal("symptoms_en", analysisData.symptoms_en)}
-        className="absolute top-2 right-2 text-blue-600 hover:text-blue-800 transition-colors"
-        title="Edit Symptoms (English)"
-      >
-        <Pencil className="h-4 w-4" />
-      </button>
-      <div className="p-2">
-        <HTMLContent content={analysisData.symptoms_en} />
-      </div>
-    </div>
+          <div className="flex gap-6">
+            {/* Symptoms English */}
+            <div className="flex-1 border border-gray-200 p-4 rounded-lg relative hover:shadow-sm transition-shadow">
+              <button
+                onClick={() =>
+                  openModal("symptoms_en", analysisData.symptoms_en)
+                }
+                className="absolute top-2 right-2 text-blue-600 hover:text-blue-800 transition-colors"
+                title="Edit Symptoms (English)"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+              <div className="p-2">
+                <HTMLContent content={analysisData.symptoms_en} />
+              </div>
+            </div>
 
-    {/* Symptoms Hindi */}
-    <div className="flex-1 border border-gray-200 p-4 rounded-lg relative hover:shadow-sm transition-shadow">
-      <button
-        onClick={() => openModal("symptoms_hi", analysisData.symptoms_hi)}
-        className="absolute top-2 right-2 text-blue-600 hover:text-blue-800 transition-colors"
-        title="Edit Symptoms (Hindi)"
-      >
-        <Pencil className="h-4 w-4" />
-      </button>
-      <div className="p-2">
-        <HTMLContent content={analysisData.symptoms_hi} />
-      </div>
-    </div>
-  </div>
-</div>
-
-
+            {/* Symptoms Hindi */}
+            <div className="flex-1 border border-gray-200 p-4 rounded-lg relative hover:shadow-sm transition-shadow">
+              <button
+                onClick={() =>
+                  openModal("symptoms_hi", analysisData.symptoms_hi)
+                }
+                className="absolute top-2 right-2 text-blue-600 hover:text-blue-800 transition-colors"
+                title="Edit Symptoms (Hindi)"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+              <div className="p-2">
+                <HTMLContent content={analysisData.symptoms_hi} />
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Remedies Row */}
         <div className="mb-6">
@@ -291,6 +316,119 @@ const AdvanceDetails = () => {
         </div>
       </div>
 
+      {/* Articles Suggestions Section */}
+      <div className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Articles Suggestions</h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setArticleView("list")}
+              className={`p-2 rounded border ${
+                articleView === "list" ? "bg-gray-200" : "bg-white"
+              } hover:bg-gray-100`}
+              title="List View"
+            >
+              <List className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setArticleView("grid")}
+              className={`p-2 rounded border ${
+                articleView === "grid" ? "bg-gray-200" : "bg-white"
+              } hover:bg-gray-100`}
+              title="Grid View"
+            >
+              <LayoutGrid className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+        {articlesLoading ? (
+          <div className="text-center py-8 text-gray-500">
+            Loading articles...
+          </div>
+        ) : articlesError ? (
+          <div className="text-center py-8 text-red-500">{articlesError}</div>
+        ) : articleView === "grid" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {articles.slice(0, 4).map((article) => (
+              <div
+                key={article.id}
+                className="border rounded-lg p-3 flex flex-col h-60 bg-white"
+              >
+                <div className="bg-black h-[120px] overflow-hidden w-full rounded mb-3 flex items-center justify-center">
+                  <img
+                    src={article.thumbnail || ""}
+                    alt={article.id || "Title"}
+                    className="w-full h-full max-h-[120px] object-cover rounded"
+                  />
+                </div>
+                <div className="font-bold mb-1 break-words max-h-12 overflow-hidden text-base">
+                  {article.title_en || "Title"}
+                </div>
+                <div
+                  className="text-sm text-gray-700 break-words"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    minHeight: "3.6em",
+                  }}
+                >
+                  {article.content_en || "Content"}
+                </div>
+              </div>
+            ))}
+            {/* Add Card */}
+            <div
+              className="border-dashed border-2 border-gray-400 rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer h-full min-h-[120px]"
+              onClick={() => navigate("/content/add")}
+            >
+              <Plus className="h-6 w-6 mb-2" />
+              <span className="font-semibold">Add</span>
+              <span className="text-xs text-gray-500">
+                Select more articles
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {articles.slice(0, 4).map((article) => (
+              <div
+                key={article.id}
+                className="border rounded-lg p-4 flex flex-row gap-4 items-start min-h-[80px]"
+              >
+                <div className="bg-black w-24 h-16 overflow-hidden rounded flex items-center justify-center">
+                  <img
+                    src={article.thumbnail || ""}
+                    alt={article.id || "Title"}
+                    className="w-24 h-16 object-cover rounded block"
+                  />
+                </div>
+                <div className="flex-1 flex flex-col justify-center min-w-0">
+                  <div className="font-bold mb-1 break-words text-base">
+                    {article.title_en || "Title"}
+                  </div>
+                  <div className="text-sm text-gray-700  break-words h-10 overflow-y-hidden">
+                    {article.content_en || "Content"}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {/* Add Card */}
+            <div
+              className="border-dashed border-2 border-gray-400 rounded-lg p-4 flex flex-row items-center justify-center cursor-pointer min-h-[80px]"
+              onClick={() => navigate("/content/add")}
+            >
+              <Plus className="h-6 w-6 mr-2" />
+              <span className="font-semibold">Add</span>
+              <span className="text-xs text-gray-500 ml-2">
+                Select more articles
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Update Button */}
       <div className="flex justify-end mt-8">
         <button
@@ -319,11 +457,14 @@ const AdvanceDetails = () => {
             >
               <X className="h-6 w-6" />
             </button>
-            
+
             <h3 className="text-xl font-bold mb-4 pr-8">
-              Edit {modalField.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+              Edit{" "}
+              {modalField
+                .replace(/_/g, " ")
+                .replace(/\b\w/g, (l) => l.toUpperCase())}
             </h3>
-            
+
             <div className="mb-6">
               <TiptapEditor
                 value={modalValue}
@@ -331,7 +472,7 @@ const AdvanceDetails = () => {
                 height="400px"
               />
             </div>
-            
+
             <div className="flex justify-end gap-3 pt-4 border-t">
               <button
                 className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
@@ -360,7 +501,7 @@ const AdvanceDetails = () => {
             >
               <X className="h-6 w-6" />
             </button>
-            
+
             <h3 className="text-xl font-bold mb-6 pr-8">Add New Question</h3>
 
             <div className="space-y-4">

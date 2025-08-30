@@ -136,20 +136,21 @@ export const updateArticle = createAsyncThunk<
         token: string;
         baseUrl: string;
         articleId: number | string;
-        formData: FormData;
+        payload: Record<string, any>;
     },
     { rejectValue: string }
 >(
     'content/updateArticle',
-    async ({ articleId, formData }, { rejectWithValue }) => {
+    async ({  articleId, payload }, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.put(
+            const response = await axiosInstance.patch(
                 `/articles/${articleId}/`,
-                formData,
+                payload,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
+                        'Content-Type': 'application/json',
                         Accept: 'application/json',
+                        
                     },
                 }
             );

@@ -37,6 +37,8 @@ import {
 import { fetchTags } from "../../store/slices/tag";
 
 const EditArticle: React.FC = () => {
+  // Toggle for comments section
+  const [showComments, setShowComments] = useState(true);
   // Content Hi Edit Modal state
   const [showContentHiEditModal, setShowContentHiEditModal] = useState(false);
   const [modalContentHiValue, setModalContentHiValue] = useState("");
@@ -1172,13 +1174,14 @@ const EditArticle: React.FC = () => {
                     value={
                       tags.length > 0
                         ? tags
-                            .map(
-                              (id) =>
-                                fetchedTags?.find(
-                                  (t: { id: string | number; name: string }) =>
-                                    String(t.id) === String(id)
-                                )?.name || id
-                            )
+                            .map((id) => {
+                              const tagObj = fetchedTags?.find(
+                                (t: { id: string | number; name: string }) =>
+                                  String(t.id) === String(id)
+                              );
+                              // If tagObj exists, show its name, else show custom tag string
+                              return tagObj ? tagObj.name : id;
+                            })
                             .join(", ")
                         : ""
                     }
@@ -1304,27 +1307,38 @@ const EditArticle: React.FC = () => {
           </div>
         </div>
 
-        {/* Comments Section */}
+        {/* Comments Section Toggle */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4">Comments</h3>
-          {/* Render comments if available, else show placeholder */}
-          {comments && comments.length > 0 ? (
-            <div className="grid gap-4">
-              {comments.map((comment: any, idx: number) => (
-                <div key={idx} className="border rounded-lg p-4">
-                  <div className="font-semibold text-gray-800 mb-1">
-                    {comment.user?.name || "Anonymous"}
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Comments</h3>
+            <button
+              type="button"
+              className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-sm font-medium"
+              onClick={() => setShowComments((prev) => !prev)}
+            >
+              {showComments ? "Hide" : "Show"} Comments
+            </button>
+          </div>
+          {showComments &&
+            (comments && comments.length > 0 ? (
+              <div className="grid gap-4">
+                {comments.map((comment: any, idx: number) => (
+                  <div key={idx} className="border rounded-lg p-4">
+                    <div className="font-semibold text-gray-800 mb-1">
+                      {comment.user?.name || "Anonymous"}
+                    </div>
+                    <div className="text-gray-700 text-sm">
+                      {comment.comment}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-2">
+                      {comment.created_at}
+                    </div>
                   </div>
-                  <div className="text-gray-700 text-sm">{comment.comment}</div>
-                  <div className="text-xs text-gray-400 mt-2">
-                    {comment.created_at}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-gray-500">No comments yet.</div>
-          )}
+                ))}
+              </div>
+            ) : (
+              <div className="text-gray-500">No comments yet.</div>
+            ))}
         </div>
         <div className="flex flex-col md:flex-row gap-4">
           <button
