@@ -639,9 +639,15 @@ const EditArticle: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+      <button
+        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm"
+        onClick={() => navigate(-1)}
+      >
+        &larr; Back
+      </button>
+      <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center justify-center gap-2">
         <Edit3 className="h-8 w-8" />
-        Edit Article - Markdown Editor
+        Edit Article
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -662,7 +668,7 @@ const EditArticle: React.FC = () => {
                 className="mt-1 block w-full p-2 border border-gray-300 bg-gray-100 rounded-md text-sm"
               />
             </div>
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700">
                 View Count
               </label>
@@ -683,7 +689,7 @@ const EditArticle: React.FC = () => {
                 readOnly
                 className="mt-1 block w-full p-2 border border-gray-300 bg-gray-100 rounded-md text-sm"
               />
-            </div>
+            </div> */}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div>
@@ -716,7 +722,7 @@ const EditArticle: React.FC = () => {
         </div>
 
         {/* Language Control Only */}
-        <div className="flex flex-wrap gap-4 mb-6 p-4 bg-blue-50 rounded-lg">
+        {/* <div className="flex flex-wrap gap-4 mb-6 p-4 bg-blue-50 rounded-lg">
           <div className="flex items-center gap-2">
             <Languages className="h-5 w-5 text-blue-600" />
             <label className="text-sm font-medium text-gray-700">
@@ -731,7 +737,7 @@ const EditArticle: React.FC = () => {
               <option value="hi">Hindi</option>
             </select>
           </div>
-        </div>
+        </div> */}
 
         {/* Markdown Toolbar
         {!previewMode && (
