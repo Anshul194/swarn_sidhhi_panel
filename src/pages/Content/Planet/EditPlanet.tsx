@@ -256,7 +256,7 @@ const EditPlanet: React.FC = () => {
           </div>
         </div>
       ))}
-      <div className="flex justify-center mt-8">
+      <div className="flex justify-end  mt-8">
         <button
           className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 shadow"
           onClick={handleUpdate}

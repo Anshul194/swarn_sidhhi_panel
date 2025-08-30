@@ -64,6 +64,10 @@ import RemediesList from "./pages/Remedies/RemediesList";
 import RemediesDetails from "./pages/Remedies/RemediesDetails";
 import AdvancedList from "./pages/Advanced/AdvancedList";
 import AdvanceDetails from "./pages/Advanced/AdvanceDetails";
+import Product from "./pages/Content/numerology/Product/Product";
+import ProductDetails from "./pages/Content/numerology/Product/ProductDetails"; // <-- Add this import
+import ProductAdd from "./pages/Content/numerology/Product/ProductAdd";
+import ProductEdit from "./pages/Content/numerology/Product/ProductEdit";
 
 // Lazy load pages
 const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));
@@ -232,6 +236,23 @@ export default function App() {
               <Route path="/vastu/entrance/list" element={<EntranceList />} />
               <Route path="/vastu/entrance/details" element={<EntranceDetails />} />
               {/* <Route path="/vastu/entrance/edit" element={<EditEntrance />} /> */}
+
+              <Route
+                path="/products/add"
+                element={<ProductAdd />}
+              />
+              <Route
+                path="/products/list"
+                element={<Product />}
+              />
+              <Route
+                path="/products/details"
+                element={<ProductDetails />}
+              />
+             {/* <Route
+                path="/products/edit"
+                element={<ProductEdit />}
+              />  */}
               <Route
                 path="/numerology/personality/add"
                 element={<AddPersonality />}

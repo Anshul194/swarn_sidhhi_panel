@@ -5,17 +5,30 @@ interface Article {
     title: string;
 }
 
+interface Comment {
+    id: number;
+    user: {
+        id: number;
+        name: string;
+        profile_photo: string;
+    };
+    comment: string;
+    created_at: string;
+}
+
 interface ContentState {
     articles: Article[];
     loading: boolean;
     error: string | null;
     selectedArticle?: Article | null;
+    comments?: Comment[];
 }
 const initialState: ContentState = {
     articles: [],
     loading: false,
     error: null,
     selectedArticle: null,
+    comments: [],
 };
 
 
@@ -177,6 +190,32 @@ export const createArticle = createAsyncThunk<
     }
 );
 
+export const fetchArticleComments = createAsyncThunk<
+    { comments: Comment[] },
+    { token: string; baseUrl: string; articleId: number | string },
+    { rejectValue: string }
+>(
+    'content/fetchArticleComments',
+    async ({ token, articleId }, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.get(
+                `/articles/${articleId}/comments/`,
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            const data = response.data;
+            const comments = data?.results || [];
+            return { comments };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch comments');
+        }
+    }
+);
+
 const contentSlice = createSlice({
     name: 'content',
     initialState,
@@ -242,6 +281,18 @@ const contentSlice = createSlice({
                 );
             })
             .addCase(deleteArticle.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || 'Unknown error';
+            })
+            .addCase(fetchArticleComments.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchArticleComments.fulfilled, (state, action) => {
+                state.loading = false;
+                state.comments = action.payload.comments;
+            })
+            .addCase(fetchArticleComments.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || 'Unknown error';
             });
